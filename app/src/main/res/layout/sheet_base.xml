@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The header (handle and title row) is the only part a sheet can be dragged by, see UpSheet.
+    Everything inside the scroll view belongs to the content, so scrolling or swiping there
+    never closes the sheet. The footer below it stays in place while the content scrolls and is
+    only shown when a sheet sets one.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/sheet_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/sheet_handle"
+            android:layout_width="36dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/space_3"
+            android:background="@drawable/handle_background" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="60dp"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/space_5"
+            android:paddingEnd="@dimen/space_3">
+
+            <TextView
+                android:id="@+id/sheet_title"
+                style="@style/TextAppearance.Up.Title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="@dimen/space_3"
+                android:paddingBottom="@dimen/space_3" />
+
+            <de.mcmodersd.unipensum.ui.widget.UpIconButton
+                android:id="@+id/sheet_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Takes the space a sheet with a minimum height leaves over, and shrinks when the content is too tall. -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="never">
+
+        <FrameLayout
+            android:id="@+id/sheet_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/space_4"
+            android:paddingEnd="@dimen/space_4"
+            android:paddingBottom="@dimen/space_4" />
+    </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/sheet_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/space_4"
+        android:paddingTop="@dimen/space_2"
+        android:paddingEnd="@dimen/space_4"
+        android:paddingBottom="@dimen/space_4"
+        android:visibility="gone" />
+</LinearLayout>

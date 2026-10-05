@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    tools:ignore="Overdraw"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical">
+
+    <include layout="@layout/view_top_bar" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space_4">
+
+            <TextView
+                style="@style/TextAppearance.Up.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_appearance" />
+
+            <de.mcmodersd.unipensum.ui.widget.UpSegmentedControl
+                android:id="@+id/theme_control"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/TextAppearance.Up.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_5"
+                android:text="@string/settings_language" />
+
+            <de.mcmodersd.unipensum.ui.widget.UpSegmentedControl
+                android:id="@+id/language_control"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/TextAppearance.Up.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_5"
+                android:text="@string/settings_hours" />
+
+            <TextView
+                style="@style/TextAppearance.Up.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_2"
+                android:paddingHorizontal="@dimen/space_1"
+                android:text="@string/hours_start" />
+
+            <de.mcmodersd.unipensum.ui.widget.UpStepper
+                android:id="@+id/hours_start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/TextAppearance.Up.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_3"
+                android:layout_marginBottom="@dimen/space_2"
+                android:paddingHorizontal="@dimen/space_1"
+                android:text="@string/hours_end" />
+
+            <de.mcmodersd.unipensum.ui.widget.UpStepper
+                android:id="@+id/hours_end"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/TextAppearance.Up.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_5"
+                android:text="@string/settings_lecturers" />
+
+            <TextView
+                style="@style/TextAppearance.Up.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_2"
+                android:paddingHorizontal="@dimen/space_1"
+                android:text="@string/settings_lecturer_name" />
+
+            <de.mcmodersd.unipensum.ui.widget.UpSegmentedControl
+                android:id="@+id/lecturer_name_control"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <de.mcmodersd.unipensum.ui.widget.UpRow
+                android:id="@+id/manage_lecturers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_2"
+                app:upChevron="true"
+                app:upTitle="@string/settings_manage_lecturers" />
+
+            <TextView
+                style="@style/TextAppearance.Up.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_5"
+                android:text="@string/semesters_title" />
+
+            <de.mcmodersd.unipensum.ui.widget.UpRow
+                android:id="@+id/manage_semesters"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:upChevron="true"
+                app:upTitle="@string/settings_manage_semesters" />
+
+            <TextView
+                style="@style/TextAppearance.Up.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_5"
+                android:text="@string/settings_data" />
+
+            <de.mcmodersd.unipensum.ui.widget.UpRow
+                android:id="@+id/export_backup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:upChevron="true"
+                app:upSubtitle="@string/backup_export_summary"
+                app:upTitle="@string/backup_export" />
+
+            <de.mcmodersd.unipensum.ui.widget.UpRow
+                android:id="@+id/import_backup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_2"
+                app:upChevron="true"
+                app:upSubtitle="@string/backup_import_summary"
+                app:upTitle="@string/backup_import" />
+
+            <TextView
+                style="@style/TextAppearance.Up.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_5"
+                android:text="@string/settings_about" />
+
+            <de.mcmodersd.unipensum.ui.widget.UpRow
+                android:id="@+id/about"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:upChevron="true"
+                app:upSubtitle="@string/about_open_source"
+                app:upTitle="@string/app_name" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

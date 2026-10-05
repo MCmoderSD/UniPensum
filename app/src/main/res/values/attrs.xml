@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="UpButton">
+        <attr name="upVariant" format="enum">
+            <enum name="primary" value="0" />
+            <enum name="secondary" value="1" />
+            <enum name="destructive" value="2" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="UpTextField">
+        <attr name="upLabel" format="reference|string" />
+        <attr name="upHint" format="reference|string" />
+    </declare-styleable>
+
+    <declare-styleable name="UpRow">
+        <attr name="upTitle" format="reference|string" />
+        <attr name="upSubtitle" format="reference|string" />
+        <attr name="upValue" format="reference|string" />
+        <attr name="upChevron" format="boolean" />
+    </declare-styleable>
+</resources>

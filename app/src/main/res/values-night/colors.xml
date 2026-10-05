@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#FF000000</color>
+    <color name="sheet">#FF121214</color>
+    <color name="surface">#FF1E1E21</color>
+    <color name="divider">#FF26262A</color>
+    <color name="text_primary">#FFF5F5F6</color>
+    <color name="text_secondary">#FF8F8F98</color>
+    <color name="text_on_accent">#FF000000</color>
+    <color name="accent">#FFF5F5F6</color>
+    <color name="danger">#FFFF5A64</color>
+
+    <color name="course_red">#FFFF5A64</color>
+    <color name="course_orange">#FFFF9F43</color>
+    <color name="course_yellow">#FFFFD43B</color>
+    <color name="course_green">#FF3DD68C</color>
+    <color name="course_teal">#FF2BD4D0</color>
+    <color name="course_blue">#FF5B8DEF</color>
+    <color name="course_violet">#FFA78BFA</color>
+    <color name="course_pink">#FFF472B6</color>
+    <color name="course_graphite">#FFE6E6EA</color>
+    <color name="course_gray">#FF9A9AA3</color>
+    <color name="course_silver">#FF5E5E66</color>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing scale -->
+    <dimen name="space_1">4dp</dimen>
+    <dimen name="space_2">8dp</dimen>
+    <dimen name="space_3">12dp</dimen>
+    <dimen name="space_4">16dp</dimen>
+    <dimen name="space_5">24dp</dimen>
+    <dimen name="space_6">32dp</dimen>
+
+    <!-- Radii -->
+    <dimen name="radius_block">6dp</dimen>
+
+    <!-- Week grid. GridMetrics reads these, nothing else knows the numbers. -->
+    <dimen name="grid_gutter">44dp</dimen>
+    <dimen name="grid_min_hour_height">44dp</dimen>
+    <dimen name="grid_vertical_padding">10dp</dimen>
+    <dimen name="grid_block_inset">1dp</dimen>
+    <dimen name="grid_accent_bar">3dp</dimen>
+    <dimen name="week_header_height">56dp</dimen>
+</resources>

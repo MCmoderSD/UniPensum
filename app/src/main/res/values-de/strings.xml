@@ -1,0 +1,241 @@
+<resources>
+    <string name="app_name">UniPensum</string>
+
+    <!-- Semester names, derived from the start date. -->
+    <string name="semester_winter">WiSe %1$02d/%2$02d</string>
+    <string name="semester_summer">SoSe %1$02d</string>
+    <string name="no_semester">Kein Semester</string>
+
+    <!-- Week header -->
+    <string name="date_short_pattern">d. MMM</string>
+    <string name="week_subtitle">%1$s – %2$s · KW %3$d</string>
+
+    <!-- Empty state -->
+    <string name="empty_title">Noch kein Semester</string>
+    <string name="empty_body">Lege dein erstes Semester an, um mit der Planung zu beginnen.</string>
+    <string name="empty_action">Semester anlegen</string>
+    <string name="semester_switch_description">Semester wechseln</string>
+
+    <!-- Common actions -->
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_save">Speichern</string>
+    <string name="action_delete">Löschen</string>
+    <string name="action_edit">Bearbeiten</string>
+    <string name="action_shorten">Verkürzen</string>
+
+    <string name="action_back">Zurück</string>
+    <string name="action_done">Fertig</string>
+    <string name="stepper_decrease">Verringern</string>
+    <string name="stepper_increase">Erhöhen</string>
+    <string name="add_course_description">Fach hinzufügen</string>
+
+    <!-- Courses -->
+    <string name="course_new">Neues Fach</string>
+    <string name="course_edit">Fach bearbeiten</string>
+    <string name="course_name">Name</string>
+    <string name="course_color">Farbe</string>
+    <string name="color_red">Rot</string>
+    <string name="color_orange">Orange</string>
+    <string name="color_yellow">Gelb</string>
+    <string name="color_green">Grün</string>
+    <string name="color_teal">Petrol</string>
+    <string name="color_blue">Blau</string>
+    <string name="color_violet">Violett</string>
+    <string name="color_pink">Pink</string>
+    <string name="color_graphite">Graphit</string>
+    <string name="color_gray">Grau</string>
+    <string name="color_silver">Silber</string>
+    <string name="events_label">Veranstaltungen</string>
+    <string name="event_add">Veranstaltung hinzufügen</string>
+    <string name="event_remove">Veranstaltung entfernen</string>
+    <string name="event_new">Neue Veranstaltung</string>
+    <string name="event_edit">Veranstaltung bearbeiten</string>
+    <string name="course_error_name">Gib einen Namen ein.</string>
+    <string name="course_error_events">Füge mindestens eine Veranstaltung hinzu.</string>
+    <string name="course_error_save">Das Fach konnte nicht gespeichert werden.</string>
+    <string name="course_delete_title">Fach löschen?</string>
+    <string name="course_delete_message">Alle Veranstaltungen und Termine dieses Fachs werden gelöscht.</string>
+
+    <string name="courses_title">Fächer</string>
+    <string name="courses_description">Fächer</string>
+    <string name="courses_empty">In diesem Semester gibt es noch keine Fächer.</string>
+    <plurals name="event_count">
+        <item quantity="one">%d Veranstaltung</item>
+        <item quantity="other">%d Veranstaltungen</item>
+    </plurals>
+
+    <!-- Settings -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_description">Einstellungen</string>
+    <string name="settings_appearance">Darstellung</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
+    <string name="settings_language">Sprache</string>
+    <string name="language_system">System</string>
+    <string name="language_english">English</string>
+    <string name="language_german">Deutsch</string>
+    <string name="settings_hours">Sichtbare Stunden</string>
+    <string name="hours_start">Der Tag beginnt um</string>
+    <string name="hours_end">Der Tag endet um</string>
+    <string name="settings_manage_semesters">Semester verwalten</string>
+    <string name="settings_about">Über</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_open_source">Kostenlos und Open Source.</string>
+
+    <!-- Event form -->
+    <string name="session_edit">Termin bearbeiten</string>
+    <string name="field_type">Art</string>
+    <string name="field_weekday">Wochentag</string>
+    <string name="field_date">Datum</string>
+    <string name="field_start">Beginn</string>
+    <string name="field_end">Ende</string>
+    <string name="field_format">Format</string>
+    <string name="mode_in_person">Präsenz</string>
+    <string name="field_hybrid">Hybrid (auch online)</string>
+    <string name="field_room">Raum</string>
+    <string name="field_link">Meeting-Link</string>
+    <string name="field_lecturer">Dozent</string>
+    <string name="field_note">Notiz</string>
+    <string name="field_period">Zeitraum</string>
+    <string name="field_from">Von</string>
+    <string name="field_until">Bis</string>
+    <string name="field_repeat">Wiederholung</string>
+    <string name="repeat_weekly">Wöchentlich</string>
+    <string name="repeat_biweekly">Alle 2 Wochen</string>
+    <string name="repeat_custom">Frei</string>
+    <plurals name="repeat_every_n_weeks">
+        <item quantity="one">Jede %d Woche</item>
+        <item quantity="other">Alle %d Wochen</item>
+    </plurals>
+    <string name="error_time">Das Ende muss nach dem Beginn liegen.</string>
+    <string name="error_period_empty">„Von“ darf nicht nach „Bis“ liegen.</string>
+    <string name="error_period_outside">Der Zeitraum muss im Semester liegen (%1$s – %2$s).</string>
+    <string name="error_period_no_dates">In diesem Zeitraum liegt kein Termin.</string>
+    <string name="error_save">Speichern nicht möglich.</string>
+    <string name="warn_schedule_change">Wenn du Wochentag, Zeitraum oder Wiederholung änderst, werden die betroffenen Termine neu erzeugt. Einzelne Änderungen daran gehen verloren.</string>
+    <string name="scope_this_only">Nur dieser Termin</string>
+    <string name="scope_this_and_following">Dieser und alle folgenden Termine</string>
+    <string name="scope_all">Die ganze Serie</string>
+    <string name="scope_from">Ab %1$s</string>
+    <string name="scope_edit_title">Welche Termine bearbeiten?</string>
+    <string name="scope_delete_title">Welche Termine löschen?</string>
+    <string name="mode_hybrid">Hybrid</string>
+    <string name="action_open_meeting">Meeting öffnen</string>
+
+    <!-- Time picker -->
+    <string name="time_type">Uhrzeit eintippen</string>
+    <string name="time_use_wheels">Räder verwenden</string>
+    <string name="time_hour">Stunde</string>
+    <string name="time_minute">Minute</string>
+
+    <!-- Calendar -->
+    <string name="calendar_previous_month">Vorheriger Monat</string>
+    <string name="calendar_next_month">Nächster Monat</string>
+
+    <!-- Semesters -->
+    <string name="semesters_title">Semester</string>
+    <string name="semesters_empty">Noch keine Semester.</string>
+    <string name="semester_new">Neues Semester</string>
+    <string name="semester_edit">Semester bearbeiten</string>
+    <string name="semester_start">Beginn</string>
+    <string name="semester_end">Ende</string>
+    <string name="semester_name_label">Name (optional)</string>
+    <string name="semester_error_range">Das Ende muss nach dem Beginn liegen.</string>
+    <string name="semester_error_overlap">Überschneidet sich mit %1$s.</string>
+    <string name="semester_error_save">Das Semester konnte nicht gespeichert werden.</string>
+    <string name="semester_shorten_title">Semester verkürzen?</string>
+    <string name="semester_shorten_message">Termine außerhalb des neuen Zeitraums werden entfernt.</string>
+    <string name="semester_delete_title">Semester löschen?</string>
+    <string name="semester_delete_message">Alle Fächer und Termine darin werden gelöscht.</string>
+
+    <!-- Sessions -->
+    <string name="type_lecture">Vorlesung</string>
+    <string name="type_exercise">Übung</string>
+    <string name="type_lab">Labor</string>
+    <string name="type_tutorial">Tutorium</string>
+    <string name="mode_online">Online</string>
+
+    <!-- Backup -->
+    <string name="settings_data">Daten</string>
+    <string name="backup_export">Backup exportieren</string>
+    <string name="backup_export_summary">Alles in einer Datei sichern</string>
+    <string name="backup_import">Backup importieren</string>
+    <string name="backup_import_summary">Alles durch eine gesicherte Datei ersetzen</string>
+    <string name="action_close">Schließen</string>
+    <string name="action_continue">Weiter</string>
+
+    <string name="backup_export_title">Backup exportieren</string>
+    <string name="backup_export_description">Speichert alle Semester, Fächer, Termine und Dozenten in einer Datei. Die Einstellungen sind nicht enthalten.</string>
+    <string name="backup_protect">Mit Passwort schützen</string>
+    <string name="backup_password">Passwort</string>
+    <string name="backup_password_repeat">Passwort wiederholen</string>
+    <string name="backup_password_hint">Das Passwort wird zum Importieren gebraucht. Es lässt sich nicht wiederherstellen, wenn du es vergisst.</string>
+    <plurals name="backup_error_password_short">
+        <item quantity="one">Verwende mindestens %d Zeichen.</item>
+        <item quantity="other">Verwende mindestens %d Zeichen.</item>
+    </plurals>
+    <string name="backup_error_password_mismatch">Die Passwörter stimmen nicht überein.</string>
+    <string name="backup_action_export">Exportieren</string>
+    <string name="backup_exporting">Backup wird gespeichert…</string>
+    <string name="backup_exported">Backup gespeichert.</string>
+    <string name="backup_export_failed">Das Backup konnte nicht gespeichert werden.</string>
+    <string name="backup_export_interrupted">Der Export wurde unterbrochen. Bitte starte ihn noch einmal.</string>
+
+    <string name="backup_import_title">Backup importieren</string>
+    <string name="backup_reading">Datei wird gelesen…</string>
+    <string name="backup_importing">Wird importiert…</string>
+    <string name="backup_protected">Dieses Backup ist geschützt. Gib das Passwort ein.</string>
+    <string name="backup_created">Erstellt am %1$s</string>
+    <string name="backup_version">UniPensum %1$s</string>
+    <string name="backup_warning_older">Dieses Backup stammt aus einer älteren Version von UniPensum. Der Import sollte funktionieren, schau dir das Ergebnis aber an.</string>
+    <string name="backup_warning_newer">Dieses Backup stammt aus einer neueren Version von UniPensum. Möglicherweise wird nicht alles übernommen.</string>
+    <string name="backup_contents">Inhalt</string>
+    <string name="backup_sessions">Termine</string>
+    <plurals name="backup_skipped">
+        <item quantity="one">%d Eintrag konnte nicht importiert werden.</item>
+        <item quantity="other">%d Einträge konnten nicht importiert werden.</item>
+    </plurals>
+    <plurals name="backup_adjusted">
+        <item quantity="one">%d Wert wurde an diese Version angepasst.</item>
+        <item quantity="other">%d Werte wurden an diese Version angepasst.</item>
+    </plurals>
+    <string name="backup_replace_warning">Alle Daten in der App werden durch dieses Backup ersetzt.</string>
+    <string name="backup_action_replace">Alle Daten ersetzen</string>
+    <string name="backup_imported">Backup importiert.</string>
+    <string name="backup_import_failed">Das Backup konnte nicht importiert werden. Deine Daten wurden nicht verändert.</string>
+    <string name="backup_error_not_a_backup">Diese Datei ist kein UniPensum-Backup.</string>
+    <string name="backup_error_damaged">Die Datei ist beschädigt.</string>
+    <string name="backup_error_wrong_password">Falsches Passwort, oder die Datei wurde verändert.</string>
+    <string name="backup_error_too_large">Die Datei ist zu groß für ein Backup.</string>
+    <string name="backup_error_unsupported">Dieses Backup ist auf eine Weise geschützt, die diese Version nicht kennt. Aktualisiere UniPensum, um es zu öffnen.</string>
+    <string name="backup_error_generic">Die Datei konnte nicht gelesen werden.</string>
+
+    <!-- Moodle -->
+    <string name="field_moodle">Moodle-Link</string>
+    <string name="error_link">Das ist kein gültiger Web-Link.</string>
+    <string name="action_open_moodle">Moodle</string>
+
+    <!-- Dozenten -->
+    <string name="lecturers_title">Dozenten</string>
+    <string name="lecturer_pick_title">Dozent wählen</string>
+    <string name="lecturer_none">Keiner</string>
+    <string name="lecturers_empty">Noch keine Dozenten.</string>
+    <string name="lecturer_new">Neuer Dozent</string>
+    <string name="lecturer_edit">Dozent bearbeiten</string>
+    <string name="lecturer_first_name">Vorname</string>
+    <string name="lecturer_last_name">Nachname</string>
+    <string name="lecturer_email">E-Mail</string>
+    <string name="lecturer_phone">Telefon</string>
+    <string name="lecturer_error_last_name">Gib einen Nachnamen ein.</string>
+    <string name="lecturer_error_email">Das ist keine gültige E-Mail-Adresse.</string>
+    <string name="lecturer_error_save">Der Dozent konnte nicht gespeichert werden.</string>
+    <string name="lecturer_delete_title">Dozent löschen?</string>
+    <string name="lecturer_delete_message">Der Dozent wird aus allen Veranstaltungen und Terminen entfernt. Die Termine bleiben bestehen.</string>
+    <string name="settings_lecturers">Dozenten</string>
+    <string name="settings_lecturer_name">Name im Wochenraster und in Veranstaltungslisten</string>
+    <string name="lecturer_name_last">Nachname</string>
+    <string name="lecturer_name_full">Vor- und Nachname</string>
+    <string name="settings_manage_lecturers">Dozenten verwalten</string>
+    <string name="session_description">%1$s, %2$s, %3$s – %4$s</string>
+</resources>

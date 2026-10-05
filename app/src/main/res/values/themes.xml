@@ -1,0 +1,52 @@
+<resources>
+    <!--
+        Material is only the base for the bottom sheet mechanics (dragging, predictive back).
+        No Material widget is inflated anywhere: every control is a UniPensum widget in ui/widget,
+        and the colors below only keep Material defaults from leaking in.
+    -->
+    <style name="Theme.UniPensum" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorPrimaryVariant">@color/accent</item>
+        <item name="colorOnPrimary">@color/text_on_accent</item>
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorSecondaryVariant">@color/accent</item>
+        <item name="colorOnSecondary">@color/text_on_accent</item>
+        <item name="colorSurface">@color/sheet</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorError">@color/danger</item>
+        <item name="colorAccent">@color/accent</item>
+
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:colorBackground">@color/bg</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.Up.BottomSheetDialog</item>
+    </style>
+
+    <style name="ThemeOverlay.Up.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Up.BottomSheet</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
+    <style name="Widget.Up.BottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="backgroundTint">@color/sheet</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Up.Sheet</item>
+        <item name="shapeAppearanceOverlay">@null</item>
+        <!-- Sheets are always opened expanded; Material would square their corners off in that state. -->
+        <item name="shouldRemoveExpandedCorners">false</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Up.Sheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">28dp</item>
+        <item name="cornerSizeTopRight">28dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+</resources>
