@@ -17,6 +17,7 @@ final class GridMetrics {
     final int verticalPadding;
     final int blockInset;
     final int accentBar;
+    final int nowLine;
     final int headerHeight;
 
     GridMetrics(Context context) {
@@ -26,6 +27,7 @@ final class GridMetrics {
         verticalPadding = res.getDimensionPixelSize(R.dimen.grid_vertical_padding);
         blockInset = res.getDimensionPixelSize(R.dimen.grid_block_inset);
         accentBar = res.getDimensionPixelSize(R.dimen.grid_accent_bar);
+        nowLine = res.getDimensionPixelSize(R.dimen.grid_now_line);
         headerHeight = res.getDimensionPixelSize(R.dimen.week_header_height);
     }
 

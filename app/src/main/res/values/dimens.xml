@@ -17,6 +17,7 @@
     <dimen name="grid_vertical_padding">10dp</dimen>
     <dimen name="grid_block_inset">1dp</dimen>
     <dimen name="grid_accent_bar">3dp</dimen>
+    <dimen name="grid_now_line">2dp</dimen>
     <dimen name="week_header_height">56dp</dimen>
 
     <!-- Main screen. From this window width on, the calendar and the pane (settings, courses, editors) sit side

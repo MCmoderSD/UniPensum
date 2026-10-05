@@ -51,7 +51,7 @@ final class WeekPageView extends LinearLayout {
         for (int i = 0; i < 5; i++) {
             perDay.add(timetable == null ? List.of() : timetable.on(monday.plusDays(i)));
         }
-        grid.bind(window, nameStyle, perDay, clickListener);
+        grid.bind(monday, window, nameStyle, perDay, clickListener);
     }
 
     void setScrollListener(OnScrollListener listener) {

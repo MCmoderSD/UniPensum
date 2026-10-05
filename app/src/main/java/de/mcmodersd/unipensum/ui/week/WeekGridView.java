@@ -5,17 +5,23 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.data.AppSettings.TimeWindow;
 import de.mcmodersd.unipensum.data.SessionView;
+import de.mcmodersd.unipensum.domain.logic.NowIndicator;
 import de.mcmodersd.unipensum.domain.logic.WeekLayout;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
@@ -25,6 +31,10 @@ import de.mcmodersd.unipensum.ui.format.TimeFormat;
  * The height is the window length times the hour height: at least the minimum hour height,
  * or more if the parent offers it (ScrollView with fillViewport), so the day fills the screen
  * whenever it comfortably fits.
+ * <p>
+ * In the current week, a line marks the current time: faint across the whole week, solid in the column of
+ * today, drawn over the session blocks. The label of the current hour is highlighted. The marker moves with
+ * the clock, once a minute.
  */
 // Created in code by WeekPageView only, never inflated from XML.
 @SuppressLint("ViewConstructor")
@@ -55,8 +65,18 @@ final class WeekGridView extends ViewGroup {
     private final GridMetrics metrics;
     private final Paint linePaint = new Paint();
     private final Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint nowLabelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint nowLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint nowFaintPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final List<Placed> placed = new ArrayList<>();
+    private final Runnable tick = () -> {
+        updateNow();
+        scheduleTick();
+    };
     private TimeWindow window = TimeWindow.DEFAULT;
+    private LocalDate monday;
+    /** Where the marker of the current time is drawn, {@code null} if it is not part of this week or these hours. */
+    private NowIndicator.Position now;
 
     WeekGridView(Context context, GridMetrics metrics) {
         super(context);
@@ -70,13 +90,27 @@ final class WeekGridView extends ViewGroup {
         labelPaint.setTextSize(TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
         labelPaint.setTextAlign(Paint.Align.RIGHT);
+
+        // The marker is black on the light theme and white on the dark one, like the rest of the app.
+        int nowColor = ContextCompat.getColor(context, R.color.accent);
+        nowLabelPaint.set(labelPaint);
+        nowLabelPaint.setColor(nowColor);
+        nowLabelPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        nowLinePaint.setColor(nowColor);
+        nowLinePaint.setStrokeWidth(metrics.nowLine);
+        nowFaintPaint.setColor(ColorUtils.setAlphaComponent(nowColor, 0x66));
+        nowFaintPaint.setStrokeWidth(Math.max(1f, metrics.nowLine / 2f));
     }
 
     /**
+     * @param monday the Monday of the week shown, which tells whether the current time belongs to it
      * @param perDay exactly five lists, Monday to Friday, each ordered by start time
      */
-    void bind(TimeWindow window, NameStyle nameStyle, List<List<SessionView>> perDay, OnSessionClickListener listener) {
+    void bind(LocalDate monday, TimeWindow window, NameStyle nameStyle, List<List<SessionView>> perDay,
+              OnSessionClickListener listener) {
+        this.monday = monday;
         this.window = window;
+        updateNow();
         removeAllViews();
         placed.clear();
 
@@ -103,6 +137,35 @@ final class WeekGridView extends ViewGroup {
             }
         }
         requestLayout();
+        invalidate();
+    }
+
+    // --- the marker of the current time ---
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        updateNow();
+        scheduleTick();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        removeCallbacks(tick);
+        super.onDetachedFromWindow();
+    }
+
+    /** The next full minute, so the marker keeps in step with the clock instead of drifting. */
+    private void scheduleTick() {
+        removeCallbacks(tick);
+        postDelayed(tick, 60_000 - System.currentTimeMillis() % 60_000 + 50);
+    }
+
+    private void updateNow() {
+        NowIndicator.Position next = monday == null ? null
+                : NowIndicator.at(monday, LocalDateTime.now(), window.startHour(), window.endHour()).orElse(null);
+        if (Objects.equals(next, now)) return;
+        now = next;
         invalidate();
     }
 
@@ -162,15 +225,29 @@ final class WeekGridView extends ViewGroup {
         for (int i = 0; i <= hours(); i++) {
             float y = metrics.verticalPadding + i * hourHeight;
             canvas.drawLine(metrics.gutter, y, getWidth(), y, linePaint);
-            String label = TimeFormat.hour(getContext(), window.startHour() + i);
+            int hour = window.startHour() + i;
+            String label = TimeFormat.hour(getContext(), hour);
+            Paint paint = now != null && now.minutes() / 60 == hour ? nowLabelPaint : labelPaint;
             canvas.drawText(label, metrics.gutter - 6 * getResources().getDisplayMetrics().density,
-                    y - labelOffset, labelPaint);
+                    y - labelOffset, paint);
         }
         float columnWidth = metrics.columnWidth(getWidth());
         for (int i = 0; i <= 5; i++) {
             float x = metrics.gutter + i * columnWidth;
             canvas.drawLine(x, metrics.verticalPadding, x, getHeight() - metrics.verticalPadding, linePaint);
         }
+    }
+
+    /** Over the session blocks, so the current time stays readable inside a lecture. */
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
+        if (now == null) return;
+        float y = yOf(now.minutes(), hourHeight(getHeight()));
+        float columnWidth = metrics.columnWidth(getWidth());
+        float left = metrics.gutter + now.dayIndex() * columnWidth;
+        canvas.drawLine(metrics.gutter, y, getWidth(), y, nowFaintPaint);
+        canvas.drawLine(left, y, left + columnWidth, y, nowLinePaint);
     }
 
     private float hourHeight(int totalHeight) {
