@@ -1,0 +1,34 @@
+### Android Studio / IntelliJ IDEA ###
+.idea/
+*.iml
+
+### Gradle ###
+.gradle/
+build/
+local.properties
+
+### Android ###
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+app/release/
+app/debug/
+
+### Signing ###
+*.jks
+*.keystore
+keystore.properties
+
+### Kotlin ###
+.kotlin/
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Other ###
+*.hprof
+*.log
