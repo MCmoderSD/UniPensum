@@ -13,6 +13,16 @@ viewpager2 = "1.1.0"
 recyclerview = "1.4.0"
 core = "1.19.1"
 customview = "1.2.0"
+# Build tools only, the app does not use these. The Android Gradle Plugin and lint bring them along in versions
+# with known security issues; the build files require at least the versions below (bundle "buildToolFixes").
+# An entry can go once the plugin asks for that version or a newer one by itself.
+# The Kotlin plugin also sets the version of the Kotlin standard library that ends up in the app.
+bouncycastle = "1.86"
+jose4j = "0.9.7"
+jdom2 = "2.0.6.1"
+commonsLang3 = "3.21.0"
+httpclient = "4.5.14"
+kotlin = "2.4.20"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -30,6 +40,20 @@ viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref =
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 core = { group = "androidx.core", name = "core", version.ref = "core" }
 customview = { group = "androidx.customview", name = "customview", version.ref = "customview" }
+fix-bcprov = { group = "org.bouncycastle", name = "bcprov-jdk18on", version.ref = "bouncycastle" }
+fix-bcpkix = { group = "org.bouncycastle", name = "bcpkix-jdk18on", version.ref = "bouncycastle" }
+fix-bcutil = { group = "org.bouncycastle", name = "bcutil-jdk18on", version.ref = "bouncycastle" }
+fix-jose4j = { group = "org.bitbucket.b_c", name = "jose4j", version.ref = "jose4j" }
+fix-jdom2 = { group = "org.jdom", name = "jdom2", version.ref = "jdom2" }
+fix-commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commonsLang3" }
+fix-httpclient = { group = "org.apache.httpcomponents", name = "httpclient", version.ref = "httpclient" }
+fix-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+
+[bundles]
+buildToolFixes = [
+    "fix-bcprov", "fix-bcpkix", "fix-bcutil", "fix-jose4j", "fix-jdom2",
+    "fix-commons-lang3", "fix-httpclient", "fix-kotlin-gradle-plugin",
+]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

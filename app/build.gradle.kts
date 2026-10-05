@@ -94,3 +94,12 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }
+
+// Lint runs on a classpath of its own, with the same outdated libraries as the Android Gradle Plugin.
+// The same fixed versions are required there, see the root build file.
+configurations.matching { it.name == "androidLintTool" }.configureEach {
+    val lintTool = this
+    libs.bundles.buildToolFixes.get().forEach {
+        lintTool.dependencyConstraints.add(project.dependencies.constraints.create(it))
+    }
+}
