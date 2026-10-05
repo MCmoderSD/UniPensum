@@ -25,6 +25,7 @@ import de.mcmodersd.unipensum.data.db.Database;
 import de.mcmodersd.unipensum.domain.model.Course;
 import de.mcmodersd.unipensum.domain.model.Lecturer;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
+import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.text.TextSanitizer;
 import de.mcmodersd.unipensum.ui.Navigator;
@@ -113,6 +114,16 @@ public class CourseEditorFragment extends Fragment {
                     nameStyle = style;
                     renderEvents();
                 });
+
+        // With the calendar beside this page, the semester of the course can be deleted, or all data replaced
+        // by an import, while the editor is open. Then there is nothing left to save the course into.
+        long semesterId = draft.semester().id();
+        repository.semesters().observe(getViewLifecycleOwner(), semesters -> {
+            for (Semester existing : semesters) {
+                if (existing.id() == semesterId) return;
+            }
+            Navigator.of(this).pop();
+        });
 
         saveButton = view.findViewById(R.id.save);
         saveButton.setOnClickListener(v -> save());

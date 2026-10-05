@@ -18,4 +18,10 @@
     <dimen name="grid_block_inset">1dp</dimen>
     <dimen name="grid_accent_bar">3dp</dimen>
     <dimen name="week_header_height">56dp</dimen>
+
+    <!-- Main screen. From this window width on, the calendar and the pane (settings, courses, editors) sit side
+         by side; the pane gets a share of the width, kept between the two bounds. PaneLayout reads these. -->
+    <dimen name="pane_split_min_width">720dp</dimen>
+    <dimen name="pane_side_min">360dp</dimen>
+    <dimen name="pane_side_max">480dp</dimen>
 </resources>

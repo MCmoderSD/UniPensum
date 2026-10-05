@@ -30,7 +30,10 @@ import de.mcmodersd.unipensum.ui.semester.SemesterSheet;
 import de.mcmodersd.unipensum.ui.session.SessionDetailSheet;
 import de.mcmodersd.unipensum.ui.settings.SettingsFragment;
 
-/** The app's one main screen: the semester name, the week range and the swipeable week grid. */
+/**
+ * The app's one main screen: the semester name, the week range and the swipeable week grid. It stays
+ * alive while pages open next to or over it, so it follows every change made there at once.
+ */
 public class WeekFragment extends Fragment {
 
     private WeekViewModel viewModel;
@@ -64,7 +67,7 @@ public class WeekFragment extends Fragment {
                 SessionDetailSheet.show(getParentFragmentManager(), session.session().id()));
         pager.setAdapter(adapter);
         pager.setOffscreenPageLimit(1);
-        // The view is rebuilt after an editor was closed; come back to the week that was open.
+        // The view is rebuilt when the screen is recreated (turning, theme, language); come back to the same week.
         pager.setCurrentItem(viewModel.page() >= 0 ? viewModel.page() : Weeks.initialPosition(LocalDate.now()), false);
         pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
@@ -78,7 +81,7 @@ public class WeekFragment extends Fragment {
         addCourse.setOnClickListener(v -> openNewCourse());
         openCourses.setOnClickListener(v -> openCourses());
         view.findViewById(R.id.open_settings).setOnClickListener(v ->
-                Navigator.of(this).push(new SettingsFragment()));
+                Navigator.of(this).toggle(new SettingsFragment()));
         view.findViewById(R.id.create_semester).setOnClickListener(v ->
                 SemesterEditorSheet.show(getParentFragmentManager(), null, timetable.semesters()));
         getParentFragmentManager().setFragmentResultListener(SemesterSheet.REQUEST_JUMP, getViewLifecycleOwner(),
@@ -114,13 +117,13 @@ public class WeekFragment extends Fragment {
         Semester semester = currentSemester();
         if (semester == null) return;
         new ViewModelProvider(requireActivity()).get(CourseDraftViewModel.class).startNew(semester);
-        Navigator.of(this).push(new CourseEditorFragment());
+        Navigator.of(this).open(new CourseEditorFragment());
     }
 
     private void openCourses() {
         Semester semester = currentSemester();
         if (semester == null) return;
-        Navigator.of(this).push(CoursesFragment.forSemester(semester.id()));
+        Navigator.of(this).toggle(CoursesFragment.forSemester(semester.id()));
     }
 
     private void updateHeader(int position) {

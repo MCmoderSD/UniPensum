@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The window background already paints the app background. -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="MergeRootFrame"
-    android:id="@+id/container"
+<!--
+    The window background already paints the app background. The first container holds the week
+    calendar, the second one the pages that open from it. PaneLayout decides whether they sit next
+    to each other or one covers the other.
+-->
+<de.mcmodersd.unipensum.ui.widget.PaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pane"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:id="@+id/side"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</de.mcmodersd.unipensum.ui.widget.PaneLayout>

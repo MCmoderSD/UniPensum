@@ -83,6 +83,13 @@ public class CoursesFragment extends Fragment {
             draft.startNew(semester);
             Navigator.of(this).push(new CourseEditorFragment());
         });
+        // With the calendar beside this page, its semester can be deleted while the page is open.
+        repository.semesters().observe(getViewLifecycleOwner(), semesters -> {
+            for (Semester existing : semesters) {
+                if (existing.id() == semesterId) return;
+            }
+            Navigator.of(this).pop();
+        });
         repository.courses(semesterId).observe(getViewLifecycleOwner(), courses -> {
             list.removeAllViews();
             emptyView.setVisibility(courses.isEmpty() ? View.VISIBLE : View.GONE);

@@ -82,7 +82,7 @@ public final class SessionDetailSheet extends UpSheet {
             Navigator navigator = (Navigator) requireActivity();
             long sessionId = requireArguments().getLong(ARG_SESSION_ID);
             dismiss();
-            navigator.push(SessionEditorFragment.forSession(sessionId, scope));
+            navigator.open(SessionEditorFragment.forSession(sessionId, scope));
         });
         manager.setFragmentResultListener(KEY_DELETE_SCOPE, getViewLifecycleOwner(), (key, result) ->
                 delete(EditScope.valueOf(result.getString(ScopeSheet.RESULT_SCOPE))));

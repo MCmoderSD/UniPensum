@@ -16,11 +16,10 @@
         android:theme="@style/Theme.UniPensum"
         tools:ignore="UnusedAttribute">
 
+        <!-- Phones are locked to portrait in MainActivity, tablets turn freely. -->
         <activity
             android:name=".ui.MainActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            tools:ignore="DiscouragedApi,LockedOrientationActivity">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

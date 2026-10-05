@@ -24,7 +24,8 @@ The app works completely offline. It needs no system permissions and has no inte
 - [x] English and German
 - [x] Export and import of all data as a `.unipensum` file, optionally protected with a password
 - [ ] Reminders
-- [ ] Landscape and tablet layout
+- [x] Tablet layout: the calendar stays in view next to the settings, the courses and the editors
+- [ ] Landscape on phones
 
 ## Requirements
 - Android 12 (API 31) or newer
