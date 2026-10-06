@@ -37,6 +37,7 @@ public class UpIconButton extends AppCompatImageView {
     private boolean held;
     private long interval;
     private boolean dimmed;
+    private boolean clickHaptic = true;
 
     public UpIconButton(Context context) {
         this(context, null);
@@ -60,9 +61,14 @@ public class UpIconButton extends AppCompatImageView {
         setMeasuredDimension(resolveSize(size, widthMeasureSpec), resolveSize(size, heightMeasureSpec));
     }
 
+    /** Turns off the click feedback for a button whose action gives feedback of its own. */
+    public void setClickHaptic(boolean enabled) {
+        clickHaptic = enabled;
+    }
+
     @Override
     public boolean performClick() {
-        Haptics.tap(this);
+        if (clickHaptic) Haptics.tap(this);
         return super.performClick();
     }
 

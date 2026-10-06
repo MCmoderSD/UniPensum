@@ -25,6 +25,7 @@ import de.mcmodersd.unipensum.domain.model.SessionDetails;
 import de.mcmodersd.unipensum.ui.format.CourseColors;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
+import de.mcmodersd.unipensum.ui.widget.Haptics;
 
 /**
  * One session in the grid: a tinted card with an accent bar in the course color. Overlapping
@@ -155,6 +156,12 @@ final class SessionBlockView extends LinearLayout {
         float inset = radius * 0.6f;
         barRect.set(inset * 0.5f, inset, inset * 0.5f + barWidth, getHeight() - inset);
         canvas.drawRoundRect(barRect, barWidth / 2f, barWidth / 2f, barPaint);
+    }
+
+    @Override
+    public boolean performClick() {
+        Haptics.tap(this);
+        return super.performClick();
     }
 
     @Override

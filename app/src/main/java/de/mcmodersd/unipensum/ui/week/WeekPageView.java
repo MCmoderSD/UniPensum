@@ -22,6 +22,7 @@ import de.mcmodersd.unipensum.data.AppSettings.TimeWindow;
 import de.mcmodersd.unipensum.data.SessionView;
 import de.mcmodersd.unipensum.data.Timetable;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
+import de.mcmodersd.unipensum.ui.widget.Haptics;
 
 /**
  * One pager page: the day header on top, the scrollable grid below. Two fingers stretch the hours of the grid,
@@ -100,7 +101,10 @@ final class WeekPageView extends LinearLayout {
         taps = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent event) {
-                resetZoom(event.getY());
+                if (grid.zoom() > ZoomMetrics.MIN) {
+                    Haptics.tap(WeekPageView.this);
+                    resetZoom(event.getY());
+                }
                 return true;
             }
         });

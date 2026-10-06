@@ -5,17 +5,17 @@ import android.view.HapticFeedbackConstants;
 import android.view.View;
 
 /**
- * Haptic feedback with the finer constants of Android 14 where they exist and the older,
- * coarser ones as a replacement on Android 12 and 13.
+ * Haptic feedback in one place, so its strength can be tuned in one place. A press and the steps of a picker are the
+ * same firm click, and the outcome of an action (saved, refused) has a pattern of its own.
  */
 public final class Haptics {
 
     private Haptics() {
     }
 
-    /** A plain press. */
+    /** A plain press of a button, a row or an icon: a firm click. */
     public static void tap(View view) {
-        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
     }
 
     /** A completed action such as saving. */
@@ -32,16 +32,12 @@ public final class Haptics {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             view.performHapticFeedback(on ? HapticFeedbackConstants.TOGGLE_ON : HapticFeedbackConstants.TOGGLE_OFF);
         } else {
-            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+            view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         }
     }
 
-    /** One step of a discrete picker, a segmented control or a calendar selection. */
+    /** One step of a wheel, a segmented control, a stepper or a calendar selection: as firm as a press. */
     public static void segmentTick(View view) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            view.performHapticFeedback(HapticFeedbackConstants.SEGMENT_TICK);
-        } else {
-            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
-        }
+        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
     }
 }

@@ -40,6 +40,8 @@ public class WheelPicker extends RecyclerView {
     private final LinearLayoutManager layoutManager;
     private String[] labels = new String[0];
     private int selected;
+    /** The value in the center row the last time the wheel moved, to notice when the next one arrives. */
+    private int centered = RecyclerView.NO_POSITION;
     private OnSelectedListener listener;
 
     public WheelPicker(Context context) {
@@ -125,6 +127,18 @@ public class WheelPicker extends RecyclerView {
     public void onScrolled(int dx, int dy) {
         super.onScrolled(dx, dy);
         updateAlphas();
+        tickOnNewValue();
+    }
+
+    /** Every value that reaches the center row while the wheel turns is felt, also while it runs out. */
+    private void tickOnNewValue() {
+        View snapView = snapHelper.findSnapView(layoutManager);
+        if (snapView == null) return;
+        int index = getChildAdapterPosition(snapView);
+        if (index == RecyclerView.NO_POSITION || index == centered) return;
+        centered = index;
+        // A jump to a value (setSelectedIndex) moves the center without the wheel turning, which is silent.
+        if (getScrollState() != SCROLL_STATE_IDLE) Haptics.segmentTick(this);
     }
 
     @Override
@@ -136,7 +150,6 @@ public class WheelPicker extends RecyclerView {
         int index = getChildAdapterPosition(snapView);
         if (index != RecyclerView.NO_POSITION && index != selected) {
             selected = index;
-            Haptics.segmentTick(this);
             if (listener != null) listener.onSelected(index);
         }
     }

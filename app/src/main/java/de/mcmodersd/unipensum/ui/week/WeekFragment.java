@@ -97,7 +97,10 @@ public class WeekFragment extends Fragment {
             }
         });
 
-        title.setOnClickListener(v -> SemesterSheet.show(getParentFragmentManager()));
+        title.setOnClickListener(v -> {
+            Haptics.tap(v);
+            SemesterSheet.show(getParentFragmentManager());
+        });
         addCourse.setOnClickListener(v -> openNewCourse());
         openCourses.setOnClickListener(v -> openCourses());
         view.findViewById(R.id.open_settings).setOnClickListener(v ->

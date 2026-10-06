@@ -52,11 +52,14 @@ public class UpStepper extends LinearLayout {
         minus.setContentDescription(context.getString(R.string.stepper_decrease));
         minus.setOnClickListener(v -> step(-1));
         minus.setOnHoldListener(() -> change(-1));
+        // A step ticks and a refused step rejects, so the press itself stays quiet.
+        minus.setClickHaptic(false);
         plus = new UpIconButton(context);
         plus.setImageResource(R.drawable.ic_add);
         plus.setContentDescription(context.getString(R.string.stepper_increase));
         plus.setOnClickListener(v -> step(1));
         plus.setOnHoldListener(() -> change(1));
+        plus.setClickHaptic(false);
 
         valueView = new TextView(context);
         valueView.setGravity(Gravity.CENTER);
