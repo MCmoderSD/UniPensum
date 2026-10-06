@@ -29,8 +29,8 @@ import de.mcmodersd.unipensum.ui.format.TimeFormat;
 /**
  * The hour lines, the time axis and the session blocks of one week (Monday to Friday).
  * The height is the window length times the hour height: at least the minimum hour height,
- * or more if the parent offers it (ScrollView with fillViewport), so the day fills the screen
- * whenever it comfortably fits.
+ * or more if the scrolling area offers it, so the day fills the screen whenever it comfortably fits.
+ * Zooming stretches the hours further.
  * <p>
  * In the current week, a line marks the current time: faint across the whole week, solid in the column of
  * today, drawn over the session blocks. The label of the current hour is highlighted. The marker moves with
@@ -74,6 +74,8 @@ final class WeekGridView extends ViewGroup {
         scheduleTick();
     };
     private TimeWindow window = TimeWindow.DEFAULT;
+    private float zoom = 1f;
+    private int viewportHeight;
     private LocalDate monday;
     /** Where the marker of the current time is drawn, {@code null} if it is not part of this week or these hours. */
     private NowIndicator.Position now;
@@ -180,12 +182,38 @@ final class WeekGridView extends ViewGroup {
         return window.endHour() - window.startHour();
     }
 
+    /** How much the hours are stretched: 1 is the normal grid, 2 doubles the height of every hour. */
+    float zoom() {
+        return zoom;
+    }
+
+    void setZoom(float zoom) {
+        if (this.zoom == zoom) return;
+        this.zoom = zoom;
+        requestLayout();
+        invalidate();
+    }
+
+    /**
+     * The height of the scrolling area the grid sits in, which the grid fills when the hours fit into it. The
+     * parent knows it only after measuring the grid, so the page tells it.
+     *
+     * @return whether the height changed, which makes the grid need a new measure
+     */
+    boolean setViewportHeight(int height) {
+        if (viewportHeight == height) return false;
+        viewportHeight = height;
+        requestLayout();
+        return true;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        // The grid fills the scrolling area, or is as high as the hours need at their minimum height. Zoom
+        // stretches only the hours, not the space above the first and below the last line.
         int minHeight = hours() * metrics.minHourHeight + 2 * metrics.verticalPadding;
-        int height = MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY
-                ? Math.max(MeasureSpec.getSize(heightMeasureSpec), minHeight)
-                : minHeight;
+        int fitted = Math.max(viewportHeight, minHeight);
+        int height = Math.round(2 * metrics.verticalPadding + (fitted - 2 * metrics.verticalPadding) * zoom);
         int width = MeasureSpec.getSize(widthMeasureSpec);
         setMeasuredDimension(width, height);
 

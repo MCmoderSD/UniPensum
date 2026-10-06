@@ -17,6 +17,7 @@ public class WeekViewModel extends AndroidViewModel {
     private final LiveData<TimeWindow> timeWindow;
     private final LiveData<NameStyle> lecturerNameStyle;
     private int page = -1;
+    private float zoom = ZoomMetrics.MIN;
 
     public WeekViewModel(@NonNull Application application) {
         super(application);
@@ -49,5 +50,14 @@ public class WeekViewModel extends AndroidViewModel {
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    /** How far the hours of the week grid are stretched, kept for the same reason as the page. */
+    float zoom() {
+        return zoom;
+    }
+
+    void setZoom(float zoom) {
+        this.zoom = zoom;
     }
 }

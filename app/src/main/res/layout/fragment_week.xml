@@ -78,6 +78,26 @@
             android:layout_weight="1" />
     </LinearLayout>
 
+    <!-- The zoom of the grid. It stays while the grid is zoomed, and a tap on it resets the zoom. -->
+    <TextView
+        android:id="@+id/zoom_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/space_4"
+        android:layout_marginBottom="@dimen/space_5"
+        android:background="@drawable/zoom_indicator_background"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:minHeight="36dp"
+        android:paddingStart="@dimen/space_3"
+        android:paddingEnd="@dimen/space_3"
+        android:textColor="@color/text_on_accent"
+        android:textSize="13sp"
+        android:visibility="invisible" />
+
     <LinearLayout
         android:id="@+id/empty"
         android:layout_width="match_parent"

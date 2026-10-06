@@ -27,6 +27,7 @@
     <string name="action_done">Done</string>
     <string name="stepper_decrease">Decrease</string>
     <string name="stepper_increase">Increase</string>
+    <string name="zoom_reset_description">Reset zoom (%s)</string>
     <string name="add_course_description">Add course</string>
 
     <!-- Courses -->

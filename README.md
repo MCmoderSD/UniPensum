@@ -10,6 +10,7 @@ The app works completely offline. It needs no system permissions and has no inte
 - [x] Week grid from Monday to Friday, swipe between weeks
 - [x] Configurable visible hours (7:00 to 22:00 by default)
 - [x] A line marks the current time in the week grid, and the current hour is highlighted
+- [x] Pinch with two fingers to stretch the hours of the week grid (up to 400 %); a label shows the zoom, and a double tap or a tap on the label resets it
 - [x] Several semesters with automatic names such as `WiSe 26/27` or `SoSe 27`
 - [x] A new semester runs 16 weeks (about four months) and a new event lasts 3 h 15 min by default
 - [x] Courses with one or more recurring events (lecture, exercise, lab, tutorial)

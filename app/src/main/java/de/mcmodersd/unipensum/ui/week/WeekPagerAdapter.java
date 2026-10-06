@@ -34,8 +34,23 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     private TimeWindow window = TimeWindow.DEFAULT;
     private NameStyle nameStyle = NameStyle.LAST_NAME;
     private WeekGridView.OnSessionClickListener clickListener;
+    private OnZoomChangedListener zoomListener;
     private int scrollY;
     private final IntSupplier currentScrollY = () -> scrollY;
+    private float zoom = ZoomMetrics.MIN;
+
+    interface OnZoomChangedListener {
+        void onZoomChanged(float zoom);
+    }
+
+    /** The zoom every page starts with, for a view that is rebuilt while the user has zoomed. */
+    void setZoom(float zoom) {
+        this.zoom = zoom;
+    }
+
+    void setOnZoomChangedListener(OnZoomChangedListener listener) {
+        this.zoomListener = listener;
+    }
 
     void setTimetable(Timetable timetable) {
         this.timetable = timetable;
@@ -64,12 +79,14 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
         page.setLayoutParams(new RecyclerView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         page.setScrollListener(this::onPageScrolled);
+        page.setZoomListener(this::onPageZoomed);
         return new PageHolder(page);
     }
 
     @Override
     public void onBindViewHolder(@NonNull PageHolder holder, int position) {
         holder.page.bind(Weeks.mondayOf(position), LocalDate.now(), window, nameStyle, timetable, clickListener);
+        holder.page.setZoom(zoom);
         holder.page.followWhenReady(currentScrollY);
     }
 
@@ -86,6 +103,19 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     @Override
     public void onViewDetachedFromWindow(@NonNull PageHolder holder) {
         attached.remove(holder.page);
+    }
+
+    /**
+     * Keeps the zoom the same on every page. Only the page under the fingers changes while they move, which is
+     * all that is visible; the others follow once the zoom has settled.
+     */
+    private void onPageZoomed(WeekPageView source, float newZoom, boolean settled) {
+        zoom = newZoom;
+        if (zoomListener != null) zoomListener.onZoomChanged(newZoom);
+        if (!settled) return;
+        for (WeekPageView page : attached) {
+            if (page != source) page.followZoom(newZoom, currentScrollY);
+        }
     }
 
     /** Keeps the vertical position the same on every page, so swiping weeks never jumps. */
