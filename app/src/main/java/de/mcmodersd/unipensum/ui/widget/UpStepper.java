@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat;
 
 import de.mcmodersd.unipensum.R;
 
-/** A number with minus and plus buttons. */
+/** A number with minus and plus buttons. Holding a button steps on, faster and faster, until the end of the range. */
 public class UpStepper extends LinearLayout {
 
     public interface Formatter {
@@ -51,10 +51,12 @@ public class UpStepper extends LinearLayout {
         minus.setImageResource(R.drawable.ic_minus);
         minus.setContentDescription(context.getString(R.string.stepper_decrease));
         minus.setOnClickListener(v -> step(-1));
+        minus.setOnHoldListener(() -> change(-1));
         plus = new UpIconButton(context);
         plus.setImageResource(R.drawable.ic_add);
         plus.setContentDescription(context.getString(R.string.stepper_increase));
         plus.setOnClickListener(v -> step(1));
+        plus.setOnHoldListener(() -> change(1));
 
         valueView = new TextView(context);
         valueView.setGravity(Gravity.CENTER);
@@ -94,15 +96,18 @@ public class UpStepper extends LinearLayout {
     }
 
     private void step(int delta) {
+        if (!change(delta)) Haptics.reject(this);
+    }
+
+    /** @return whether the value changed, which is not the case at the end of the range */
+    private boolean change(int delta) {
         int next = Math.max(min, Math.min(max, value + delta));
-        if (next == value) {
-            Haptics.reject(this);
-            return;
-        }
+        if (next == value) return false;
         value = next;
         render();
         Haptics.segmentTick(this);
         if (listener != null) listener.onValueChanged(value);
+        return true;
     }
 
     private void render() {
