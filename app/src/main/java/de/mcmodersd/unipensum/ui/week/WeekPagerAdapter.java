@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntSupplier;
 
 import de.mcmodersd.unipensum.data.AppSettings.TimeWindow;
 import de.mcmodersd.unipensum.data.Timetable;
@@ -34,6 +35,7 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     private NameStyle nameStyle = NameStyle.LAST_NAME;
     private WeekGridView.OnSessionClickListener clickListener;
     private int scrollY;
+    private final IntSupplier currentScrollY = () -> scrollY;
 
     void setTimetable(Timetable timetable) {
         this.timetable = timetable;
@@ -68,7 +70,7 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     @Override
     public void onBindViewHolder(@NonNull PageHolder holder, int position) {
         holder.page.bind(Weeks.mondayOf(position), LocalDate.now(), window, nameStyle, timetable, clickListener);
-        holder.page.scrollToWhenReady(scrollY);
+        holder.page.followWhenReady(currentScrollY);
     }
 
     @Override
@@ -90,7 +92,7 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     private void onPageScrolled(WeekPageView source, int y) {
         scrollY = y;
         for (WeekPageView page : attached) {
-            if (page != source && page.scrollY() != y) page.scrollToWhenReady(y);
+            if (page != source && page.scrollY() != y) page.followWhenReady(currentScrollY);
         }
     }
 }

@@ -8,6 +8,7 @@ import android.widget.ScrollView;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntSupplier;
 
 import de.mcmodersd.unipensum.data.AppSettings.TimeWindow;
 import de.mcmodersd.unipensum.data.SessionView;
@@ -26,6 +27,8 @@ final class WeekPageView extends LinearLayout {
     private final WeekHeaderView header;
     private final ScrollView scroll;
     private final WeekGridView grid;
+    /** True while {@link #followWhenReady} moves the grid. */
+    private boolean following;
 
     WeekPageView(Context context, GridMetrics metrics) {
         super(context);
@@ -54,18 +57,33 @@ final class WeekPageView extends LinearLayout {
         grid.bind(monday, window, nameStyle, perDay, clickListener);
     }
 
+    /** Reports every scroll of this page, except the ones {@link #followWhenReady} makes. */
     void setScrollListener(OnScrollListener listener) {
-        scroll.setOnScrollChangeListener((v, x, y, oldX, oldY) -> listener.onScrolled(this, y));
+        scroll.setOnScrollChangeListener((v, x, y, oldX, oldY) -> {
+            if (!following) listener.onScrolled(this, y);
+        });
     }
 
     int scrollY() {
         return scroll.getScrollY();
     }
 
-    /** Applies the scroll position once the grid has been laid out. */
-    void scrollToWhenReady(int y) {
+    /**
+     * Moves the grid to the position {@code y} gives once the grid has been laid out. The position is asked for when
+     * the move happens, not when it is requested, and the move is not reported as a scroll of this page: another
+     * page is the one being scrolled, and a report would send it back to an outdated position in the middle of a
+     * fling.
+     */
+    void followWhenReady(IntSupplier y) {
         scroll.post(() -> {
-            if (scroll.getScrollY() != y) scroll.scrollTo(0, y);
+            int target = y.getAsInt();
+            if (scroll.getScrollY() == target) return;
+            following = true;
+            try {
+                scroll.scrollTo(0, target);
+            } finally {
+                following = false;
+            }
         });
     }
 }
