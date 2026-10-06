@@ -107,7 +107,7 @@ public class UpStepper extends LinearLayout {
 
     private void render() {
         valueView.setText(formatter.format(value));
-        minus.setAlpha(value > min ? 1f : 0.3f);
-        plus.setAlpha(value < max ? 1f : 0.3f);
+        minus.setDimmed(value <= min);
+        plus.setDimmed(value >= max);
     }
 }

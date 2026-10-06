@@ -14,6 +14,8 @@ import de.mcmodersd.unipensum.R;
 /** A tappable icon with a 44dp touch target. Set a content description wherever it is used. */
 public class UpIconButton extends AppCompatImageView {
 
+    private boolean dimmed;
+
     public UpIconButton(Context context) {
         this(context, null);
     }
@@ -42,9 +44,19 @@ public class UpIconButton extends AppCompatImageView {
         return super.performClick();
     }
 
+    /** Shows the button as unavailable. It stays tappable, so the tap can still be answered. */
+    public void setDimmed(boolean dimmed) {
+        this.dimmed = dimmed;
+        updateAlpha();
+    }
+
     @Override
     public void setPressed(boolean pressed) {
         super.setPressed(pressed);
-        setAlpha(pressed ? 0.5f : 1f);
+        updateAlpha();
+    }
+
+    private void updateAlpha() {
+        setAlpha(dimmed ? 0.3f : (isPressed() ? 0.5f : 1f));
     }
 }
