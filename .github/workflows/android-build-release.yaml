@@ -57,9 +57,26 @@ jobs:
           printf '%s' "$SIGNING_KEYSTORE" | base64 --decode --ignore-garbage > "$KEYSTORE"
           echo "path=${KEYSTORE}" >> "$GITHUB_OUTPUT"
 
+      # Google Play takes every version code once, so each build gets its own: the number of commits since the last
+      # release (all commits before the first one). The same commit always gets the same number.
+      - id: build-number
+        name: Resolve build number
+        run: |
+          LAST_TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+
+          if [ -n "$LAST_TAG" ]; then
+            BUILD="$(git rev-list --count "${LAST_TAG}..HEAD")"
+          else
+            BUILD="$(git rev-list --count HEAD)"
+          fi
+
+          echo "build=${BUILD}" >> "$GITHUB_OUTPUT"
+          echo "Build number ${BUILD} (since ${LAST_TAG:-the first commit})"
+
       - id: build
         name: Test, lint and build
         env:
+          VERSION_BUILD: ${{ steps.build-number.outputs.build }}
           SIGNING_STORE_FILE: ${{ steps.keystore.outputs.path }}
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ vars.SIGNING_KEY_ALIAS }}

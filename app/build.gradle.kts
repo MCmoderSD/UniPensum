@@ -4,19 +4,30 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-// The one version to maintain: the version code follows from it ("1.2.3" becomes 10203).
+// The one version to maintain: the version code follows from it ("1.2.3" becomes 10203000) plus a build number.
 // A "-SNAPSHOT" suffix marks a development build, which the release workflow builds but does not publish.
 val appVersion = "1.0-SNAPSHOT"
 
-fun versionCodeOf(version: String): Int {
+// Google Play accepts every version code once, so every build that is uploaded needs its own. The release workflow
+// passes the number of commits since the last release as VERSION_BUILD; a build on this machine uses 0.
+val versionBuild: Int = providers.environmentVariable("VERSION_BUILD").orNull
+    ?.takeUnless(String::isBlank)
+    ?.let {
+        requireNotNull(it.toIntOrNull()) { "VERSION_BUILD \"$it\" must be a whole number." }
+    } ?: 0
+
+fun versionCodeOf(version: String, build: Int): Int {
     require(Regex("""\d{1,2}(\.\d{1,2}){0,2}(-SNAPSHOT)?""").matches(version)) {
         "appVersion \"$version\" must look like 1.2.3 or 1.2.3-SNAPSHOT, with one to three parts from 0 to 99."
     }
+    require(build in 0..999) {
+        "VERSION_BUILD $build must be from 0 to 999. Release the version, or raise appVersion, to start counting again."
+    }
     val parts = version.substringBefore('-').split('.').map(String::toInt)
     val (major, minor, patch) = parts + listOf(0, 0)
-    val code = major * 10_000 + minor * 100 + patch
-    require(code > 0) { "appVersion \"$version\" must be above 0." }
-    return code
+    val base = major * 10_000 + minor * 100 + patch
+    require(base > 0) { "appVersion \"$version\" must be above 0." }
+    return base * 1_000 + build
 }
 
 // Release signing comes from keystore.properties (local, not in git) or from the environment (CI).
@@ -40,7 +51,7 @@ android {
         applicationId = "de.mcmodersd.unipensum"
         minSdk = 31
         targetSdk = 37
-        versionCode = versionCodeOf(appVersion)
+        versionCode = versionCodeOf(appVersion, versionBuild)
         versionName = appVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

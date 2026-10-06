@@ -79,8 +79,10 @@ It runs on every push to `master` or `main` whose commit message contains `relea
 
 ### Version
 The version is set in one place, `appVersion` at the top of `app/build.gradle.kts`. The version code Android needs is
-derived from it: `1.2.3` becomes `10203` (one to three parts, each from 0 to 99). A version ending in `-SNAPSHOT` is a
-development build.
+derived from it: `1.2.3` becomes `10203000` (one to three parts, each from 0 to 99), plus a build number from 0 to 999.
+Google Play takes every version code only once, so the workflow adds the number of commits since the last release, and
+`1.2.3` with 42 commits since then is `10203042`. A build on your own machine uses 0. A version ending in `-SNAPSHOT` is
+a development build.
 
 ### Publish a release
 1. Set `appVersion` to the release, for example `"1.1"`.
