@@ -4,7 +4,8 @@
 A free and open source timetable app for Android. \
 UniPensum is a replacement for the timetable of QIS/LSF (HIS eG) and works for any university: a simple week calendar for the lectures of a semester, without an account and without extra features in the way.
 
-The app works completely offline. It needs no system permissions and has no internet access.
+The app works completely offline and has no internet access. The only permissions it asks for are the ones for the
+[reminders](#reminders).
 
 ## Features
 - [x] Week grid from Monday to Friday, swipe between weeks
@@ -25,9 +26,9 @@ The app works completely offline. It needs no system permissions and has no inte
 - [x] Light and dark theme, following the system or set manually
 - [x] English and German
 - [x] Export and import of all data as a `.unipensum` file, optionally protected with a password
-- [ ] Reminders
+- [x] Reminders before every event: 30 minutes by default, 5 minutes for an event that is only online, set per event
+- [x] Reminders look and work like those of a calendar app, with buttons for the meeting and for Moodle
 - [x] Tablet layout: the calendar stays in view next to the settings, the courses and the editors
-- [ ] Landscape on phones
 
 ## Requirements
 - Android 12 (API 31) or newer
@@ -135,6 +136,31 @@ Build provenance attestations are added to the release files as soon as the repo
 > An app signed with another key cannot be updated in place. Installing a release over a debug build needs the debug
 > build removed first, which deletes its data: export a backup (Settings → Data) beforehand and import it afterwards.
 
+## Reminders
+Every event reminds you before it starts: 30 minutes by default, 5 minutes for an event that is only online. The time is
+set in the event form, from "At the start" to 3 hours, or the reminder is switched off for that event. Like everything
+else in the form, it applies to one session, to this and all following sessions, or to the whole series. Settings →
+Reminders turns all of them off at once.
+
+A reminder is a notification like the ones of a calendar app: it comes up as a banner, stays until you swipe it away or
+the event is over, and has buttons for the meeting and for Moodle. A tap opens the event.
+
+For this the app asks for three permissions, and for nothing else:
+
+| Permission                | What for                                                                                 |
+|---------------------------|------------------------------------------------------------------------------------------|
+| Notifications             | To show the reminder. The app asks once, on Android 13 and newer.                        |
+| Exact alarms              | To be on time, also when the phone sleeps. Calendar apps get this without a question.    |
+| Start after a restart     | To set the alarm again, because a restart of the phone clears all alarms.                |
+
+There is one alarm at any time, for the next reminder, and it is worked out from the data again after every change. A
+reminder that came due while the phone was off is shown when it is switched on again, as long as the event has not ended.
+An event that is saved with a reminder time that has already passed does not remind.
+
+> [!NOTE]
+> Some phones stop apps that have not been opened for a while to save battery, and then no reminder comes. If that
+> happens, take UniPensum out of the list of sleeping apps or battery optimizations in the system settings.
+
 ## Backup
 Settings → Data saves everything (semesters, courses, sessions, lecturers; not the settings) to a file and
 restores it. The file and where it goes are chosen in the system's own dialogs, so the app needs no storage
@@ -164,12 +190,13 @@ The app is written in Java with the classic Android View system. All data is sto
 de.mcmodersd.unipensum
 ├── domain              Plain Java without Android imports, covered by unit tests
 │   ├── model           Semester, Course, Series, Session and their value types
-│   ├── logic           Recurrence, semester rules, week layout, series editing
+│   ├── logic           Recurrence, semester rules, week layout, series editing, reminders
 │   ├── text            Cleaning and checking of typed text, web links, e-mail addresses and phone numbers
 │   └── backup          What a backup holds, and the checks that make imported data safe
 ├── data                Repository, settings and the read models of the UI
 │   ├── db              SQLite schema, migrations and data access
 │   └── backup          The .unipensum file: zip container, JSON, encryption, export and import
+├── reminder            The alarm for the next reminder, and the notification
 └── ui
     ├── week            The week grid, the app's main screen
     ├── session         Session details, edit scope and the event form
