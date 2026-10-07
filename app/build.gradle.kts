@@ -79,6 +79,13 @@ android {
             }
         }
     }
+    bundle {
+        // The language is chosen in the app, not only by the device: a device in English must still be able to get
+        // the German texts, also those of a reminder, which come up without a screen of the app.
+        language {
+            enableSplit = false
+        }
+    }
     compileOptions {
         // Java 17 for records and switch expressions in the domain layer.
         sourceCompatibility = JavaVersion.VERSION_17

@@ -37,6 +37,9 @@ import de.mcmodersd.unipensum.ui.widget.UpSheet;
  */
 public final class SessionDetailSheet extends UpSheet {
 
+    /** The fragment tag, which lets the app find the sheet that is open. */
+    public static final String TAG = "session-detail";
+
     private static final String ARG_SESSION_ID = "session_id";
     private static final String KEY_EDIT_SCOPE = "detail_edit_scope";
     private static final String KEY_DELETE_SCOPE = "detail_delete_scope";
@@ -51,7 +54,7 @@ public final class SessionDetailSheet extends UpSheet {
         args.putLong(ARG_SESSION_ID, sessionId);
         SessionDetailSheet sheet = new SessionDetailSheet();
         sheet.setArguments(args);
-        sheet.show(manager, "session-detail");
+        sheet.show(manager, TAG);
     }
 
     @Nullable

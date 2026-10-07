@@ -27,6 +27,9 @@
     <string name="action_done">Fertig</string>
     <string name="stepper_decrease">Verringern</string>
     <string name="stepper_increase">Erhöhen</string>
+    <!-- Erinnerungen -->
+    <string name="reminder_channel_name">Erinnerungen</string>
+    <string name="reminder_channel_description">Erinnerungen vor deinen Veranstaltungen</string>
     <string name="zoom_reset_description">Zoom zurücksetzen (%s)</string>
     <string name="add_course_description">Fach hinzufügen</string>
 

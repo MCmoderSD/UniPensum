@@ -42,6 +42,7 @@ public final class Database {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final AtomicInteger revisionCounter = new AtomicInteger();
     private final MutableLiveData<Integer> revision = new MutableLiveData<>(0);
+    private volatile Runnable writeListener;
 
     private Database(DbHelper helper) {
         this.helper = helper;
@@ -67,8 +68,18 @@ public final class Database {
                 return;
             }
             revision.postValue(revisionCounter.incrementAndGet());
+            Runnable listener = writeListener;
+            if (listener != null) listener.run();
             deliverSuccess(callback, result);
         });
+    }
+
+    /**
+     * Called on the database thread after every write that went through, with the data already stored. For what
+     * has to follow the data, such as the alarm of the next reminder.
+     */
+    public void setWriteListener(Runnable listener) {
+        this.writeListener = listener;
     }
 
     /** One-off read in the background, reported on the main thread. */

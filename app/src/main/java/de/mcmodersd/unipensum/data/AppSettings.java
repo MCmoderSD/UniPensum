@@ -46,6 +46,8 @@ public final class AppSettings {
     private static final String KEY_WINDOW_START = "window_start";
     private static final String KEY_WINDOW_END = "window_end";
     private static final String KEY_LECTURER_NAME = "lecturer_name";
+    private static final String KEY_REMINDERS = "reminders";
+    private static final String KEY_NOTIFICATIONS_ASKED = "notifications_asked";
 
     private final SharedPreferences prefs;
     private final MutableLiveData<TimeWindow> timeWindow = new MutableLiveData<>();
@@ -74,6 +76,24 @@ public final class AppSettings {
         } catch (IllegalArgumentException unknown) {
             return NameStyle.LAST_NAME;
         }
+    }
+
+    /** Whether the app reminds of events at all; every event still has its own time. On by default. */
+    public boolean remindersEnabled() {
+        return prefs.getBoolean(KEY_REMINDERS, true);
+    }
+
+    public void setRemindersEnabled(boolean enabled) {
+        prefs.edit().putBoolean(KEY_REMINDERS, enabled).apply();
+    }
+
+    /** Whether the user has been asked to allow notifications. The app asks once and then leaves it be. */
+    public boolean notificationsAsked() {
+        return prefs.getBoolean(KEY_NOTIFICATIONS_ASKED, false);
+    }
+
+    public void setNotificationsAsked() {
+        prefs.edit().putBoolean(KEY_NOTIFICATIONS_ASKED, true).apply();
     }
 
     public ThemeMode themeMode() {

@@ -27,6 +27,9 @@
     <string name="action_done">Done</string>
     <string name="stepper_decrease">Decrease</string>
     <string name="stepper_increase">Increase</string>
+    <!-- Reminders -->
+    <string name="reminder_channel_name">Reminders</string>
+    <string name="reminder_channel_description">Reminders before your events</string>
     <string name="zoom_reset_description">Reset zoom (%s)</string>
     <string name="add_course_description">Add course</string>
 

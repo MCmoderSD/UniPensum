@@ -1,6 +1,7 @@
 package de.mcmodersd.unipensum.ui;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
@@ -13,12 +14,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.debug.DebugSeeder;
+import de.mcmodersd.unipensum.reminder.ReminderScheduler;
+import de.mcmodersd.unipensum.ui.session.SessionDetailSheet;
 import de.mcmodersd.unipensum.ui.week.WeekFragment;
 import de.mcmodersd.unipensum.ui.widget.PaneLayout;
 
@@ -36,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements Navigator {
      * is more reliable than counting back stack entries while a page is leaving.
      */
     private static final String FIRST_PAGE = "first-page";
+    /** Set by a reminder: the session the notification is about, which opens as its sheet. */
+    public static final String EXTRA_SESSION_ID = "unipensum.session_id";
 
     private PaneLayout pane;
 
@@ -66,14 +72,49 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         pane.setSideOpen(manager.getBackStackEntryCount() > 0, false);
 
         if (savedInstanceState == null) {
-            // Only does something in debug builds: adb shell am start ... --ez unipensum.debug.seed true
-            if (getIntent().getBooleanExtra(DebugSeeder.EXTRA_SEED, false)) {
-                DebugSeeder.seed(this);
-            }
+            seedIfAsked(getIntent());
             manager.beginTransaction()
                     .replace(R.id.container, new WeekFragment())
                     .commit();
+            openSessionOfIntent(getIntent());
         }
+    }
+
+    /** The app is already open when a reminder is tapped: the same activity gets the new intent. */
+    @Override
+    protected void onNewIntent(@NonNull Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        seedIfAsked(intent);
+        openSessionOfIntent(intent);
+    }
+
+    /**
+     * Only does something in debug builds: adb shell am start ... --ez unipensum.debug.seed true. The extra is
+     * taken from the intent, so it applies once, also when the app was already open (a new intent then).
+     */
+    private void seedIfAsked(Intent intent) {
+        if (!intent.getBooleanExtra(DebugSeeder.EXTRA_SEED, false)) return;
+        intent.removeExtra(DebugSeeder.EXTRA_SEED);
+        DebugSeeder.seed(this, intent);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Reminders that came due while the app was not running, and the alarm for the next one.
+        ReminderScheduler.update(this, true, null);
+    }
+
+    private void openSessionOfIntent(Intent intent) {
+        long sessionId = intent.getLongExtra(EXTRA_SESSION_ID, 0);
+        if (sessionId == 0) return;
+        // Taken from the intent, so turning the screen or coming back does not open it again.
+        intent.removeExtra(EXTRA_SESSION_ID);
+        FragmentManager manager = getSupportFragmentManager();
+        Fragment shown = manager.findFragmentByTag(SessionDetailSheet.TAG);
+        if (shown instanceof DialogFragment) ((DialogFragment) shown).dismissAllowingStateLoss();
+        SessionDetailSheet.show(manager, sessionId);
     }
 
     /**

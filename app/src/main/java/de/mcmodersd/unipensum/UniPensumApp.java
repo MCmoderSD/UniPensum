@@ -7,6 +7,8 @@ import de.mcmodersd.unipensum.data.AppSettings;
 import de.mcmodersd.unipensum.data.TimetableRepository;
 import de.mcmodersd.unipensum.data.backup.BackupManager;
 import de.mcmodersd.unipensum.data.db.Database;
+import de.mcmodersd.unipensum.reminder.ReminderNotifier;
+import de.mcmodersd.unipensum.reminder.ReminderScheduler;
 
 public class UniPensumApp extends Application {
 
@@ -27,6 +29,9 @@ public class UniPensumApp extends Application {
         backups = new BackupManager(this, database);
         settings = new AppSettings(this);
         settings.applyTheme();
+        ReminderNotifier.createChannel(this);
+        // The next reminder follows the data: whatever is saved or imported moves or removes the alarm.
+        database.setWriteListener(() -> ReminderScheduler.update(this, false, null));
     }
 
     public TimetableRepository repository() {
