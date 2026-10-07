@@ -35,6 +35,17 @@ public final class Timetable {
         return sessions == null ? Collections.emptyList() : Collections.unmodifiableList(sessions);
     }
 
+    /** Whether a session on {@code from} or later has a reminder. */
+    public boolean hasReminderFrom(LocalDate from) {
+        for (Map.Entry<LocalDate, List<SessionView>> day : byDay.entrySet()) {
+            if (day.getKey().isBefore(from)) continue;
+            for (SessionView view : day.getValue()) {
+                if (view.session().details().hasReminder()) return true;
+            }
+        }
+        return false;
+    }
+
     /** @return the semester containing that day, or {@code null} outside every semester */
     public Semester semesterAt(LocalDate day) {
         for (Semester semester : semesters) {

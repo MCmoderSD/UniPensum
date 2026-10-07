@@ -38,8 +38,10 @@ import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
 import de.mcmodersd.unipensum.domain.model.SessionType;
 import de.mcmodersd.unipensum.domain.text.TextSanitizer;
+import de.mcmodersd.unipensum.reminder.NotificationAccess;
 import de.mcmodersd.unipensum.ui.Navigator;
 import de.mcmodersd.unipensum.ui.course.CourseDraftViewModel;
+import de.mcmodersd.unipensum.ui.format.ReminderFormat;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
 import de.mcmodersd.unipensum.ui.lecturer.LecturerSheet;
@@ -159,6 +161,9 @@ public class SessionEditorFragment extends Fragment {
     private UpTextField roomField;
     private UpTextField linkField;
     private UpRow lecturerRow;
+    private UpSwitch reminderSwitch;
+    private UpStepper reminderStepper;
+    private UpRow notificationsOffRow;
     private UpTextField noteField;
     private TextView timeError;
     private TextView scheduleError;
@@ -297,6 +302,9 @@ public class SessionEditorFragment extends Fragment {
         roomField = view.findViewById(R.id.room_field);
         linkField = view.findViewById(R.id.link_field);
         lecturerRow = view.findViewById(R.id.lecturer_row);
+        reminderSwitch = view.findViewById(R.id.reminder_switch);
+        reminderStepper = view.findViewById(R.id.reminder_stepper);
+        notificationsOffRow = view.findViewById(R.id.notifications_off_row);
         noteField = view.findViewById(R.id.note_field);
         timeError = view.findViewById(R.id.time_error);
         scheduleError = view.findViewById(R.id.schedule_error);
@@ -344,7 +352,9 @@ public class SessionEditorFragment extends Fragment {
         modeControl.setOnSelectionChangedListener(index -> {
             Mode previous = form.mode;
             form.mode = Mode.values()[index];
+            // A reminder that is still the standard time of the old format becomes that of the new one.
             form.reminderMin = Reminders.afterModeChange(form.reminderMin, previous, form.mode);
+            reminderStepper.setValue(Reminders.afterModeChange(reminderStepper.getValue(), previous, form.mode));
             updateModeVisibility();
         });
         hybridSwitch.setChecked(form.hybrid);
@@ -373,6 +383,19 @@ public class SessionEditorFragment extends Fragment {
             for (Lecturer lecturer : list) lecturers.put(lecturer.id(), lecturer);
             renderLecturer();
         });
+        reminderStepper.setRange(0, SessionDetails.MAX_REMINDER_MIN);
+        reminderStepper.setStep(Reminders.STEP_MIN);
+        reminderStepper.setFormatter(minutes -> ReminderFormat.text(requireContext(), minutes));
+        boolean reminderOn = form.reminderMin != SessionDetails.NO_REMINDER;
+        reminderStepper.setValue(reminderOn ? form.reminderMin : Reminders.defaultFor(form.mode));
+        reminderSwitch.setChecked(reminderOn);
+        reminderSwitch.setOnCheckedChangeListener(checked -> {
+            form.reminderMin = checked ? reminderStepper.getValue() : SessionDetails.NO_REMINDER;
+            updateReminderVisibility();
+        });
+        reminderStepper.setOnValueChangedListener(minutes -> form.reminderMin = minutes);
+        notificationsOffRow.setOnClickListener(v -> NotificationAccess.openSettings(requireContext()));
+
         noteField.setMultiLine(3);
         noteField.setMaxLength(TextSanitizer.MAX_NOTE);
         noteField.setText(form.note);
@@ -436,7 +459,23 @@ public class SessionEditorFragment extends Fragment {
         renderValues();
         updateModeVisibility();
         updateRepeatVisibility();
+        updateReminderVisibility();
         formScroll.setVisibility(View.VISIBLE);
+    }
+
+    /** The user may come back from the system settings where the notifications were turned on. */
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (form != null && getView() != null) updateReminderVisibility();
+    }
+
+    /** The time is only there while the reminder is on, and so is the hint that notifications are off. */
+    private void updateReminderVisibility() {
+        boolean on = form.reminderMin != SessionDetails.NO_REMINDER;
+        reminderStepper.setVisibility(on ? View.VISIBLE : View.GONE);
+        notificationsOffRow.setVisibility(on && !NotificationAccess.allowed(requireContext())
+                ? View.VISIBLE : View.GONE);
     }
 
     private static int repeatIndex(int interval) {

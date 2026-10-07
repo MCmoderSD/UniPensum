@@ -161,6 +161,52 @@
                 app:upChevron="true"
                 app:upTitle="@string/field_lecturer" />
 
+            <TextView
+                style="@style/TextAppearance.Up.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="@string/field_reminder" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/space_1">
+
+                <TextView
+                    style="@style/TextAppearance.Up.Body"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/reminder_switch" />
+
+                <de.mcmodersd.unipensum.ui.widget.UpSwitch
+                    android:id="@+id/reminder_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/reminder_switch" />
+            </LinearLayout>
+
+            <de.mcmodersd.unipensum.ui.widget.UpStepper
+                android:id="@+id/reminder_stepper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_2" />
+
+            <!-- Shown while the reminder is on but the app may not show notifications. -->
+            <de.mcmodersd.unipensum.ui.widget.UpRow
+                android:id="@+id/notifications_off_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_2"
+                android:visibility="gone"
+                app:upChevron="true"
+                app:upSubtitle="@string/reminder_off_summary"
+                app:upTitle="@string/reminder_off_title" />
+
             <!-- Series scopes: period and repetition. -->
             <LinearLayout
                 android:id="@+id/period_block"

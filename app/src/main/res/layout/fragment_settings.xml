@@ -86,6 +86,55 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_5"
+                android:text="@string/settings_reminders" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/space_1">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/TextAppearance.Up.Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_reminders_enabled" />
+
+                    <TextView
+                        style="@style/TextAppearance.Up.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_reminders_summary" />
+                </LinearLayout>
+
+                <de.mcmodersd.unipensum.ui.widget.UpSwitch
+                    android:id="@+id/reminders_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/settings_reminders_enabled" />
+            </LinearLayout>
+
+            <de.mcmodersd.unipensum.ui.widget.UpRow
+                android:id="@+id/notifications_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_2"
+                app:upChevron="true"
+                app:upTitle="@string/settings_notifications" />
+
+            <TextView
+                style="@style/TextAppearance.Up.Section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_5"
                 android:text="@string/settings_lecturers" />
 
             <TextView

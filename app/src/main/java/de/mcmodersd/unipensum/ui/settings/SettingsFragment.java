@@ -23,6 +23,8 @@ import de.mcmodersd.unipensum.data.AppSettings;
 import de.mcmodersd.unipensum.data.AppSettings.ThemeMode;
 import de.mcmodersd.unipensum.data.AppSettings.TimeWindow;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
+import de.mcmodersd.unipensum.reminder.NotificationAccess;
+import de.mcmodersd.unipensum.reminder.ReminderScheduler;
 import de.mcmodersd.unipensum.ui.Links;
 import de.mcmodersd.unipensum.ui.Navigator;
 import de.mcmodersd.unipensum.ui.backup.BackupExportSheet;
@@ -33,6 +35,7 @@ import de.mcmodersd.unipensum.ui.widget.Haptics;
 import de.mcmodersd.unipensum.ui.widget.UpRow;
 import de.mcmodersd.unipensum.ui.widget.UpSegmentedControl;
 import de.mcmodersd.unipensum.ui.widget.UpStepper;
+import de.mcmodersd.unipensum.ui.widget.UpSwitch;
 
 /** Theme, language, the visible hours of the grid and a way into the semester list. */
 public class SettingsFragment extends Fragment {
@@ -51,6 +54,7 @@ public class SettingsFragment extends Fragment {
     private AppSettings settings;
     private UpStepper hoursStart;
     private UpStepper hoursEnd;
+    private UpRow notificationsRow;
 
     @Nullable
     @Override
@@ -69,6 +73,7 @@ public class SettingsFragment extends Fragment {
         bindLanguage(view.findViewById(R.id.language_control));
         bindHours(view.findViewById(R.id.hours_start), view.findViewById(R.id.hours_end));
         bindLecturerNames(view.findViewById(R.id.lecturer_name_control));
+        bindReminders(view.findViewById(R.id.reminders_switch), view.findViewById(R.id.notifications_row));
 
         view.findViewById(R.id.manage_lecturers).setOnClickListener(v ->
                 LecturerSheet.showManager(getParentFragmentManager()));
@@ -132,6 +137,30 @@ public class SettingsFragment extends Fragment {
         NameStyle current = settings.lecturerNameStyle().getValue();
         control.setSelectedIndex(current == null ? NameStyle.LAST_NAME.ordinal() : current.ordinal());
         control.setOnSelectionChangedListener(index -> settings.setLecturerNameStyle(NameStyle.values()[index]));
+    }
+
+    private void bindReminders(UpSwitch enabled, UpRow notifications) {
+        notificationsRow = notifications;
+        enabled.setChecked(settings.remindersEnabled());
+        enabled.setOnCheckedChangeListener(on -> {
+            settings.setRemindersEnabled(on);
+            // Turning them off removes the alarm, turning them on sets it again.
+            ReminderScheduler.update(requireContext(), false, null);
+        });
+        notifications.setOnClickListener(v -> NotificationAccess.openSettings(requireContext()));
+        renderNotifications();
+    }
+
+    /** Back from the system settings, where the answer may have changed. */
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (notificationsRow != null) renderNotifications();
+    }
+
+    private void renderNotifications() {
+        notificationsRow.setValue(getString(NotificationAccess.allowed(requireContext())
+                ? R.string.notifications_on : R.string.notifications_off));
     }
 
     private void bindHours(UpStepper start, UpStepper end) {

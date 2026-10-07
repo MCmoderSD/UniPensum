@@ -29,6 +29,7 @@ public class UpStepper extends LinearLayout {
     private int min = 1;
     private int max = 99;
     private int value = 1;
+    private int step = 1;
     private Formatter formatter = String::valueOf;
     private OnValueChangedListener listener;
 
@@ -79,6 +80,11 @@ public class UpStepper extends LinearLayout {
         render();
     }
 
+    /** How far one press moves the value; 1 by default. A value that is not a multiple stays until it is moved. */
+    public void setStep(int step) {
+        this.step = Math.max(1, step);
+    }
+
     public void setFormatter(Formatter formatter) {
         this.formatter = formatter;
         render();
@@ -104,7 +110,7 @@ public class UpStepper extends LinearLayout {
 
     /** @return whether the value changed, which is not the case at the end of the range */
     private boolean change(int delta) {
-        int next = Math.max(min, Math.min(max, value + delta));
+        int next = Math.max(min, Math.min(max, value + delta * step));
         if (next == value) return false;
         value = next;
         render();

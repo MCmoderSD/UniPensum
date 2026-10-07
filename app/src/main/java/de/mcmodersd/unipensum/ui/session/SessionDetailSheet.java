@@ -23,6 +23,7 @@ import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
 import de.mcmodersd.unipensum.ui.Links;
 import de.mcmodersd.unipensum.ui.Navigator;
+import de.mcmodersd.unipensum.ui.format.ReminderFormat;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
@@ -140,6 +141,10 @@ public final class SessionDetailSheet extends UpSheet {
                 column.addView(contact(app, dp, R.drawable.ic_phone, lecturer.phone(),
                         getString(R.string.lecturer_phone), Links::dial));
             }
+        }
+        if (details.hasReminder()) {
+            column.addView(info(app, dp, ReminderFormat.text(app, details.reminderMin()),
+                    getString(R.string.field_reminder)));
         }
         if (details.note() != null) {
             column.addView(info(app, dp, details.note(), getString(R.string.field_note)));

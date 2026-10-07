@@ -1,11 +1,15 @@
 package de.mcmodersd.unipensum.ui.week;
 
+import android.Manifest;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -18,9 +22,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 import de.mcmodersd.unipensum.R;
+import de.mcmodersd.unipensum.UniPensumApp;
+import de.mcmodersd.unipensum.data.AppSettings;
 import de.mcmodersd.unipensum.data.Timetable;
 import de.mcmodersd.unipensum.domain.logic.Weeks;
 import de.mcmodersd.unipensum.domain.model.Semester;
+import de.mcmodersd.unipensum.reminder.NotificationAccess;
 import de.mcmodersd.unipensum.ui.Navigator;
 import de.mcmodersd.unipensum.ui.course.CourseDraftViewModel;
 import de.mcmodersd.unipensum.ui.course.CourseEditorFragment;
@@ -31,6 +38,7 @@ import de.mcmodersd.unipensum.ui.semester.SemesterEditorSheet;
 import de.mcmodersd.unipensum.ui.semester.SemesterSheet;
 import de.mcmodersd.unipensum.ui.session.SessionDetailSheet;
 import de.mcmodersd.unipensum.ui.settings.SettingsFragment;
+import de.mcmodersd.unipensum.ui.widget.ConfirmSheet;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
 
 /**
@@ -42,7 +50,11 @@ public class WeekFragment extends Fragment {
     /** How long the zoom label stays once the zoom is back at 100 %. */
     private static final long ZOOM_INDICATOR_MS = 1200;
 
+    private static final String KEY_NOTIFICATIONS = "week_notifications";
+
     private final Runnable hideZoom = this::fadeOutZoom;
+    private final ActivityResultLauncher<String> askNotifications =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> { });
     private WeekViewModel viewModel;
     private ViewPager2 pager;
     private TextView zoomIndicator;
@@ -97,6 +109,8 @@ public class WeekFragment extends Fragment {
             }
         });
 
+        getParentFragmentManager().setFragmentResultListener(KEY_NOTIFICATIONS, getViewLifecycleOwner(),
+                (key, result) -> allowNotifications());
         title.setOnClickListener(v -> {
             Haptics.tap(v);
             SemesterSheet.show(getParentFragmentManager());
@@ -116,6 +130,7 @@ public class WeekFragment extends Fragment {
         viewModel.timetable().observe(getViewLifecycleOwner(), loaded -> {
             timetable = loaded;
             adapter.setTimetable(loaded);
+            askForNotificationsOnce(loaded);
             boolean noSemesters = loaded.semesters().isEmpty();
             empty.setVisibility(noSemesters ? View.VISIBLE : View.GONE);
             pager.setVisibility(noSemesters ? View.INVISIBLE : View.VISIBLE);
@@ -151,6 +166,33 @@ public class WeekFragment extends Fragment {
     private void fadeOutZoom() {
         zoomIndicator.animate().alpha(0f).setDuration(250)
                 .withEndAction(() -> zoomIndicator.setVisibility(View.INVISIBLE));
+    }
+
+    /**
+     * Asks once, with an explanation of its own before the system's question, as soon as there is a reminder that
+     * would not come without notifications. A no, or a swipe away, is answered by the hints in the event form and
+     * in the settings, not by asking again.
+     */
+    private void askForNotificationsOnce(Timetable loaded) {
+        AppSettings settings = UniPensumApp.from(requireContext()).settings();
+        if (!settings.remindersEnabled() || settings.notificationsAsked()
+                || NotificationAccess.allowed(requireContext())
+                || !loaded.hasReminderFrom(LocalDate.now())) {
+            return;
+        }
+        settings.setNotificationsAsked();
+        ConfirmSheet.show(getParentFragmentManager(), KEY_NOTIFICATIONS,
+                getString(R.string.reminder_permission_title), getString(R.string.reminder_permission_message),
+                getString(R.string.reminder_permission_allow), false);
+    }
+
+    private void allowNotifications() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS);
+        } else {
+            // Before Android 13 the notifications are on until the user turns them off in the settings.
+            NotificationAccess.openSettings(requireContext());
+        }
     }
 
     /** The semester of the visible week, or the latest one if the week lies outside every semester. */
