@@ -25,6 +25,7 @@ import de.mcmodersd.unipensum.UniPensumApp;
 import de.mcmodersd.unipensum.data.SessionContext;
 import de.mcmodersd.unipensum.data.db.Database;
 import de.mcmodersd.unipensum.domain.logic.Recurrence;
+import de.mcmodersd.unipensum.domain.logic.Reminders;
 import de.mcmodersd.unipensum.domain.logic.SemesterDefaults;
 import de.mcmodersd.unipensum.domain.logic.SemesterRules;
 import de.mcmodersd.unipensum.domain.model.EditScope;
@@ -112,6 +113,7 @@ public class SessionEditorFragment extends Fragment {
         String link = "";
         long lecturerId = SessionDetails.NO_LECTURER;
         String note = "";
+        int reminderMin = Reminders.defaultFor(Mode.IN_PERSON);
         LocalDate first;
         LocalDate last;
         /**
@@ -269,6 +271,7 @@ public class SessionEditorFragment extends Fragment {
         target.link = orEmpty(details.link());
         target.lecturerId = details.lecturerId();
         target.note = orEmpty(details.note());
+        target.reminderMin = details.reminderMin();
     }
 
     private static String orEmpty(String value) {
@@ -339,7 +342,9 @@ public class SessionEditorFragment extends Fragment {
         modeControl.setOptions(getString(R.string.mode_in_person), getString(R.string.mode_online));
         modeControl.setSelectedIndex(form.mode.ordinal());
         modeControl.setOnSelectionChangedListener(index -> {
+            Mode previous = form.mode;
             form.mode = Mode.values()[index];
+            form.reminderMin = Reminders.afterModeChange(form.reminderMin, previous, form.mode);
             updateModeVisibility();
         });
         hybridSwitch.setChecked(form.hybrid);
@@ -524,7 +529,7 @@ public class SessionEditorFragment extends Fragment {
         }
 
         SessionDetails details = new SessionDetails(form.type, form.startMin, form.endMin, form.mode, form.hybrid,
-                form.room, form.link, form.lecturerId, form.note).normalized();
+                form.room, form.link, form.lecturerId, form.note, form.reminderMin).normalized();
 
         if (seriesMode) {
             Series source = form.source;

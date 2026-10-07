@@ -14,7 +14,7 @@ import java.time.DayOfWeek;
 public class ModelTest {
 
     private static SessionDetails details(Mode mode, boolean hybrid, String room, String link) {
-        return new SessionDetails(SessionType.LECTURE, 480, 570, mode, hybrid, room, link, 0, "");
+        return new SessionDetails(SessionType.LECTURE, 480, 570, mode, hybrid, room, link, 0, "", SessionDetails.NO_REMINDER);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class ModelTest {
     @Test
     public void normalized_cleansTextAndTheLink() {
         SessionDetails dirty = new SessionDetails(SessionType.LECTURE, 480, 570, Mode.IN_PERSON, true,
-                "  A1\t ​", " meet.example/abc ", 0, " bring ‮laptop \r\n\r\n\r\n room B2 ");
+                "  A1\t ​", " meet.example/abc ", 0, " bring ‮laptop \r\n\r\n\r\n room B2 ", SessionDetails.NO_REMINDER);
 
         SessionDetails result = dirty.normalized();
 
@@ -85,7 +85,7 @@ public class ModelTest {
     @Test
     public void normalized_isIdempotent() {
         SessionDetails once = new SessionDetails(SessionType.LAB, 480, 570, Mode.IN_PERSON, true,
-                " A1 ", "HTTPS://meet.example/a b", 3, " x \n\n\n y ").normalized();
+                " A1 ", "HTTPS://meet.example/a b", 3, " x \n\n\n y ", SessionDetails.NO_REMINDER).normalized();
         assertEquals(once, once.normalized());
     }
 
@@ -111,15 +111,50 @@ public class ModelTest {
 
     private static SessionDetails withLecturer(SessionDetails d, long lecturerId) {
         return new SessionDetails(d.type(), d.startMin(), d.endMin(), d.mode(), d.hybrid(),
-                d.room(), d.link(), lecturerId, d.note());
+                d.room(), d.link(), lecturerId, d.note(), d.reminderMin());
+    }
+
+    @Test
+    public void normalized_bringsTheReminderIntoItsRange() {
+        SessionDetails base = details(Mode.IN_PERSON, false, "A1", null);
+        assertEquals(30, base.withReminder(30).normalized().reminderMin());
+        assertEquals(0, base.withReminder(0).normalized().reminderMin());
+        assertEquals(SessionDetails.MAX_REMINDER_MIN, base.withReminder(180).normalized().reminderMin());
+        assertEquals(SessionDetails.MAX_REMINDER_MIN, base.withReminder(100_000).normalized().reminderMin());
+        assertEquals(SessionDetails.NO_REMINDER, base.withReminder(-1).normalized().reminderMin());
+        assertEquals(SessionDetails.NO_REMINDER, base.withReminder(-30).normalized().reminderMin());
+    }
+
+    @Test
+    public void reminder_isKeptForEveryFormat() {
+        assertEquals(5, details(Mode.ONLINE, false, null, null).withReminder(5).normalized().reminderMin());
+        assertEquals(45, details(Mode.IN_PERSON, true, "A1", "https://meet.example/x").withReminder(45)
+                .normalized().reminderMin());
+    }
+
+    @Test
+    public void hasReminder_isTrueForZeroMinutes() {
+        assertTrue(details(Mode.IN_PERSON, false, null, null).withReminder(0).hasReminder());
+        assertFalse(details(Mode.IN_PERSON, false, null, null).withReminder(SessionDetails.NO_REMINDER).hasReminder());
+    }
+
+    @Test
+    public void with_changesOnlyThatField() {
+        SessionDetails base = details(Mode.ONLINE, false, null, "https://meet.example/x").withReminder(15);
+
+        assertEquals(base.withLecturer(9), new SessionDetails(base.type(), base.startMin(), base.endMin(), base.mode(),
+                base.hybrid(), base.room(), base.link(), 9, base.note(), 15));
+        assertEquals(15, base.withLink(null).reminderMin());
+        assertNull(base.withLink(null).link());
+        assertEquals("https://meet.example/x", base.withReminder(0).link());
     }
 
     @Test
     public void hasValidTimes() {
-        assertTrue(new SessionDetails(SessionType.LAB, 0, 1440, Mode.ONLINE, false, null, null, 0, null).hasValidTimes());
-        assertFalse(new SessionDetails(SessionType.LAB, 600, 600, Mode.ONLINE, false, null, null, 0, null).hasValidTimes());
-        assertFalse(new SessionDetails(SessionType.LAB, 700, 600, Mode.ONLINE, false, null, null, 0, null).hasValidTimes());
-        assertFalse(new SessionDetails(SessionType.LAB, 600, 1441, Mode.ONLINE, false, null, null, 0, null).hasValidTimes());
+        assertTrue(new SessionDetails(SessionType.LAB, 0, 1440, Mode.ONLINE, false, null, null, 0, null, SessionDetails.NO_REMINDER).hasValidTimes());
+        assertFalse(new SessionDetails(SessionType.LAB, 600, 600, Mode.ONLINE, false, null, null, 0, null, SessionDetails.NO_REMINDER).hasValidTimes());
+        assertFalse(new SessionDetails(SessionType.LAB, 700, 600, Mode.ONLINE, false, null, null, 0, null, SessionDetails.NO_REMINDER).hasValidTimes());
+        assertFalse(new SessionDetails(SessionType.LAB, 600, 1441, Mode.ONLINE, false, null, null, 0, null, SessionDetails.NO_REMINDER).hasValidTimes());
     }
 
     @Test

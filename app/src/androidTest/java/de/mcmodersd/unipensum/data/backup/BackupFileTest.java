@@ -86,9 +86,9 @@ public class BackupFileTest {
         long semester = TimetableStore.saveSemester(db, new Semester(0, START, END, "Winter term"));
 
         SessionDetails lecture = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
-                "A1", "https://meet.example/x", weber, "bring laptop\n\nroom B2");
+                "A1", "https://meet.example/x", weber, "bring laptop\n\nroom B2", 45);
         SessionDetails exercise = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
-                null, "https://meet.example/y", koch, null);
+                null, "https://meet.example/y", koch, null, SessionDetails.NO_REMINDER);
         TimetableStore.createCourse(db,
                 new Course(0, semester, "Math", CourseColor.TEAL, "https://moodle.example/c/1"),
                 List.of(new Series(0, 0, lecture, new Schedule(DayOfWeek.MONDAY, START, END, 1)),
@@ -97,7 +97,7 @@ public class BackupFileTest {
         // One session of the lecture deviates: another day and room.
         Session first = TimetableStore.loadTimetable(db).on(START.plusWeeks(2)).get(0).session();
         SessionDetails moved = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
-                "B7", "https://meet.example/x", weber, "bring laptop\n\nroom B2");
+                "B7", "https://meet.example/x", weber, "bring laptop\n\nroom B2", 45);
         TimetableStore.editSession(db, first.id(), EditScope.THIS_ONLY, moved, START.plusWeeks(2).plusDays(1), null);
         return TimetableStore.exportData(db);
     }
@@ -353,6 +353,58 @@ public class BackupFileTest {
         assertEquals(Mode.ONLINE, moved.details().mode());
         assertNull(moved.details().room());
         assertEquals(2, moved.details().lecturerId());
+    }
+
+    @Test
+    public void aFileFromBeforeTheReminders_getsTheDefaultOfEachEvent() throws Exception {
+        // Do not "fix" this sample when the code changes: it stands for files that already exist.
+        BackupFile.Opened opened = open(zip(sampleFile(
+                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"appVersion\":\"1.0\",\"appVersionCode\":1}",
+                "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
+                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
+                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-12\","
+                        + "\"type\":\"lecture\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"},"
+                        + "{\"id\":2,\"course\":1,\"weekday\":2,\"first\":\"2026-10-06\",\"last\":\"2026-10-13\","
+                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"online\"}],"
+                        + "\"sessions\":[{\"id\":1,\"series\":1,\"day\":\"2026-10-05\",\"type\":\"lecture\","
+                        + "\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"},"
+                        + "{\"id\":2,\"series\":2,\"day\":\"2026-10-06\",\"type\":\"lab\",\"startMin\":480,"
+                        + "\"endMin\":600,\"mode\":\"online\"}]}")));
+
+        BackupCleaner.Result result = opened.read(null);
+
+        // Nothing was changed by the reader: a file that never had the field is not a damaged one.
+        assertEquals(new BackupReport(0, 1, 1, 2, 2, 0, 0), result.report());
+        assertEquals(30, result.data().series().get(0).details().reminderMin());
+        assertEquals(5, result.data().series().get(1).details().reminderMin());
+        assertEquals(30, result.data().sessions().get(0).details().reminderMin());
+        assertEquals(5, result.data().sessions().get(1).details().reminderMin());
+    }
+
+    @Test
+    public void remindersInAFile_areKeptBroughtIntoRangeOrReplacedByTheDefault() throws Exception {
+        BackupFile.Opened opened = open(zip(sampleFile(
+                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":3}",
+                "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
+                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
+                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-05\","
+                        + "\"type\":\"lecture\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\",\"reminder\":0},"
+                        + "{\"id\":2,\"course\":1,\"weekday\":2,\"first\":\"2026-10-06\",\"last\":\"2026-10-06\","
+                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"online\",\"reminder\":-1},"
+                        + "{\"id\":3,\"course\":1,\"weekday\":3,\"first\":\"2026-10-07\",\"last\":\"2026-10-07\","
+                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\",\"reminder\":9999},"
+                        + "{\"id\":4,\"course\":1,\"weekday\":4,\"first\":\"2026-10-08\",\"last\":\"2026-10-08\","
+                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"online\",\"reminder\":\"soon\"}]}")));
+
+        BackupCleaner.Result result = opened.read(null);
+
+        List<Series> series = result.data().series();
+        assertEquals(0, series.get(0).details().reminderMin());
+        assertEquals(SessionDetails.NO_REMINDER, series.get(1).details().reminderMin());
+        assertEquals(SessionDetails.MAX_REMINDER_MIN, series.get(2).details().reminderMin());
+        assertEquals(5, series.get(3).details().reminderMin());
+        // Only the value that is no number counts as adjusted.
+        assertEquals(new BackupReport(0, 1, 1, 4, 0, 0, 1), result.report());
     }
 
     @Test

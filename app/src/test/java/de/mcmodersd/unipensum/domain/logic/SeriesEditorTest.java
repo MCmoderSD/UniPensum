@@ -11,6 +11,7 @@ import static de.mcmodersd.unipensum.domain.Fixtures.withLecturer;
 import static de.mcmodersd.unipensum.domain.Fixtures.withNote;
 import static de.mcmodersd.unipensum.domain.Fixtures.withRoom;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -74,6 +75,63 @@ public class SeriesEditorTest {
                 EditScope.THIS_ONLY, details(), date(10, 24), series.schedule()));          // Saturday
         assertThrows(IllegalArgumentException.class, () -> SeriesEditor.edit(SEMESTER, series, sessions, 103,
                 EditScope.THIS_ONLY, details(), date(10, 2), series.schedule()));           // before the semester
+    }
+
+    // --- reminders ---
+
+    private static SessionDetails withReminder(int minutes) {
+        return details().withReminder(minutes);
+    }
+
+    @Test
+    public void editThisOnly_changesTheReminderOfThatSessionOnly() {
+        ChangeSet changes = edit(103, EditScope.THIS_ONLY, withReminder(10), series.schedule());
+
+        assertEquals(1, changes.updatedSessions.size());
+        assertEquals(10, changes.updatedSessions.get(0).details().reminderMin());
+        assertTrue(changes.updatedSeries.isEmpty());
+    }
+
+    @Test
+    public void editAll_carriesTheReminderToEverySessionAndTheSeries() {
+        ChangeSet changes = edit(103, EditScope.ALL, withReminder(10), series.schedule());
+
+        assertEquals(10, changes.updatedSeries.get(0).details().reminderMin());
+        assertEquals(5, changes.updatedSessions.size());
+        for (Session session : changes.updatedSessions) assertEquals(10, session.details().reminderMin());
+    }
+
+    @Test
+    public void editAll_keepsASessionThatHasAReminderOfItsOwn() {
+        sessions.set(2, sessions.get(2).withDetails(withReminder(60)));
+
+        ChangeSet changes = edit(101, EditScope.ALL, withRoom(details(), "B2"), series.schedule());
+
+        assertEquals(60, byId(changes.updatedSessions, 103).details().reminderMin());
+        assertEquals("B2", byId(changes.updatedSessions, 103).details().room());
+    }
+
+    @Test
+    public void editAll_switchingTheReminderOff_reachesEverySession() {
+        Series reminded = new Series(10, 1, withReminder(30), series.schedule());
+        List<Session> remindedSessions = sessionsOf(reminded, 101);
+
+        ChangeSet changes = SeriesEditor.edit(SEMESTER, reminded, remindedSessions, 101, EditScope.ALL,
+                withReminder(SessionDetails.NO_REMINDER), date(10, 5), reminded.schedule());
+
+        assertEquals(5, changes.updatedSessions.size());
+        for (Session session : changes.updatedSessions) assertFalse(session.details().hasReminder());
+        assertFalse(changes.updatedSeries.get(0).details().hasReminder());
+    }
+
+    @Test
+    public void editFollowing_carriesTheReminderFromThatSessionOn() {
+        ChangeSet changes = edit(103, EditScope.THIS_AND_FOLLOWING, withReminder(15), series.schedule());
+
+        ChangeSet.NewSeries created = changes.newSeries.get(0);
+        assertEquals(15, created.series().details().reminderMin());
+        for (Session session : created.adopted()) assertEquals(15, session.details().reminderMin());
+        assertEquals(3, created.adopted().size());
     }
 
     // --- edit: whole series ---

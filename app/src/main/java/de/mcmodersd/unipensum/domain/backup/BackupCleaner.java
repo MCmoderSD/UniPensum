@@ -144,21 +144,15 @@ public final class BackupCleaner {
             lecturer = SessionDetails.NO_LECTURER;
             adjusted++;
         }
-        var link = details.link();
-        var candidate = withLecturerAndLink(details, lecturer, link);
+        var candidate = details.withLecturer(lecturer);
         SessionDetails clean;
         try {
             clean = candidate.normalized();
         } catch (IllegalArgumentException notAWebLink) {
-            clean = withLecturerAndLink(details, lecturer, null).normalized();
+            clean = candidate.withLink(null).normalized();
             adjusted++;
         }
         return clean;
-    }
-
-    private static SessionDetails withLecturerAndLink(SessionDetails d, long lecturerId, String link) {
-        return new SessionDetails(d.type(), d.startMin(), d.endMin(), d.mode(), d.hybrid(),
-                d.room(), link, lecturerId, d.note());
     }
 
     private String webLinkOrNull(String link) {

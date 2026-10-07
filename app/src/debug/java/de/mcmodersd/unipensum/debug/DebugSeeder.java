@@ -9,6 +9,7 @@ import java.util.List;
 
 import de.mcmodersd.unipensum.UniPensumApp;
 import de.mcmodersd.unipensum.data.TimetableStore;
+import de.mcmodersd.unipensum.domain.logic.Reminders;
 import de.mcmodersd.unipensum.domain.logic.SemesterDefaults;
 import de.mcmodersd.unipensum.domain.model.Course;
 import de.mcmodersd.unipensum.domain.model.CourseColor;
@@ -89,6 +90,6 @@ public final class DebugSeeder {
     private static SessionDetails details(SessionType type, int startHour, int startMinute, int endHour, int endMinute,
                                           Mode mode, boolean hybrid, String room, String link, long lecturerId) {
         return new SessionDetails(type, startHour * 60 + startMinute, endHour * 60 + endMinute, mode, hybrid,
-                room, link, lecturerId, null);
+                room, link, lecturerId, null, Reminders.defaultFor(mode));
     }
 }

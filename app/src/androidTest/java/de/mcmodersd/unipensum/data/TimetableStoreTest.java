@@ -73,7 +73,7 @@ public class TimetableStoreTest {
 
     private SessionDetails lecture() {
         return new SessionDetails(SessionType.LECTURE, 8 * 60, 11 * 60, Mode.IN_PERSON, false,
-                "A1", null, lecturerId, null);
+                "A1", null, lecturerId, null, SessionDetails.NO_REMINDER);
     }
 
     private long semester(LocalDate start, LocalDate end) {
@@ -118,7 +118,7 @@ public class TimetableStoreTest {
     public void series_roundTripsEveryField() {
         long semesterId = semester(START, END);
         SessionDetails hybrid = new SessionDetails(SessionType.TUTORIAL, 13 * 60 + 15, 14 * 60 + 45,
-                Mode.IN_PERSON, true, "B 2.04", "https://meet.example/room", lecturerId, "Bring laptop");
+                Mode.IN_PERSON, true, "B 2.04", "https://meet.example/room", lecturerId, "Bring laptop", SessionDetails.NO_REMINDER);
         course(semesterId, series(hybrid, DayOfWeek.WEDNESDAY, date(10, 7), date(12, 16), 3));
 
         Series stored = TimetableStore.listCourses(db, semesterId).get(0).series().get(0);
@@ -128,10 +128,88 @@ public class TimetableStoreTest {
     }
 
     @Test
+    public void reminder_roundTripsInTheSeriesAndTheirSessions_andNoneStaysNone() {
+        long semesterId = semester(START, END);
+        course(semesterId,
+                series(lecture().withReminder(45), DayOfWeek.MONDAY, START, date(10, 12), 1),
+                series(lecture().withReminder(0), DayOfWeek.TUESDAY, START, date(10, 12), 1),
+                series(lecture(), DayOfWeek.WEDNESDAY, START, date(10, 12), 1));
+
+        List<Series> stored = TimetableStore.listCourses(db, semesterId).get(0).series();
+        Timetable timetable = TimetableStore.loadTimetable(db);
+
+        assertEquals(45, stored.get(0).details().reminderMin());
+        assertEquals(0, stored.get(1).details().reminderMin());
+        assertEquals(SessionDetails.NO_REMINDER, stored.get(2).details().reminderMin());
+        assertEquals(45, timetable.on(date(10, 5)).get(0).session().details().reminderMin());
+        assertEquals(0, timetable.on(date(10, 6)).get(0).session().details().reminderMin());
+        assertEquals(SessionDetails.NO_REMINDER, timetable.on(date(10, 7)).get(0).session().details().reminderMin());
+    }
+
+    @Test
+    public void reminder_isBroughtIntoItsRangeWhenSaved() {
+        long semesterId = semester(START, END);
+        course(semesterId, series(lecture().withReminder(5_000), DayOfWeek.MONDAY, START, START, 1),
+                series(lecture().withReminder(-20), DayOfWeek.TUESDAY, START, date(10, 6), 1));
+
+        List<Series> stored = TimetableStore.listCourses(db, semesterId).get(0).series();
+
+        assertEquals(SessionDetails.MAX_REMINDER_MIN, stored.get(0).details().reminderMin());
+        assertEquals(SessionDetails.NO_REMINDER, stored.get(1).details().reminderMin());
+    }
+
+    @Test
+    public void loadReminders_holdsTheSessionsWithAReminderFromTheDayOn() {
+        long semesterId = semester(START, END);
+        course(semesterId,
+                series(lecture().withReminder(30), DayOfWeek.MONDAY, START, date(10, 19), 1),
+                series(lecture(), DayOfWeek.THURSDAY, START, date(10, 19), 1));
+        TimetableStore.createCourse(db, new Course(0, semesterId, "Physics", CourseColor.RED, "https://moodle.example/p"),
+                List.of(series(lecture().withReminder(5), DayOfWeek.TUESDAY, date(10, 13), date(10, 13), 1)));
+
+        List<ReminderView> reminders = TimetableStore.loadReminders(db, date(10, 12));
+
+        // Monday 12th and 19th of "Math", Tuesday 13th of "Physics"; no Thursday, no Monday 5th.
+        assertEquals(3, reminders.size());
+        assertEquals(date(10, 12), reminders.get(0).session().day());
+        assertEquals("Math", reminders.get(0).courseName());
+        assertNull(reminders.get(0).moodleLink());
+        assertEquals(date(10, 13), reminders.get(1).session().day());
+        assertEquals("Physics", reminders.get(1).courseName());
+        assertEquals("https://moodle.example/p", reminders.get(1).moodleLink());
+        assertEquals(5, reminders.get(1).session().details().reminderMin());
+        assertEquals(date(10, 19), reminders.get(2).session().day());
+    }
+
+    @Test
+    public void editSession_changesTheReminderWithinItsScope() {
+        long semesterId = semester(START, END);
+        course(semesterId, series(lecture().withReminder(30), DayOfWeek.MONDAY, START, date(10, 26), 1));
+        Schedule schedule = new Schedule(DayOfWeek.MONDAY, START, date(10, 26), 1);
+
+        TimetableStore.editSession(db, sessionIdOn(date(10, 12)), EditScope.THIS_ONLY,
+                lecture().withReminder(10), date(10, 12), null);
+        assertEquals(10, reminderOn(date(10, 12)));
+        assertEquals(30, reminderOn(date(10, 5)));
+        assertEquals(30, reminderOn(date(10, 19)));
+
+        TimetableStore.editSession(db, sessionIdOn(date(10, 19)), EditScope.THIS_AND_FOLLOWING,
+                lecture().withReminder(SessionDetails.NO_REMINDER), date(10, 19), schedule);
+        assertEquals(30, reminderOn(date(10, 5)));
+        assertEquals(10, reminderOn(date(10, 12)));
+        assertEquals(SessionDetails.NO_REMINDER, reminderOn(date(10, 19)));
+        assertEquals(SessionDetails.NO_REMINDER, reminderOn(date(10, 26)));
+    }
+
+    private int reminderOn(LocalDate day) {
+        return TimetableStore.loadTimetable(db).on(day).get(0).session().details().reminderMin();
+    }
+
+    @Test
     public void createCourse_normalizesDetailsForTheChosenMode() {
         long semesterId = semester(START, END);
         SessionDetails online = new SessionDetails(SessionType.LECTURE, 600, 700, Mode.ONLINE, true,
-                "Leftover room", "https://meet.example/x", SessionDetails.NO_LECTURER, "");
+                "Leftover room", "https://meet.example/x", SessionDetails.NO_LECTURER, "", SessionDetails.NO_REMINDER);
         course(semesterId, series(online, DayOfWeek.FRIDAY, date(10, 9), date(10, 9), 1));
 
         SessionDetails stored = TimetableStore.listCourses(db, semesterId).get(0).series().get(0).details();
@@ -147,7 +225,7 @@ public class TimetableStoreTest {
     public void createCourse_dropsALecturerThatNoLongerExists() {
         long semesterId = semester(START, END);
         SessionDetails gone = new SessionDetails(SessionType.LECTURE, 600, 700, Mode.IN_PERSON, false,
-                "A1", null, 4711, null);
+                "A1", null, 4711, null, SessionDetails.NO_REMINDER);
 
         course(semesterId, series(gone, DayOfWeek.FRIDAY, date(10, 9), date(10, 9), 1));
 
@@ -212,7 +290,7 @@ public class TimetableStoreTest {
     public void sessionWithoutALecturer_hasNone() {
         long semesterId = semester(START, END);
         SessionDetails none = new SessionDetails(SessionType.LECTURE, 600, 700, Mode.IN_PERSON, false,
-                "A1", null, SessionDetails.NO_LECTURER, null);
+                "A1", null, SessionDetails.NO_LECTURER, null, SessionDetails.NO_REMINDER);
         course(semesterId, series(none, DayOfWeek.MONDAY, START, START, 1));
 
         SessionView view = TimetableStore.loadTimetable(db).on(START).get(0);
@@ -245,7 +323,7 @@ public class TimetableStoreTest {
         course(semesterId, new Series(0, 0, lecture(), schedule));
         long other = TimetableStore.saveLecturer(db, new Lecturer(0, "Max", "Other", null, null));
         SessionDetails withOther = new SessionDetails(SessionType.LECTURE, 8 * 60, 11 * 60, Mode.IN_PERSON, false,
-                "A1", null, other, null);
+                "A1", null, other, null, SessionDetails.NO_REMINDER);
 
         TimetableStore.editSession(db, sessionIdOn(date(10, 12)), EditScope.THIS_ONLY, withOther, date(10, 12), null);
         Timetable timetable = TimetableStore.loadTimetable(db);
@@ -266,7 +344,7 @@ public class TimetableStoreTest {
     public void createCourse_cleansTheNameTheLinksAndTheNotes() {
         long semesterId = semester(START, END);
         SessionDetails dirty = new SessionDetails(SessionType.LECTURE, 600, 700, Mode.ONLINE, false,
-                null, " meet.example/x ", lecturerId, "  a \r\n\r\n\r\n b​ ");
+                null, " meet.example/x ", lecturerId, "  a \r\n\r\n\r\n b​ ", SessionDetails.NO_REMINDER);
 
         long courseId = TimetableStore.createCourse(db,
                 new Course(0, semesterId, "  Math​ \t II ", CourseColor.BLUE, " moodle.example/c/1 "),
@@ -287,7 +365,7 @@ public class TimetableStoreTest {
                 new Course(0, semesterId, "Math", CourseColor.BLUE, "javascript:alert(1)"),
                 List.of(series(lecture(), DayOfWeek.MONDAY, START, START, 1))));
         SessionDetails badMeeting = new SessionDetails(SessionType.LECTURE, 600, 700, Mode.ONLINE, false,
-                null, "ftp://files.example/x", lecturerId, null);
+                null, "ftp://files.example/x", lecturerId, null, SessionDetails.NO_REMINDER);
         assertThrows(IllegalArgumentException.class, () -> course(semesterId,
                 series(badMeeting, DayOfWeek.MONDAY, START, START, 1)));
 
@@ -317,7 +395,7 @@ public class TimetableStoreTest {
     public void saveCourse_doesNotRejectAnUntouchedEventBecauseOfAnOldLink() {
         long semesterId = semester(START, END);
         SessionDetails online = new SessionDetails(SessionType.LECTURE, 600, 700, Mode.ONLINE, false,
-                null, "https://meet.example/x", lecturerId, null);
+                null, "https://meet.example/x", lecturerId, null, SessionDetails.NO_REMINDER);
         long courseId = course(semesterId, series(online, DayOfWeek.MONDAY, START, date(10, 12), 1));
         // A link an earlier version accepted and today's rules would refuse.
         db.execSQL("UPDATE series SET link = 'ftp://old.example/x'");
@@ -403,7 +481,7 @@ public class TimetableStoreTest {
         course(semesterId, new Series(0, 0, lecture(), schedule));
         long third = sessionIdOn(date(10, 19));
         SessionDetails moved = new SessionDetails(SessionType.LECTURE, 8 * 60, 11 * 60, Mode.IN_PERSON, false,
-                "B2", null, lecturerId, null);
+                "B2", null, lecturerId, null, SessionDetails.NO_REMINDER);
 
         TimetableStore.editSession(db, third, EditScope.THIS_AND_FOLLOWING, moved, date(10, 19), schedule);
 
@@ -466,7 +544,7 @@ public class TimetableStoreTest {
 
         Series monday = stored.get(0);
         SessionDetails newRoom = new SessionDetails(SessionType.LECTURE, 8 * 60, 11 * 60, Mode.IN_PERSON, false,
-                "B2", null, lecturerId, null);
+                "B2", null, lecturerId, null, SessionDetails.NO_REMINDER);
         Series changedMonday = new Series(monday.id(), courseId, newRoom, monday.schedule());
         Series added = series(lecture(), DayOfWeek.FRIDAY, START, date(10, 9), 1);
         // The Thursday series is left out, so it is removed.

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import de.mcmodersd.unipensum.domain.backup.BackupData;
+import de.mcmodersd.unipensum.domain.logic.Reminders;
 import de.mcmodersd.unipensum.domain.model.Course;
 import de.mcmodersd.unipensum.domain.model.CourseColor;
 import de.mcmodersd.unipensum.domain.model.Lecturer;
@@ -33,7 +34,8 @@ import de.mcmodersd.unipensum.domain.model.SessionType;
 
 /**
  * The data of a backup as JSON: five lists, one entry per row, dates as {@code 2026-10-05}, times as
- * minutes since midnight, enums as their stable keys, empty values left out.
+ * minutes since midnight, enums as their stable keys, empty values left out. A file without the reminders
+ * (from before they existed) is read with the default reminder of each event.
  * <p>
  * Reading is as forgiving as it can be, because the file may come from another version: unknown fields
  * and lists are ignored, a missing optional value takes its default, an unknown enum value is replaced
@@ -130,6 +132,8 @@ final class BackupJson {
         optional(json, "link", details.link());
         if (details.lecturerId() != SessionDetails.NO_LECTURER) json.name("lecturer").value(details.lecturerId());
         optional(json, "note", details.note());
+        // Always written, "none" as -1: a file without the field is older and gets the default reminder.
+        json.name("reminder").value(details.reminderMin());
     }
 
     private static void optional(JsonWriter json, String name, String value) throws IOException {
@@ -290,7 +294,19 @@ final class BackupJson {
                 adjusted++;
             }
             return new SessionDetails(type, startMin, endMin, mode, Boolean.TRUE.equals(f.get("hybrid")),
-                    text(f, "room"), text(f, "link"), lecturer, text(f, "note"));
+                    text(f, "room"), text(f, "link"), lecturer, text(f, "note"), reminder(f, mode));
+        }
+
+        /** A file from before the reminders has no field and gets the default; so does a value that is no number. */
+        private int reminder(Map<String, Object> f, Mode mode) {
+            if (!f.containsKey("reminder")) return Reminders.defaultFor(mode);
+            try {
+                return (int) Math.max(SessionDetails.NO_REMINDER,
+                        Math.min(SessionDetails.MAX_REMINDER_MIN, requiredLong(f, "reminder")));
+            } catch (RuntimeException notANumber) {
+                adjusted++;
+                return Reminders.defaultFor(mode);
+            }
         }
 
         private static String text(Map<String, Object> f, String key) {

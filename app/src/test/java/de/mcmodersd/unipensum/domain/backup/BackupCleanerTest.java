@@ -54,12 +54,12 @@ public class BackupCleanerTest {
 
     private static SessionDetails withLink(SessionDetails d, Mode mode, String link) {
         return new SessionDetails(d.type(), d.startMin(), d.endMin(), mode, d.hybrid(), d.room(), link,
-                d.lecturerId(), d.note());
+                d.lecturerId(), d.note(), d.reminderMin());
     }
 
     private static SessionDetails withTimes(SessionDetails d, int start, int end) {
         return new SessionDetails(d.type(), start, end, d.mode(), d.hybrid(), d.room(), d.link(),
-                d.lecturerId(), d.note());
+                d.lecturerId(), d.note(), d.reminderMin());
     }
 
     @Test
@@ -93,6 +93,19 @@ public class BackupCleanerTest {
         assertEquals("Anna", data.lecturers().get(0).firstName());
         assertEquals("a@uni.example", data.lecturers().get(0).email());
         assertEquals("030", data.lecturers().get(0).phone());
+    }
+
+    @Test
+    public void reminders_areKeptAndBroughtIntoTheirRange() {
+        Series series = new Series(10, 1, SERIES.details().withReminder(45), SERIES.schedule());
+        Series tooLong = new Series(11, 1, SERIES.details().withReminder(5_000), SERIES.schedule());
+        Series negative = new Series(12, 1, SERIES.details().withReminder(-9), SERIES.schedule());
+
+        BackupData data = clean(with(good(), null, null, null, List.of(series, tooLong, negative), List.of())).data();
+
+        assertEquals(45, data.series().get(0).details().reminderMin());
+        assertEquals(SessionDetails.MAX_REMINDER_MIN, data.series().get(1).details().reminderMin());
+        assertEquals(SessionDetails.NO_REMINDER, data.series().get(2).details().reminderMin());
     }
 
     // --- lecturers ---

@@ -24,6 +24,9 @@ final class Rows {
         if (details.lecturerId() > 0) values.put("lecturer_id", details.lecturerId());
         else values.putNull("lecturer_id");
         values.put("note", details.note());
+        // NULL is "no reminder", so a column that is added later reads as none until it is filled.
+        if (details.hasReminder()) values.put("reminder_min", details.reminderMin());
+        else values.putNull("reminder_min");
     }
 
     static SessionDetails readDetails(Cursor cursor) {
@@ -36,7 +39,13 @@ final class Rows {
                 string(cursor, "room"),
                 string(cursor, "link"),
                 longOrZero(cursor, "lecturer_id"),
-                string(cursor, "note"));
+                string(cursor, "note"),
+                nullableInt(cursor, "reminder_min", SessionDetails.NO_REMINDER));
+    }
+
+    static int nullableInt(Cursor cursor, String column, int whenNull) {
+        int index = cursor.getColumnIndexOrThrow(column);
+        return cursor.isNull(index) ? whenNull : cursor.getInt(index);
     }
 
     /** {@code NULL} reads as 0, which is how the domain says "no lecturer". */

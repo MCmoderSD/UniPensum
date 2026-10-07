@@ -18,7 +18,8 @@ final class Migrations {
     }
 
     private static final Step[] STEPS = {
-            Migrations::lecturersAndMoodleLink
+            Migrations::lecturersAndMoodleLink,
+            Migrations::reminders
     };
 
     private Migrations() {
@@ -31,6 +32,18 @@ final class Migrations {
                 throw new IllegalStateException("No migration from version " + version + " to " + (version + 1));
             }
             STEPS[index].apply(db);
+        }
+    }
+
+    /**
+     * Every event and session gets a reminder: 5 minutes before the start for an online one, 30 for the rest.
+     * The same defaults as {@code Reminders.defaultFor}, written out here because a migration must not change
+     * when the code does.
+     */
+    private static void reminders(SQLiteDatabase db) {
+        for (String table : new String[]{"series", "session"}) {
+            db.execSQL("ALTER TABLE " + table + " ADD COLUMN reminder_min INTEGER");
+            db.execSQL("UPDATE " + table + " SET reminder_min = CASE mode WHEN 'online' THEN 5 ELSE 30 END");
         }
     }
 

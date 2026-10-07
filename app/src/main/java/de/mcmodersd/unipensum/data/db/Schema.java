@@ -7,11 +7,12 @@ package de.mcmodersd.unipensum.data.db;
 public final class Schema {
 
     public static final String NAME = "unipensum.db";
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     /**
      * The current layout, used for fresh installs. Databases upgraded from version 1 still carry the
      * unused free-text {@code lecturer} column on {@code series} and {@code session}, see {@link Migrations}.
+     * {@code reminder_min} is the minutes before the start at which the app reminds, {@code NULL} for none.
      */
     static final String[] CREATE_STATEMENTS = {
             "CREATE TABLE semester ("
@@ -47,6 +48,7 @@ public final class Schema {
                     + "link TEXT, "
                     + "lecturer_id INTEGER REFERENCES lecturer(id) ON DELETE SET NULL, "
                     + "note TEXT, "
+                    + "reminder_min INTEGER, "
                     + "first_day INTEGER NOT NULL, "
                     + "last_day INTEGER NOT NULL, "
                     + "interval_weeks INTEGER NOT NULL)",
@@ -63,7 +65,8 @@ public final class Schema {
                     + "room TEXT, "
                     + "link TEXT, "
                     + "lecturer_id INTEGER REFERENCES lecturer(id) ON DELETE SET NULL, "
-                    + "note TEXT)",
+                    + "note TEXT, "
+                    + "reminder_min INTEGER)",
 
             "CREATE INDEX course_semester ON course(semester_id)",
             "CREATE INDEX series_course ON series(course_id)",

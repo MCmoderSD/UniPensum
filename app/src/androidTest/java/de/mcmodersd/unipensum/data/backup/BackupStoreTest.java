@@ -75,15 +75,15 @@ public class BackupStoreTest {
         long koch = TimetableStore.saveLecturer(db, new Lecturer(0, "", "Prof. Koch", null, null));
         long semester = TimetableStore.saveSemester(db, new Semester(0, START, END, "Winter term"));
         SessionDetails lecture = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
-                "A1", "https://meet.example/x", weber, "bring laptop");
+                "A1", "https://meet.example/x", weber, "bring laptop", SessionDetails.NO_REMINDER);
         SessionDetails exercise = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
-                null, "https://meet.example/y", koch, null);
+                null, "https://meet.example/y", koch, null, SessionDetails.NO_REMINDER);
         TimetableStore.createCourse(db, new Course(0, semester, courseName, CourseColor.TEAL, "https://moodle.example/c"),
                 List.of(new Series(0, 0, lecture, new Schedule(DayOfWeek.MONDAY, START, END, 1)),
                         new Series(0, 0, exercise, new Schedule(DayOfWeek.THURSDAY, START, END, 2))));
         Session third = TimetableStore.loadTimetable(db).on(START.plusWeeks(2)).get(0).session();
         SessionDetails moved = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
-                "B7", "https://meet.example/x", weber, "bring laptop");
+                "B7", "https://meet.example/x", weber, "bring laptop", SessionDetails.NO_REMINDER);
         TimetableStore.editSession(db, third.id(), EditScope.THIS_ONLY, moved, START.plusWeeks(2).plusDays(1), null);
     }
 

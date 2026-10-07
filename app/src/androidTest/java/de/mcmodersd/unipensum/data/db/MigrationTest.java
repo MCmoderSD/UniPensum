@@ -22,6 +22,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
+import de.mcmodersd.unipensum.data.ReminderView;
 import de.mcmodersd.unipensum.data.SessionView;
 import de.mcmodersd.unipensum.data.Timetable;
 import de.mcmodersd.unipensum.data.TimetableStore;
@@ -181,7 +182,7 @@ public class MigrationTest {
         // New data on top of the migrated layout, which still has the unused text columns.
         long created = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Neu", "neu@uni.example", null));
         SessionDetails details = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.IN_PERSON, false,
-                "B1", null, created, null);
+                "B1", null, created, null, SessionDetails.NO_REMINDER);
         TimetableStore.addSeries(db, 1, new Series(0, 0, details,
                 new Schedule(DayOfWeek.FRIDAY, MONDAY, NEXT_MONDAY.plusDays(4), 1)));
         assertEquals(created, TimetableStore.loadTimetable(db).on(MONDAY.plusDays(4)).get(0).session().details().lecturerId());
@@ -198,6 +199,74 @@ public class MigrationTest {
         }
         assertNotEquals(0, created);
         assertTrue(DatabaseUtils.queryNumEntries(db, "lecturer") >= 2);
+        db.close();
+    }
+
+    @Test
+    public void fromVersion1_everyEventAndSessionGetsTheDefaultReminder() {
+        SQLiteDatabase db = migrate();
+
+        // All of the version 1 rows are in person.
+        assertEquals(0, DatabaseUtils.queryNumEntries(db, "series", "reminder_min IS NULL OR reminder_min <> 30"));
+        assertEquals(0, DatabaseUtils.queryNumEntries(db, "session", "reminder_min IS NULL OR reminder_min <> 30"));
+        List<ReminderView> reminders = TimetableStore.loadReminders(db, MONDAY);
+        assertEquals(5, reminders.size());
+        for (ReminderView view : reminders) assertEquals(30, view.session().details().reminderMin());
+        db.close();
+    }
+
+    /** The version 2 layout, copied from the schema of that release. */
+    private static final String[] VERSION_2 = {
+            "CREATE TABLE semester (id INTEGER PRIMARY KEY AUTOINCREMENT, start_day INTEGER NOT NULL, "
+                    + "end_day INTEGER NOT NULL, custom_name TEXT)",
+            "CREATE TABLE lecturer (id INTEGER PRIMARY KEY AUTOINCREMENT, first_name TEXT NOT NULL, "
+                    + "last_name TEXT NOT NULL, email TEXT, phone TEXT)",
+            "CREATE TABLE course (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + "semester_id INTEGER NOT NULL REFERENCES semester(id) ON DELETE CASCADE, "
+                    + "name TEXT NOT NULL, color TEXT NOT NULL, moodle_link TEXT)",
+            "CREATE TABLE series (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + "course_id INTEGER NOT NULL REFERENCES course(id) ON DELETE CASCADE, "
+                    + "type TEXT NOT NULL, weekday INTEGER NOT NULL, start_min INTEGER NOT NULL, "
+                    + "end_min INTEGER NOT NULL, mode TEXT NOT NULL, hybrid INTEGER NOT NULL, room TEXT, "
+                    + "link TEXT, lecturer_id INTEGER REFERENCES lecturer(id) ON DELETE SET NULL, note TEXT, "
+                    + "first_day INTEGER NOT NULL, last_day INTEGER NOT NULL, interval_weeks INTEGER NOT NULL)",
+            "CREATE TABLE session (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + "series_id INTEGER NOT NULL REFERENCES series(id) ON DELETE CASCADE, "
+                    + "day INTEGER NOT NULL, type TEXT NOT NULL, start_min INTEGER NOT NULL, "
+                    + "end_min INTEGER NOT NULL, mode TEXT NOT NULL, hybrid INTEGER NOT NULL, room TEXT, "
+                    + "link TEXT, lecturer_id INTEGER REFERENCES lecturer(id) ON DELETE SET NULL, note TEXT)"
+    };
+
+    @Test
+    public void fromVersion2_onlineEventsGetFiveMinutesAndTheRestThirty() {
+        context.deleteDatabase(NAME);
+        SQLiteDatabase old = context.openOrCreateDatabase(NAME, Context.MODE_PRIVATE, null);
+        for (String statement : VERSION_2) old.execSQL(statement);
+        old.execSQL("INSERT INTO semester VALUES (1, " + MONDAY.toEpochDay() + ", "
+                + LocalDate.of(2027, 2, 12).toEpochDay() + ", NULL)");
+        old.execSQL("INSERT INTO course (id, semester_id, name, color) VALUES (1, 1, 'Math', 'blue')");
+        // Series 1 is in person, series 2 online, series 3 hybrid.
+        String[] modes = {"'in_person', 0", "'online', 0", "'in_person', 1"};
+        for (int i = 0; i < 3; i++) {
+            old.execSQL("INSERT INTO series (id, course_id, type, weekday, start_min, end_min, mode, hybrid, "
+                    + "first_day, last_day, interval_weeks) VALUES (" + (i + 1) + ", 1, 'lecture', " + (i + 1)
+                    + ", 480, 570, " + modes[i] + ", " + MONDAY.toEpochDay() + ", " + MONDAY.toEpochDay() + ", 1)");
+            old.execSQL("INSERT INTO session (id, series_id, day, type, start_min, end_min, mode, hybrid) VALUES ("
+                    + (i + 1) + ", " + (i + 1) + ", " + MONDAY.plusDays(i).toEpochDay() + ", 'lecture', 480, 570, "
+                    + modes[i] + ")");
+        }
+        old.setVersion(2);
+        old.close();
+
+        SQLiteDatabase db = migrate();
+
+        List<ReminderView> reminders = TimetableStore.loadReminders(db, MONDAY);
+        assertEquals(3, reminders.size());
+        assertEquals(30, reminders.get(0).session().details().reminderMin());
+        assertEquals(5, reminders.get(1).session().details().reminderMin());
+        assertEquals(30, reminders.get(2).session().details().reminderMin());
+        assertEquals(5, TimetableStore.listCourses(db, 1).get(0).series().get(1).details().reminderMin());
+        assertEquals(Schema.VERSION, db.getVersion());
         db.close();
     }
 

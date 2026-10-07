@@ -217,7 +217,8 @@ public final class SeriesEditor {
                 pick(before.room(), after.room(), base.room()),
                 pick(before.link(), after.link(), base.link()),
                 pick(before.lecturerId(), after.lecturerId(), base.lecturerId()),
-                pick(before.note(), after.note(), base.note()));
+                pick(before.note(), after.note(), base.note()),
+                pick(before.reminderMin(), after.reminderMin(), base.reminderMin()));
     }
 
     private static <T> T pick(T before, T after, T base) {

@@ -80,6 +80,26 @@ public final class TimetableStore {
         return new Timetable(SemesterDao.list(db), views);
     }
 
+    /**
+     * The sessions that have a reminder and take place on {@code from} or later, with the name and the Moodle
+     * link of their course, which is what a reminder shows. Earliest first.
+     */
+    public static List<ReminderView> loadReminders(SQLiteDatabase db, LocalDate from) {
+        String sql = "SELECT s.*, c.name AS course_name, c.moodle_link AS moodle_link "
+                + "FROM session s JOIN series r ON s.series_id = r.id JOIN course c ON r.course_id = c.id "
+                + "WHERE s.day >= ? AND s.reminder_min IS NOT NULL ORDER BY s.day, s.start_min, s.id";
+        List<ReminderView> views = new ArrayList<>();
+        try (Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(from.toEpochDay())})) {
+            int name = cursor.getColumnIndexOrThrow("course_name");
+            int moodle = cursor.getColumnIndexOrThrow("moodle_link");
+            while (cursor.moveToNext()) {
+                views.add(new ReminderView(SessionDao.read(cursor), cursor.getString(name),
+                        cursor.isNull(moodle) ? null : cursor.getString(moodle)));
+            }
+        }
+        return views;
+    }
+
     public static List<CourseWithSeries> listCourses(SQLiteDatabase db, long semesterId) {
         List<CourseWithSeries> result = new ArrayList<>();
         for (Course course : CourseDao.listBySemester(db, semesterId)) {
@@ -172,8 +192,7 @@ public final class TimetableStore {
     private static SessionDetails withLecturer(SessionDetails d, Map<Long, Long> lecturerIds) {
         long lecturer = d.lecturerId() == SessionDetails.NO_LECTURER
                 ? SessionDetails.NO_LECTURER : mapped(lecturerIds, d.lecturerId(), "lecturer");
-        return new SessionDetails(d.type(), d.startMin(), d.endMin(), d.mode(), d.hybrid(),
-                d.room(), d.link(), lecturer, d.note());
+        return d.withLecturer(lecturer);
     }
 
     // --- lecturers ---
@@ -388,8 +407,7 @@ public final class TimetableStore {
         SessionDetails clean = details.normalized();
         if (!clean.hasValidTimes()) throw new IllegalArgumentException("Invalid start or end time");
         if (clean.lecturerId() != SessionDetails.NO_LECTURER && LecturerDao.get(db, clean.lecturerId()) == null) {
-            return new SessionDetails(clean.type(), clean.startMin(), clean.endMin(), clean.mode(), clean.hybrid(),
-                    clean.room(), clean.link(), SessionDetails.NO_LECTURER, clean.note());
+            return clean.withLecturer(SessionDetails.NO_LECTURER);
         }
         return clean;
     }
