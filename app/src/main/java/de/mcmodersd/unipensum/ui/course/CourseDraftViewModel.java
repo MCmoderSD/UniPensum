@@ -43,6 +43,7 @@ public class CourseDraftViewModel extends ViewModel {
     }
 
     /** {@code false} if no editor was prepared, which happens when the process was restored. */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isReady() {
         return semester != null;
     }

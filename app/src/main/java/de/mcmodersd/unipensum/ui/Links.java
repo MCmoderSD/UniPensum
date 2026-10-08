@@ -11,6 +11,7 @@ public final class Links {
 
     private Links() { }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean openWeb(Context context, String link) {
         String url;
         try {

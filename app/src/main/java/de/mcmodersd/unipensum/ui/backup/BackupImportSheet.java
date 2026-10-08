@@ -33,6 +33,7 @@ import de.mcmodersd.unipensum.ui.widget.UpTextField;
  * holds (with a warning if it comes from another version), and only after an explicit confirmation
  * replace all data.
  */
+@SuppressWarnings("SizeReplaceableByIsEmpty")
 public final class BackupImportSheet extends UpSheet {
 
     private static final String ARG_SOURCE = "source";

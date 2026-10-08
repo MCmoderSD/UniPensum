@@ -3,6 +3,7 @@ package de.mcmodersd.unipensum.domain.text;
 import java.text.Normalizer;
 import java.util.Locale;
 
+@SuppressWarnings("SizeReplaceableByIsEmpty")
 public final class TextSanitizer {
 
     public static final int MAX_NAME = 100;
@@ -116,6 +117,7 @@ public final class TextSanitizer {
         return Character.isWhitespace(cp) || Character.isSpaceChar(cp);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean isDropped(int cp) {
         return switch (Character.getType(cp)) {
             case Character.CONTROL, Character.SURROGATE, Character.PRIVATE_USE -> true;
