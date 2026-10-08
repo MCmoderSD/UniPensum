@@ -35,11 +35,13 @@ import de.mcmodersd.unipensum.ui.widget.Haptics;
 final class WeekPageView extends LinearLayout {
 
     interface OnScrollListener {
+        @SuppressWarnings("unused")
         void onScrolled(WeekPageView page, int scrollY);
     }
 
     interface OnZoomListener {
         /** @param settled false while the zoom still changes under the fingers or in the animation back */
+        @SuppressWarnings("unused")
         void onZoomed(WeekPageView page, float zoom, boolean settled);
     }
 

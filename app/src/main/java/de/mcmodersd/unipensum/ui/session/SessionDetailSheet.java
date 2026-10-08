@@ -242,6 +242,7 @@ public final class SessionDetailSheet extends UpSheet {
     }
 
     private interface Opener {
+        @SuppressWarnings("unused")
         boolean open(Context context, String value);
     }
 

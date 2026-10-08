@@ -43,12 +43,14 @@ final class Rows {
         );
     }
 
+    @SuppressWarnings("SameParameterValue")
     static int nullableInt(Cursor cursor, String column, int whenNull) {
         var index = cursor.getColumnIndexOrThrow(column);
         return cursor.isNull(index) ? whenNull : cursor.getInt(index);
     }
 
     /** {@code NULL} reads as 0, which is how the domain says "no lecturer". */
+    @SuppressWarnings("SameParameterValue")
     static long longOrZero(Cursor cursor, String column) {
         var index = cursor.getColumnIndexOrThrow(column);
         return cursor.isNull(index) ? 0 : cursor.getLong(index);

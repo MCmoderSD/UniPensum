@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
 final class Migrations {
 
     interface Step {
+        @SuppressWarnings("unused")
         void apply(SQLiteDatabase db);
     }
 

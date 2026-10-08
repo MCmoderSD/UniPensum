@@ -26,6 +26,7 @@ import de.mcmodersd.unipensum.ui.format.CourseColors;
 public class ColorSwatchPicker extends View {
 
     public interface OnColorSelectedListener {
+        @SuppressWarnings("unused")
         void onColorSelected(CourseColor color);
     }
 
