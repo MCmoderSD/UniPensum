@@ -64,8 +64,7 @@ public final class BackupFile {
     private BackupFile() { }
 
     /** What the file says about the app that wrote it. */
-    public record Meta(int schema, int appVersionCode, String appVersion, Instant exportedAt) {
-    }
+    public record Meta(int schema, int appVersionCode, String appVersion, Instant exportedAt) { }
 
     // --- writing ---
 
@@ -272,8 +271,7 @@ public final class BackupFile {
 
     // --- manifest ---
 
-    private record ParsedManifest(BackupInfo info, BackupCrypto.Params crypto) {
-    }
+    private record ParsedManifest(BackupInfo info, BackupCrypto.Params crypto) { }
 
     private static ParsedManifest parseManifest(byte[] bytes) throws BackupException {
         String app = null;

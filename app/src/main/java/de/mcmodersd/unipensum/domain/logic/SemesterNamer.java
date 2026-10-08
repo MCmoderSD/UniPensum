@@ -14,8 +14,7 @@ public final class SemesterNamer {
      * @param year for {@link Season#SUMMER} the calendar year; for {@link Season#WINTER} the year
      *             the winter term begins in (so a start in January 2027 yields 2026, i.e. "26/27")
      */
-    public record Label(Season season, int year) {
-    }
+    public record Label(Season season, int year) { }
 
     private SemesterNamer() { }
 

@@ -38,8 +38,7 @@ import de.mcmodersd.unipensum.domain.backup.BackupData;
 public final class BackupManager {
 
     /** The versions of the installed app, to compare a backup's {@code BackupInfo} with. */
-    public record Current(int format, int schema, int appVersionCode, String appVersion) {
-    }
+    public record Current(int format, int schema, int appVersionCode, String appVersion) { }
 
     private final Context context;
     private final Database database;

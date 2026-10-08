@@ -10,6 +10,5 @@ public final class DebugSeeder {
 
     private DebugSeeder() { }
 
-    public static void seed(Context context, Intent intent) {
-    }
+    public static void seed(Context context, Intent intent) { }
 }

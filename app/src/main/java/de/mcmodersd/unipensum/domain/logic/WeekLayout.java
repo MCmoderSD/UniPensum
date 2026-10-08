@@ -10,16 +10,14 @@ import java.util.List;
  */
 public final class WeekLayout {
 
-    public record Block(long id, int startMin, int endMin) {
-    }
+    public record Block(long id, int startMin, int endMin) { }
 
     /**
      * @param column      zero-based column inside the overlap group
      * @param columns     number of columns of the overlap group, the block is {@code 1/columns} wide
      * @param overlapping true if the block shares time with at least one other block
      */
-    public record Placement(long id, int column, int columns, boolean overlapping) {
-    }
+    public record Placement(long id, int column, int columns, boolean overlapping) { }
 
     private WeekLayout() { }
 

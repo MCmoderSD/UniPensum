@@ -10,5 +10,4 @@ import de.mcmodersd.unipensum.domain.model.Session;
  * @param lecturer the session's lecturer, {@code null} if it has none
  */
 public record SessionView(Session session, long courseId, long semesterId, String courseName, CourseColor color,
-                          Lecturer lecturer) {
-}
+                          Lecturer lecturer) { }

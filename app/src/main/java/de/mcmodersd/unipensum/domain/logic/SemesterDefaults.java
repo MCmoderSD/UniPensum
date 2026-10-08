@@ -15,8 +15,7 @@ public final class SemesterDefaults {
 
     public static final int LECTURE_WEEKS = 16;
 
-    public record Period(LocalDate start, LocalDate end) {
-    }
+    public record Period(LocalDate start, LocalDate end) { }
 
     private SemesterDefaults() { }
 

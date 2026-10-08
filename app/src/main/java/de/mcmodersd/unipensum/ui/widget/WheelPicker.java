@@ -67,8 +67,7 @@ public class WheelPicker extends RecyclerView {
             }
 
             @Override
-            public void onChildViewDetachedFromWindow(@NonNull View view) {
-            }
+            public void onChildViewDetachedFromWindow(@NonNull View view) { }
         });
     }
 

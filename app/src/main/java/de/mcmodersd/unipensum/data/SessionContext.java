@@ -11,5 +11,4 @@ import de.mcmodersd.unipensum.domain.model.Session;
  *
  * @param lecturer the session's lecturer, {@code null} if it has none
  */
-public record SessionContext(Session session, Series series, Course course, Semester semester, Lecturer lecturer) {
-}
+public record SessionContext(Session session, Series series, Course course, Semester semester, Lecturer lecturer) { }

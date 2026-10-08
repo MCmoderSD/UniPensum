@@ -18,8 +18,7 @@ public final class NowIndicator {
      * @param dayIndex 0 for Monday to 4 for Friday
      * @param minutes  minutes since midnight
      */
-    public record Position(int dayIndex, int minutes) {
-    }
+    public record Position(int dayIndex, int minutes) { }
 
     /**
      * @param monday    the Monday of the shown week

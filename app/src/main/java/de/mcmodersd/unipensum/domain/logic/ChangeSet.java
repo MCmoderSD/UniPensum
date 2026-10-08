@@ -19,8 +19,7 @@ public final class ChangeSet {
      * @param sessions new sessions to insert into it (their {@code seriesId} is ignored)
      * @param adopted  existing sessions that move into it; their {@code seriesId} is overwritten
      */
-    public record NewSeries(Series series, ArrayList<Session> sessions, ArrayList<Session> adopted) {
-    }
+    public record NewSeries(Series series, ArrayList<Session> sessions, ArrayList<Session> adopted) { }
 
     public final ArrayList<NewSeries> newSeries = new ArrayList<>();
     public final ArrayList<Series> updatedSeries = new ArrayList<>();

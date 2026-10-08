@@ -44,8 +44,7 @@ final class BackupJson {
 
     /** @param skipped  entries that could not be read at all
      *  @param adjusted values that were replaced by a default */
-    record Parsed(BackupData data, int skipped, int adjusted) {
-    }
+    record Parsed(BackupData data, int skipped, int adjusted) { }
 
     private BackupJson() { }
 

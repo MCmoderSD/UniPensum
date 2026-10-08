@@ -30,8 +30,7 @@ public final class Reminders {
      * @param start    when the session begins
      * @param end      when the session is over, which is when the reminder is of no use any more
      */
-    public record Due(Session session, LocalDateTime remindAt, LocalDateTime start, LocalDateTime end) {
-    }
+    public record Due(Session session, LocalDateTime remindAt, LocalDateTime start, LocalDateTime end) { }
 
     private static final Comparator<Due> BY_TIME =
             Comparator.comparing(Due::remindAt).thenComparing(due -> due.session().id());

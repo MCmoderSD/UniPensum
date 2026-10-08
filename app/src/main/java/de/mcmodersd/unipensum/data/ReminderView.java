@@ -8,5 +8,4 @@ import de.mcmodersd.unipensum.domain.model.Session;
  *
  * @param moodleLink {@code null} if the course has none
  */
-public record ReminderView(Session session, String courseName, String moodleLink) {
-}
+public record ReminderView(Session session, String courseName, String moodleLink) { }
