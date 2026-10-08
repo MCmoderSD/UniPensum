@@ -94,7 +94,7 @@ final class WeekGridView extends ViewGroup {
         labelPaint.setTextAlign(Paint.Align.RIGHT);
 
         // The marker is black on the light theme and white on the dark one, like the rest of the app.
-        int nowColor = ContextCompat.getColor(context, R.color.accent);
+        var nowColor = ContextCompat.getColor(context, R.color.accent);
         nowLabelPaint.set(labelPaint);
         nowLabelPaint.setColor(nowColor);
         nowLabelPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
@@ -116,22 +116,22 @@ final class WeekGridView extends ViewGroup {
         removeAllViews();
         placed.clear();
 
-        int windowStart = window.startHour() * 60;
-        int windowEnd = window.endHour() * 60;
-        for (int day = 0; day < perDay.size(); day++) {
-            List<SessionView> sessions = perDay.get(day);
-            List<WeekLayout.Block> blocks = new ArrayList<>();
-            for (SessionView session : sessions) {
+        var windowStart = window.startHour() * 60;
+        var windowEnd = window.endHour() * 60;
+        for (var day = 0; day < perDay.size(); day++) {
+            var sessions = perDay.get(day);
+            var blocks = new ArrayList<WeekLayout.Block>();
+            for (var session : sessions) {
                 blocks.add(new WeekLayout.Block(session.session().id(),
                         session.session().details().startMin(), session.session().details().endMin()));
             }
-            for (WeekLayout.Placement placement : WeekLayout.layout(blocks)) {
-                SessionView session = find(sessions, placement.id());
-                int start = Math.max(session.session().details().startMin(), windowStart);
-                int end = Math.min(session.session().details().endMin(), windowEnd);
+            for (var placement : WeekLayout.layout(blocks)) {
+                var session = find(sessions, placement.id());
+                var start = Math.max(session.session().details().startMin(), windowStart);
+                var end = Math.min(session.session().details().endMin(), windowEnd);
                 if (end <= start) continue;
 
-                SessionBlockView block = new SessionBlockView(getContext(), metrics, session, nameStyle,
+                var block = new SessionBlockView(getContext(), metrics, session, nameStyle,
                         placement.overlapping());
                 if (listener != null) block.setOnClickListener(v -> listener.onSessionClick(session));
                 addView(block);
@@ -172,7 +172,7 @@ final class WeekGridView extends ViewGroup {
     }
 
     private static SessionView find(List<SessionView> sessions, long id) {
-        for (SessionView session : sessions) {
+        for (var session : sessions) {
             if (session.session().id() == id) return session;
         }
         throw new IllegalStateException("Layout returned an unknown session " + id);
@@ -211,24 +211,24 @@ final class WeekGridView extends ViewGroup {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // The grid fills the scrolling area, or is as high as the hours need at their minimum height. Zoom
         // stretches only the hours, not the space above the first and below the last line.
-        int minHeight = hours() * metrics.minHourHeight + 2 * metrics.verticalPadding;
-        int fitted = Math.max(viewportHeight, minHeight);
-        int height = Math.round(2 * metrics.verticalPadding + (fitted - 2 * metrics.verticalPadding) * zoom);
-        int width = MeasureSpec.getSize(widthMeasureSpec);
+        var minHeight = hours() * metrics.minHourHeight + 2 * metrics.verticalPadding;
+        var fitted = Math.max(viewportHeight, minHeight);
+        var height = Math.round(2 * metrics.verticalPadding + (fitted - 2 * metrics.verticalPadding) * zoom);
+        var width = MeasureSpec.getSize(widthMeasureSpec);
         setMeasuredDimension(width, height);
 
         // The blocks are sized here, not in onLayout: fitting their content changes child views,
         // which must not happen during a layout pass.
-        float hourHeight = hourHeight(height);
-        float columnWidth = metrics.columnWidth(width);
-        for (Placed item : placed) {
-            float columnShare = columnWidth / item.placement.columns();
-            int blockLeft = Math.round(metrics.gutter + item.dayIndex * columnWidth
+        var hourHeight = hourHeight(height);
+        var columnWidth = metrics.columnWidth(width);
+        for (var item : placed) {
+            var columnShare = columnWidth / item.placement.columns();
+            var blockLeft = Math.round(metrics.gutter + item.dayIndex * columnWidth
                     + item.placement.column() * columnShare) + metrics.blockInset;
-            int blockRight = Math.round(metrics.gutter + item.dayIndex * columnWidth
+            var blockRight = Math.round(metrics.gutter + item.dayIndex * columnWidth
                     + (item.placement.column() + 1) * columnShare) - metrics.blockInset;
-            int blockTop = Math.round(yOf(item.startMin, hourHeight)) + metrics.blockInset;
-            int blockBottom = Math.round(yOf(item.endMin, hourHeight)) - metrics.blockInset;
+            var blockTop = Math.round(yOf(item.startMin, hourHeight)) + metrics.blockInset;
+            var blockBottom = Math.round(yOf(item.endMin, hourHeight)) - metrics.blockInset;
             item.bounds.set(blockLeft, blockTop, Math.max(blockLeft, blockRight), Math.max(blockTop, blockBottom));
 
             item.view.fitTo(item.bounds.width(), item.bounds.height());
@@ -240,28 +240,28 @@ final class WeekGridView extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        for (Placed item : placed) {
+        for (var item : placed) {
             item.view.layout(item.bounds.left, item.bounds.top, item.bounds.right, item.bounds.bottom);
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        float hourHeight = hourHeight(getHeight());
-        float labelOffset = (labelPaint.descent() + labelPaint.ascent()) / 2f;
+        var hourHeight = hourHeight(getHeight());
+        var labelOffset = (labelPaint.descent() + labelPaint.ascent()) / 2f;
 
-        for (int i = 0; i <= hours(); i++) {
-            float y = metrics.verticalPadding + i * hourHeight;
+        for (var i = 0; i <= hours(); i++) {
+            var y = metrics.verticalPadding + i * hourHeight;
             canvas.drawLine(metrics.gutter, y, getWidth(), y, linePaint);
-            int hour = window.startHour() + i;
-            String label = TimeFormat.hour(getContext(), hour);
-            Paint paint = now != null && now.minutes() / 60 == hour ? nowLabelPaint : labelPaint;
+            var hour = window.startHour() + i;
+            var label = TimeFormat.hour(getContext(), hour);
+            var paint = now != null && now.minutes() / 60 == hour ? nowLabelPaint : labelPaint;
             canvas.drawText(label, metrics.gutter - 6 * getResources().getDisplayMetrics().density,
                     y - labelOffset, paint);
         }
-        float columnWidth = metrics.columnWidth(getWidth());
-        for (int i = 0; i <= 5; i++) {
-            float x = metrics.gutter + i * columnWidth;
+        var columnWidth = metrics.columnWidth(getWidth());
+        for (var i = 0; i <= 5; i++) {
+            var x = metrics.gutter + i * columnWidth;
             canvas.drawLine(x, metrics.verticalPadding, x, getHeight() - metrics.verticalPadding, linePaint);
         }
     }
@@ -271,9 +271,9 @@ final class WeekGridView extends ViewGroup {
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
         if (now == null) return;
-        float y = yOf(now.minutes(), hourHeight(getHeight()));
-        float columnWidth = metrics.columnWidth(getWidth());
-        float left = metrics.gutter + now.dayIndex() * columnWidth;
+        var y = yOf(now.minutes(), hourHeight(getHeight()));
+        var columnWidth = metrics.columnWidth(getWidth());
+        var left = metrics.gutter + now.dayIndex() * columnWidth;
         canvas.drawLine(metrics.gutter, y, getWidth(), y, nowFaintPaint);
         canvas.drawLine(left, y, left + columnWidth, y, nowLinePaint);
     }

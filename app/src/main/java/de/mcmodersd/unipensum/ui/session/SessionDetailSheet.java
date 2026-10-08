@@ -51,9 +51,9 @@ public final class SessionDetailSheet extends UpSheet {
     private LinearLayout column;
 
     public static void show(FragmentManager manager, long sessionId) {
-        Bundle args = new Bundle();
+        var args = new Bundle();
         args.putLong(ARG_SESSION_ID, sessionId);
-        SessionDetailSheet sheet = new SessionDetailSheet();
+        var sheet = new SessionDetailSheet();
         sheet.setArguments(args);
         sheet.show(manager, TAG);
     }
@@ -80,11 +80,11 @@ public final class SessionDetailSheet extends UpSheet {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        FragmentManager manager = getParentFragmentManager();
+        var manager = getParentFragmentManager();
         manager.setFragmentResultListener(KEY_EDIT_SCOPE, getViewLifecycleOwner(), (key, result) -> {
-            EditScope scope = EditScope.valueOf(result.getString(ScopeSheet.RESULT_SCOPE));
-            Navigator navigator = (Navigator) requireActivity();
-            long sessionId = requireArguments().getLong(ARG_SESSION_ID);
+            var scope = EditScope.valueOf(result.getString(ScopeSheet.RESULT_SCOPE));
+            var navigator = (Navigator) requireActivity();
+            var sessionId = requireArguments().getLong(ARG_SESSION_ID);
             dismiss();
             navigator.open(SessionEditorFragment.forSession(sessionId, scope));
         });
@@ -108,9 +108,9 @@ public final class SessionDetailSheet extends UpSheet {
     }
 
     private void render(SessionContext context) {
-        Context app = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
-        SessionDetails details = context.session().details();
+        var app = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
+        var details = context.session().details();
         column.removeAllViews();
 
         setSheetTitle(context.course().name());
@@ -121,15 +121,15 @@ public final class SessionDetailSheet extends UpSheet {
                         + " · " + TimeFormat.typeName(app, details.type())));
 
         // "Online" and "A2 | Hybrid" already name the format; a room on its own gets "In person" below it.
-        String place = SeriesFormat.place(app, details);
-        boolean plainInPerson = details.mode() == Mode.IN_PERSON && !details.hybrid();
+        var place = SeriesFormat.place(app, details);
+        var plainInPerson = details.mode() == Mode.IN_PERSON && !details.hybrid();
         if (place.isEmpty()) {
             column.addView(info(app, dp, getString(R.string.mode_in_person), null));
         } else {
             column.addView(info(app, dp, place, plainInPerson ? getString(R.string.mode_in_person) : null));
         }
 
-        Lecturer lecturer = context.lecturer();
+        var lecturer = context.lecturer();
         if (lecturer != null) {
             // The large view always spells the name out; the setting only shortens it in the grid and lists.
             column.addView(info(app, dp, lecturer.name(NameStyle.FULL_NAME), getString(R.string.field_lecturer)));
@@ -155,14 +155,14 @@ public final class SessionDetailSheet extends UpSheet {
 
     /** Meeting and Moodle on one row (whichever exist), edit and delete on the next. */
     private View actions(Context app, float dp, SessionContext context) {
-        String meeting = context.session().details().link();
-        String moodle = context.course().moodleLink();
+        var meeting = context.session().details().link();
+        var moodle = context.course().moodleLink();
 
-        LinearLayout actions = new LinearLayout(app);
+        var actions = new LinearLayout(app);
         actions.setOrientation(LinearLayout.VERTICAL);
 
         if (meeting != null || moodle != null) {
-            LinearLayout links = new LinearLayout(app);
+            var links = new LinearLayout(app);
             links.setBaselineAligned(false);
             if (meeting != null) {
                 links.addView(button(app, R.string.action_open_meeting, UpButton.Variant.PRIMARY,
@@ -175,7 +175,7 @@ public final class SessionDetailSheet extends UpSheet {
             actions.addView(links, rowParams(dp, 0, 8));
         }
 
-        LinearLayout manage = new LinearLayout(app);
+        var manage = new LinearLayout(app);
         manage.setBaselineAligned(false);
         // The first button of the sheet is the filled one: the meeting if there is one, else Edit.
         manage.addView(button(app, R.string.action_edit,
@@ -194,7 +194,7 @@ public final class SessionDetailSheet extends UpSheet {
     }
 
     private void delete(EditScope scope) {
-        TimetableRepository repository = UniPensumApp.from(requireContext()).repository();
+        var repository = UniPensumApp.from(requireContext()).repository();
         repository.deleteSession(requireArguments().getLong(ARG_SESSION_ID), scope, new Database.Callback<Void>() {
             @Override
             public void onSuccess(Void result) {
@@ -214,7 +214,7 @@ public final class SessionDetailSheet extends UpSheet {
 
     /** A row with an icon that hands its value to another app when tapped. */
     private UpRow contact(Context context, float dp, int icon, String value, String label, Opener opener) {
-        UpRow row = info(context, dp, value, label);
+        var row = info(context, dp, value, label);
         row.setLeadingIcon(icon);
         row.setOnClickListener(v -> {
             if (!opener.open(context, value)) Haptics.reject(v);
@@ -223,7 +223,7 @@ public final class SessionDetailSheet extends UpSheet {
     }
 
     private UpRow info(Context context, float dp, String title, @Nullable String subtitle) {
-        UpRow row = new UpRow(context);
+        var row = new UpRow(context);
         row.setTitle(title);
         row.setSubtitle(subtitle);
         row.setLayoutParams(rowParams(dp, 0, 8));
@@ -231,7 +231,7 @@ public final class SessionDetailSheet extends UpSheet {
     }
 
     private static UpButton button(Context context, int text, UpButton.Variant variant, View.OnClickListener listener) {
-        UpButton button = new UpButton(context);
+        var button = new UpButton(context);
         button.setText(text);
         button.setVariant(variant);
         button.setOnClickListener(listener);
@@ -243,13 +243,13 @@ public final class SessionDetailSheet extends UpSheet {
      * which matters when a label wraps (large font sizes).
      */
     private static LinearLayout.LayoutParams weighted(float dp, boolean gapBefore) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+        var params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
         if (gapBefore) params.setMarginStart(Math.round(8 * dp));
         return params;
     }
 
     private static LinearLayout.LayoutParams rowParams(float dp, int topDp, int bottomDp) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);

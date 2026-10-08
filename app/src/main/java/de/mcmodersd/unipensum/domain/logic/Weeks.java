@@ -28,8 +28,8 @@ public final class Weeks {
 
     /** The current week, or the coming one on Saturday and Sunday, which the app does not show. */
     public static int initialPosition(LocalDate today) {
-        boolean weekend = today.getDayOfWeek() == DayOfWeek.SATURDAY || today.getDayOfWeek() == DayOfWeek.SUNDAY;
-        int position = positionOf(today) + (weekend ? 1 : 0);
+        var weekend = today.getDayOfWeek() == DayOfWeek.SATURDAY || today.getDayOfWeek() == DayOfWeek.SUNDAY;
+        var position = positionOf(today) + (weekend ? 1 : 0);
         return Math.max(0, Math.min(PAGE_COUNT - 1, position));
     }
 

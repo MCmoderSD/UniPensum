@@ -23,7 +23,7 @@ final class ZoomMetrics {
      * @param padding the space above the first hour line, which does not grow
      */
     static float scrollAfterZoom(float scrollY, float focusY, float padding, float ratio) {
-        float contentY = scrollY + focusY;
+        var contentY = scrollY + focusY;
         return padding + (contentY - padding) * ratio - focusY;
     }
 }

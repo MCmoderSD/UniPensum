@@ -38,7 +38,7 @@ public final class ReminderNotifier {
 
     /** Idempotent. The user can change sound and priority of the channel in the system settings. */
     public static void createChannel(Context context) {
-        NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+        var channel = new NotificationChannel(CHANNEL_ID,
                 context.getString(R.string.reminder_channel_name), NotificationManager.IMPORTANCE_HIGH);
         channel.setDescription(context.getString(R.string.reminder_channel_description));
         context.getSystemService(NotificationManager.class).createNotificationChannel(channel);
@@ -47,20 +47,20 @@ public final class ReminderNotifier {
     static void show(Context context, @Nullable ReminderView view, Reminders.Due due) {
         if (view == null) return;
         createChannel(context);
-        SessionDetails details = view.session().details();
+        var details = view.session().details();
 
         // The texts follow the language of the app, which Android also applies when only a receiver runs.
-        List<String> parts = new ArrayList<>();
+        var parts = new ArrayList<String>();
         parts.add(TimeFormat.typeName(context, details.type()));
         parts.add(SeriesFormat.timeRange(context, details));
-        String place = SeriesFormat.place(context, details);
+        var place = SeriesFormat.place(context, details);
         if (!place.isEmpty()) parts.add(place);
 
-        long startMillis = due.start().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        long endMillis = due.end().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        int id = idOf(view.session().id());
+        var startMillis = due.start().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        var endMillis = due.end().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        var id = idOf(view.session().id());
 
-        Notification.Builder builder = new Notification.Builder(context, CHANNEL_ID)
+        var builder = new Notification.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(view.courseName())
                 .setContentText(String.join(" · ", parts))
@@ -87,7 +87,7 @@ public final class ReminderNotifier {
     }
 
     private static PendingIntent openEvent(Context context, long sessionId, int id) {
-        Intent intent = new Intent(context, MainActivity.class)
+        var intent = new Intent(context, MainActivity.class)
                 .putExtra(MainActivity.EXTRA_SESSION_ID, sessionId)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(context, id, intent,
@@ -102,9 +102,9 @@ public final class ReminderNotifier {
         } catch (IllegalArgumentException notAWebLink) {
             url = null;
         }
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url == null ? "about:blank" : url))
+        var intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url == null ? "about:blank" : url))
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pending = PendingIntent.getActivity(context, id * 4 + slot, intent,
+        var pending = PendingIntent.getActivity(context, id * 4 + slot, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         return new Notification.Action.Builder(null, title, pending).build();
     }

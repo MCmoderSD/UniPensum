@@ -39,11 +39,11 @@ public class UpStepper extends LinearLayout {
 
     public UpStepper(Context context, AttributeSet attrs) {
         super(context, attrs);
-        float dp = getResources().getDisplayMetrics().density;
+        var dp = getResources().getDisplayMetrics().density;
         setOrientation(HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
         setPadding(Math.round(4 * dp), Math.round(4 * dp), Math.round(4 * dp), Math.round(4 * dp));
-        GradientDrawable background = new GradientDrawable();
+        var background = new GradientDrawable();
         background.setCornerRadius(14 * dp);
         background.setColor(ContextCompat.getColor(context, R.color.surface));
         setBackground(background);
@@ -110,7 +110,7 @@ public class UpStepper extends LinearLayout {
 
     /** @return whether the value changed, which is not the case at the end of the range */
     private boolean change(int delta) {
-        int next = Math.max(min, Math.min(max, value + delta * step));
+        var next = Math.max(min, Math.min(max, value + delta * step));
         if (next == value) return false;
         value = next;
         render();

@@ -57,7 +57,7 @@ public class RemindersTest {
 
     @Test
     public void of_isTheStartMinusTheTime() {
-        Reminders.Due due = Reminders.of(session(1, 10, 5, 30)).orElseThrow();
+        var due = Reminders.of(session(1, 10, 5, 30)).orElseThrow();
 
         assertEquals(at(10, 5, 7, 30), due.remindAt());
         assertEquals(at(10, 5, 8, 0), due.start());
@@ -76,9 +76,9 @@ public class RemindersTest {
 
     @Test
     public void of_forAnEarlySession_fallsOnTheDayBefore() {
-        SessionDetails early = new SessionDetails(details().type(), 10, 70, Mode.IN_PERSON, false, null, null, 0, null, 30);
+        var early = new SessionDetails(details().type(), 10, 70, Mode.IN_PERSON, false, null, null, 0, null, 30);
 
-        Reminders.Due due = Reminders.of(new Session(1, 10, date(10, 5), early)).orElseThrow();
+        var due = Reminders.of(new Session(1, 10, date(10, 5), early)).orElseThrow();
 
         assertEquals(at(10, 4, 23, 40), due.remindAt());
     }
@@ -89,7 +89,7 @@ public class RemindersTest {
     public void due_holdsTheRemindersBetweenTheTwoTimes() {
         List<Session> sessions = List.of(session(1, 10, 5, 30), session(2, 10, 6, 30));
 
-        List<Reminders.Due> due = Reminders.due(sessions, at(10, 5, 7, 0), at(10, 5, 7, 45));
+        var due = Reminders.due(sessions, at(10, 5, 7, 0), at(10, 5, 7, 45));
 
         assertEquals(1, due.size());
         assertEquals(1, due.get(0).session().id());
@@ -136,7 +136,7 @@ public class RemindersTest {
         List<Session> sessions = List.of(session(3, 10, 5, 30), session(2, 10, 5, 10), session(1, 10, 5, 10),
                 session(4, 10, 5, 60));
 
-        List<Reminders.Due> due = Reminders.due(sessions, at(10, 4, 0, 0), at(10, 5, 7, 55));
+        var due = Reminders.due(sessions, at(10, 4, 0, 0), at(10, 5, 7, 55));
 
         assertEquals(List.of(4L, 3L, 1L, 2L), due.stream().map(d -> d.session().id()).toList());
     }
@@ -162,7 +162,7 @@ public class RemindersTest {
 
     @Test
     public void next_findsAReminderOnTheDayBefore() {
-        SessionDetails early = new SessionDetails(details().type(), 10, 70, Mode.IN_PERSON, false, null, null, 0, null, 30);
+        var early = new SessionDetails(details().type(), 10, 70, Mode.IN_PERSON, false, null, null, 0, null, 30);
         List<Session> sessions = List.of(new Session(1, 10, date(10, 5), early));
 
         assertEquals(at(10, 4, 23, 40), Reminders.next(sessions, at(10, 4, 20, 0)).orElseThrow());

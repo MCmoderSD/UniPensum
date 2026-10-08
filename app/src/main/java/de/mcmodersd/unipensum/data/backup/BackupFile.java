@@ -80,7 +80,7 @@ public final class BackupFile {
 
     static byte[] write(BackupData data, Meta meta, char[] password, int iterations)
             throws IOException, GeneralSecurityException {
-        ByteArrayOutputStream json = new ByteArrayOutputStream();
+        var json = new ByteArrayOutputStream();
         BackupJson.write(data, json);
 
         byte[] manifest;
@@ -91,15 +91,15 @@ public final class BackupFile {
             payload = json.toByteArray();
             payloadName = DATA_JSON;
         } else {
-            BackupCrypto.Params params = BackupCrypto.newParams(iterations);
+            var params = BackupCrypto.newParams(iterations);
             // The manifest is fixed first because it is part of what the encryption protects.
             manifest = manifest(meta, params);
             payload = BackupCrypto.encrypt(password, params, manifest, deflate(json.toByteArray()));
             payloadName = DATA_ENC;
         }
 
-        ByteArrayOutputStream archive = new ByteArrayOutputStream();
-        try (ZipOutputStream zip = new ZipOutputStream(archive)) {
+        var archive = new ByteArrayOutputStream();
+        try (var zip = new ZipOutputStream(archive)) {
             zip.setLevel(Deflater.BEST_COMPRESSION);
             put(zip, MANIFEST, manifest);
             put(zip, payloadName, payload);
@@ -114,8 +114,8 @@ public final class BackupFile {
     }
 
     private static byte[] manifest(Meta meta, BackupCrypto.Params params) throws IOException {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        JsonWriter json = new JsonWriter(new BufferedWriter(new OutputStreamWriter(bytes, StandardCharsets.UTF_8)));
+        var bytes = new ByteArrayOutputStream();
+        var json = new JsonWriter(new BufferedWriter(new OutputStreamWriter(bytes, StandardCharsets.UTF_8)));
         json.beginObject();
         json.name("app").value(APP);
         json.name("format").value(FORMAT);
@@ -140,9 +140,9 @@ public final class BackupFile {
     }
 
     private static byte[] deflate(byte[] plain) throws IOException {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
-        try (DeflaterOutputStream out = new DeflaterOutputStream(bytes, deflater)) {
+        var bytes = new ByteArrayOutputStream();
+        var deflater = new Deflater(Deflater.BEST_COMPRESSION);
+        try (var out = new DeflaterOutputStream(bytes, deflater)) {
             out.write(plain);
         } finally {
             deflater.end();
@@ -183,7 +183,7 @@ public final class BackupFile {
          *                         changed afterwards, {@code DAMAGED} or {@code TOO_LARGE} for a broken one
          */
         public BackupCleaner.Result read(char[] password) throws BackupException {
-            byte[] json = data;
+            var json = data;
             if (crypto != null) {
                 if (password == null || password.length == 0) throw new BackupException(BackupException.Reason.WRONG_PASSWORD);
                 try {
@@ -218,28 +218,28 @@ public final class BackupFile {
             throw new BackupException(BackupException.Reason.NOT_A_BACKUP);
         }
 
-        Map<String, byte[]> entries = unzip(bytes);
-        byte[] manifest = entries.get(MANIFEST);
+        var entries = unzip(bytes);
+        var manifest = entries.get(MANIFEST);
         if (manifest == null) throw new BackupException(BackupException.Reason.NOT_A_BACKUP);
 
-        ParsedManifest parsed = parseManifest(manifest);
-        byte[] data = entries.get(parsed.crypto == null ? DATA_JSON : DATA_ENC);
+        var parsed = parseManifest(manifest);
+        var data = entries.get(parsed.crypto == null ? DATA_JSON : DATA_ENC);
         if (data == null) throw new BackupException(BackupException.Reason.DAMAGED);
         return new Opened(parsed.info, parsed.crypto, manifest, data);
     }
 
     private static Map<String, byte[]> unzip(byte[] bytes) throws BackupException {
-        Map<String, byte[]> entries = new HashMap<>();
-        long budget = MAX_UNPACKED_BYTES;
-        try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(bytes))) {
+        var entries = new HashMap<String, byte[]>();
+        var budget = MAX_UNPACKED_BYTES;
+        try (var zip = new ZipInputStream(new ByteArrayInputStream(bytes))) {
             ZipEntry entry;
-            int count = 0;
+            var count = 0;
             while ((entry = zip.getNextEntry()) != null) {
                 if (++count > MAX_ENTRIES) throw new BackupException(BackupException.Reason.DAMAGED);
                 // Every entry is read through, even the ones that are ignored, so all of them count to the cap.
-                byte[] content = readCapped(zip, budget);
+                var content = readCapped(zip, budget);
                 budget -= content.length;
-                String name = entry.getName();
+                var name = entry.getName();
                 if (!entry.isDirectory() && (name.equals(MANIFEST) || name.equals(DATA_JSON) || name.equals(DATA_ENC))) {
                     entries.put(name, content);
                 }
@@ -251,7 +251,7 @@ public final class BackupFile {
     }
 
     private static byte[] inflate(byte[] packed) throws BackupException {
-        try (InflaterInputStream in = new InflaterInputStream(new ByteArrayInputStream(packed))) {
+        try (var in = new InflaterInputStream(new ByteArrayInputStream(packed))) {
             return readCapped(in, MAX_UNPACKED_BYTES);
         } catch (IOException damaged) {
             throw new BackupException(BackupException.Reason.DAMAGED, damaged);
@@ -260,8 +260,8 @@ public final class BackupFile {
 
     /** Reads to the end, but gives up once more than {@code limit} bytes have come out. */
     private static byte[] readCapped(InputStream in, long limit) throws IOException, BackupException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buffer = new byte[8192];
+        var out = new ByteArrayOutputStream();
+        var buffer = new byte[8192];
         long total = 0;
         int read;
         while ((read = in.read(buffer)) != -1) {
@@ -281,12 +281,12 @@ public final class BackupFile {
         String app = null;
         Integer format = null;
         Integer schema = null;
-        int build = 0;
-        String version = "";
+        var build = 0;
+        var version = "";
         Instant exportedAt = null;
         BackupCrypto.Params crypto = null;
 
-        JsonReader json = new JsonReader(new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8));
+        var json = new JsonReader(new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8));
         try {
             json.beginObject();
             while (json.hasNext()) {
@@ -330,7 +330,7 @@ public final class BackupFile {
     private static BackupCrypto.Params readEncryption(JsonReader json) throws IOException, BackupException {
         String cipher = null;
         String kdf = null;
-        int iterations = 0;
+        var iterations = 0;
         byte[] salt = null;
         byte[] iv = null;
         json.beginObject();
@@ -362,7 +362,7 @@ public final class BackupFile {
         if (!BackupCrypto.CIPHER_NAME.equals(cipher) || !BackupCrypto.KDF_NAME.equals(kdf)) {
             throw new BackupException(BackupException.Reason.UNSUPPORTED);
         }
-        boolean sane = iterations >= BackupCrypto.MIN_ITERATIONS && iterations <= BackupCrypto.MAX_ITERATIONS
+        var sane = iterations >= BackupCrypto.MIN_ITERATIONS && iterations <= BackupCrypto.MAX_ITERATIONS
                 && salt != null && salt.length == BackupCrypto.SALT_BYTES
                 && iv != null && iv.length == BackupCrypto.IV_BYTES;
         if (!sane) throw new BackupException(BackupException.Reason.DAMAGED);

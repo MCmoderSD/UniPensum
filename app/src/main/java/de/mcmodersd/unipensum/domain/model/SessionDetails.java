@@ -66,8 +66,8 @@ public record SessionDetails(
      *                                  {@link TextSanitizer#webLink}; check with {@link TextSanitizer#isValidWebLink} first
      */
     public SessionDetails normalized() {
-        boolean online = mode == Mode.ONLINE;
-        boolean hybridEffective = !online && hybrid;
+        var online = mode == Mode.ONLINE;
+        var hybridEffective = !online && hybrid;
         return new SessionDetails(
                 type,
                 startMin,

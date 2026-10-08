@@ -38,7 +38,7 @@ public final class SeriesEditor {
      */
     public static ChangeSet edit(Semester semester, Series series, List<Session> sessions, long sessionId,
                                  EditScope scope, SessionDetails details, LocalDate day, Schedule schedule) {
-        Session target = find(sessions, sessionId);
+        var target = find(sessions, sessionId);
         switch (scope) {
             case THIS_ONLY:
                 return editOne(semester, target, details, day);
@@ -65,8 +65,8 @@ public final class SeriesEditor {
     }
 
     public static ChangeSet delete(Series series, List<Session> sessions, long sessionId, EditScope scope) {
-        Session target = find(sessions, sessionId);
-        ChangeSet changes = new ChangeSet();
+        var target = find(sessions, sessionId);
+        var changes = new ChangeSet();
         switch (scope) {
             case THIS_ONLY:
                 changes.deletedSessionIds.add(target.id());
@@ -75,7 +75,7 @@ public final class SeriesEditor {
                 if (isFirst(sessions, target)) {
                     changes.deletedSeriesIds.add(series.id());
                 } else {
-                    for (Session following : followingOf(sessions, target)) {
+                    for (var following : followingOf(sessions, target)) {
                         changes.deletedSessionIds.add(following.id());
                     }
                     changes.updatedSeries.add(series.withSchedule(endBefore(series.schedule(), target)));
@@ -95,7 +95,7 @@ public final class SeriesEditor {
         if (!SemesterRules.isValidMoveTarget(semester, day)) {
             throw new IllegalArgumentException("Not a valid date for this semester: " + day);
         }
-        ChangeSet changes = new ChangeSet();
+        var changes = new ChangeSet();
         if (!day.equals(target.day()) || !details.equals(target.details())) {
             changes.updatedSessions.add(new Session(target.id(), target.seriesId(), day, details));
         }
@@ -106,20 +106,20 @@ public final class SeriesEditor {
     private static ChangeSet editAll(Semester semester, Series series, List<Session> sessions, SessionDetails before,
                                      SessionDetails details, Schedule schedule) {
         requireValidSchedule(semester, schedule);
-        SessionDetails template = carryOver(before, details, series.details());
-        Series updated = new Series(series.id(), series.courseId(), template, schedule);
+        var template = carryOver(before, details, series.details());
+        var updated = new Series(series.id(), series.courseId(), template, schedule);
 
-        ChangeSet changes = new ChangeSet();
+        var changes = new ChangeSet();
         if (schedule.equals(series.schedule())) {
-            for (Session session : sessions) {
-                SessionDetails carried = carryOver(before, details, session.details());
+            for (var session : sessions) {
+                var carried = carryOver(before, details, session.details());
                 if (!carried.equals(session.details())) changes.updatedSessions.add(session.withDetails(carried));
             }
             if (!updated.equals(series)) changes.updatedSeries.add(updated);
         } else {
             changes.updatedSeries.add(updated);
-            for (Session session : sessions) changes.deletedSessionIds.add(session.id());
-            for (LocalDate date : Recurrence.occurrences(schedule)) {
+            for (var session : sessions) changes.deletedSessionIds.add(session.id());
+            for (var date : Recurrence.occurrences(schedule)) {
                 changes.newSessions.add(new Session(0, series.id(), date, template));
             }
         }
@@ -129,37 +129,37 @@ public final class SeriesEditor {
     private static ChangeSet editFollowing(Semester semester, Series series, List<Session> sessions, Session target,
                                            SessionDetails details, Schedule schedule) {
         requireValidSchedule(semester, schedule);
-        Schedule old = series.schedule();
-        SessionDetails before = target.details();
-        SessionDetails template = carryOver(before, details, series.details());
-        List<Session> following = followingOf(sessions, target);
+        var old = series.schedule();
+        var before = target.details();
+        var template = carryOver(before, details, series.details());
+        var following = followingOf(sessions, target);
 
-        boolean sameRhythm = schedule.weekday() == old.weekday()
+        var sameRhythm = schedule.weekday() == old.weekday()
                 && schedule.last().equals(old.last())
                 && schedule.intervalWeeks() == old.intervalWeeks()
                 && !schedule.first().isAfter(target.day());
 
-        LocalDate newFirst = schedule.first().isBefore(target.day()) ? target.day() : schedule.first();
+        var newFirst = schedule.first().isBefore(target.day()) ? target.day() : schedule.first();
         if (sameRhythm) {
             newFirst = Recurrence.firstOnOrAfter(old, newFirst).orElse(newFirst);
         }
-        Schedule split = schedule.withFirst(newFirst);
+        var split = schedule.withFirst(newFirst);
         if (split.first().isAfter(split.last())) {
             throw new IllegalArgumentException("The new series would be empty");
         }
 
-        ChangeSet changes = new ChangeSet();
+        var changes = new ChangeSet();
         changes.updatedSeries.add(series.withSchedule(endBefore(old, target)));
 
-        List<Session> generated = new ArrayList<>();
-        List<Session> adopted = new ArrayList<>();
+        var generated = new ArrayList<Session>();
+        var adopted = new ArrayList<Session>();
         if (sameRhythm) {
-            for (Session session : following) {
+            for (var session : following) {
                 adopted.add(session.withDetails(carryOver(before, details, session.details())));
             }
         } else {
-            for (Session session : following) changes.deletedSessionIds.add(session.id());
-            for (LocalDate date : Recurrence.occurrences(split)) {
+            for (var session : following) changes.deletedSessionIds.add(session.id());
+            for (var date : Recurrence.occurrences(split)) {
                 generated.add(new Session(0, 0, date, template));
             }
         }
@@ -181,22 +181,22 @@ public final class SeriesEditor {
     }
 
     private static Session find(List<Session> sessions, long sessionId) {
-        for (Session session : sessions) {
+        for (var session : sessions) {
             if (session.id() == sessionId) return session;
         }
         throw new IllegalArgumentException("Session " + sessionId + " is not part of the series");
     }
 
     private static boolean isFirst(List<Session> sessions, Session target) {
-        for (Session session : sessions) {
+        for (var session : sessions) {
             if (BY_DAY_THEN_ID.compare(session, target) < 0) return false;
         }
         return true;
     }
 
     private static List<Session> followingOf(List<Session> sessions, Session target) {
-        List<Session> result = new ArrayList<>();
-        for (Session session : sessions) {
+        var result = new ArrayList<Session>();
+        for (var session : sessions) {
             if (BY_DAY_THEN_ID.compare(session, target) >= 0) result.add(session);
         }
         result.sort(BY_DAY_THEN_ID);

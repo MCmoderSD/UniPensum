@@ -76,9 +76,9 @@ public final class SemesterEditorSheet extends UpSheet {
      * @param all      all semesters, used to suggest a free period and to check for overlaps
      */
     public static void show(FragmentManager manager, @Nullable Semester existing, List<Semester> all) {
-        Bundle args = new Bundle();
+        var args = new Bundle();
         if (existing == null) {
-            SemesterDefaults.Period period = SemesterDefaults.suggest(LocalDate.now(), all);
+            var period = SemesterDefaults.suggest(LocalDate.now(), all);
             args.putLong(ARG_ID, 0);
             args.putLong(ARG_START, period.start().toEpochDay());
             args.putLong(ARG_END, period.end().toEpochDay());
@@ -88,7 +88,7 @@ public final class SemesterEditorSheet extends UpSheet {
             args.putLong(ARG_END, existing.end().toEpochDay());
             args.putString(ARG_NAME, existing.customName());
         }
-        SemesterEditorSheet sheet = new SemesterEditorSheet();
+        var sheet = new SemesterEditorSheet();
         sheet.setArguments(args);
         sheet.show(manager, "semester-editor");
     }
@@ -102,21 +102,21 @@ public final class SemesterEditorSheet extends UpSheet {
     @Override
     protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
                                  @Nullable Bundle savedInstanceState) {
-        Context context = requireContext();
-        Bundle args = requireArguments();
-        float dp = getResources().getDisplayMetrics().density;
+        var context = requireContext();
+        var args = requireArguments();
+        var dp = getResources().getDisplayMetrics().density;
         repository = UniPensumApp.from(context).repository();
 
         id = args.getLong(ARG_ID);
-        Bundle source = savedInstanceState != null ? savedInstanceState : args;
+        var source = savedInstanceState != null ? savedInstanceState : args;
         start = LocalDate.ofEpochDay(source.getLong(savedInstanceState != null ? STATE_START : ARG_START));
         end = LocalDate.ofEpochDay(source.getLong(savedInstanceState != null ? STATE_END : ARG_END));
-        String name = source.getString(savedInstanceState != null ? STATE_NAME : ARG_NAME);
+        var name = source.getString(savedInstanceState != null ? STATE_NAME : ARG_NAME);
         endTouched = savedInstanceState != null && savedInstanceState.getBoolean(STATE_END_TOUCHED);
         original = id == 0 ? null : new Semester(id, LocalDate.ofEpochDay(args.getLong(ARG_START)),
                 LocalDate.ofEpochDay(args.getLong(ARG_END)), args.getString(ARG_NAME));
 
-        LinearLayout column = new LinearLayout(context);
+        var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
 
         startRow = new UpRow(context);
@@ -149,18 +149,18 @@ public final class SemesterEditorSheet extends UpSheet {
         saveButton = new UpButton(context);
         saveButton.setText(R.string.action_save);
         saveButton.setOnClickListener(v -> onSave());
-        LinearLayout.LayoutParams saveParams = spaced(dp, 0);
+        var saveParams = spaced(dp, 0);
         saveParams.topMargin = Math.round(12 * dp);
         column.addView(saveButton, saveParams);
 
         if (id != 0) {
-            UpButton delete = new UpButton(context);
+            var delete = new UpButton(context);
             delete.setText(R.string.action_delete);
             delete.setVariant(UpButton.Variant.DESTRUCTIVE);
             delete.setOnClickListener(v -> ConfirmSheet.show(getParentFragmentManager(), KEY_DELETE,
                     getString(R.string.semester_delete_title), getString(R.string.semester_delete_message),
                     getString(R.string.action_delete), true));
-            LinearLayout.LayoutParams deleteParams = spaced(dp, 0);
+            var deleteParams = spaced(dp, 0);
             deleteParams.topMargin = Math.round(8 * dp);
             column.addView(delete, deleteParams);
         }
@@ -172,7 +172,7 @@ public final class SemesterEditorSheet extends UpSheet {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        FragmentManager manager = getParentFragmentManager();
+        var manager = getParentFragmentManager();
         manager.setFragmentResultListener(KEY_START, getViewLifecycleOwner(), (key, result) -> {
             start = LocalDate.ofEpochDay(result.getLong(DatePickerSheet.RESULT_EPOCH_DAY));
             if (id == 0 && !endTouched) end = SemesterDefaults.lectureEnd(start);
@@ -202,7 +202,7 @@ public final class SemesterEditorSheet extends UpSheet {
     }
 
     private void refresh() {
-        Context context = requireContext();
+        var context = requireContext();
         startRow.setValue(TimeFormat.dateMedium(context, start));
         endRow.setValue(TimeFormat.dateMedium(context, end));
         nameField.setHint(SemesterNames.display(context, new Semester(0, start, end, null)));
@@ -214,7 +214,7 @@ public final class SemesterEditorSheet extends UpSheet {
     }
 
     private void onSave() {
-        Semester candidate = candidate();
+        var candidate = candidate();
         switch (SemesterRules.check(candidate, others)) {
             case INVALID_RANGE:
                 showError(getString(R.string.semester_error_range));
@@ -225,7 +225,7 @@ public final class SemesterEditorSheet extends UpSheet {
             default:
                 break;
         }
-        boolean shortens = original != null
+        var shortens = original != null
                 && (start.isAfter(original.start()) || end.isBefore(original.end()));
         if (shortens) {
             ConfirmSheet.show(getParentFragmentManager(), KEY_SHORTEN,
@@ -270,7 +270,7 @@ public final class SemesterEditorSheet extends UpSheet {
     }
 
     private String overlappingName(Semester candidate) {
-        for (Semester other : others) {
+        for (var other : others) {
             if (other.id() == candidate.id()) continue;
             if (!candidate.start().isAfter(other.end()) && !other.start().isAfter(candidate.end())) {
                 return SemesterNames.display(requireContext(), other);
@@ -286,7 +286,7 @@ public final class SemesterEditorSheet extends UpSheet {
     }
 
     private static LinearLayout.LayoutParams spaced(float dp, int bottomDp) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;

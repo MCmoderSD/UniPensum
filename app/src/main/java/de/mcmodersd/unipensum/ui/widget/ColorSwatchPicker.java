@@ -82,11 +82,11 @@ public class ColorSwatchPicker extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        float cellWidth = getWidth() / (float) COLUMNS;
-        float radius = Math.min(cellWidth, cellHeight) * 0.34f;
-        for (int i = 0; i < colors.length; i++) {
-            float cx = cellWidth * (i % COLUMNS + 0.5f);
-            float cy = cellHeight * (i / COLUMNS + 0.5f);
+        var cellWidth = getWidth() / (float) COLUMNS;
+        var radius = Math.min(cellWidth, cellHeight) * 0.34f;
+        for (var i = 0; i < colors.length; i++) {
+            var cx = cellWidth * (i % COLUMNS + 0.5f);
+            var cy = cellHeight * (i / COLUMNS + 0.5f);
             fill.setColor(CourseColors.resolve(getContext(), colors[i]));
             canvas.drawCircle(cx, cy, radius, fill);
             if (colors[i] == selected) canvas.drawCircle(cx, cy, radius + 5 * dp, ring);
@@ -117,8 +117,8 @@ public class ColorSwatchPicker extends View {
     }
 
     private int indexAt(float x, float y) {
-        int column = Math.min(COLUMNS - 1, (int) (x / (getWidth() / (float) COLUMNS)));
-        int index = (int) (y / cellHeight) * COLUMNS + column;
+        var column = Math.min(COLUMNS - 1, (int) (x / (getWidth() / (float) COLUMNS)));
+        var index = (int) (y / cellHeight) * COLUMNS + column;
         return index >= 0 && index < colors.length ? index : -1;
     }
 
@@ -131,14 +131,14 @@ public class ColorSwatchPicker extends View {
     }
 
     private void cellBounds(int index, Rect out) {
-        float cellWidth = getWidth() / (float) COLUMNS;
-        int left = Math.round(cellWidth * (index % COLUMNS));
-        int top = Math.round(cellHeight * (index / COLUMNS));
+        var cellWidth = getWidth() / (float) COLUMNS;
+        var left = Math.round(cellWidth * (index % COLUMNS));
+        var top = Math.round(cellHeight * (index / COLUMNS));
         out.set(left, top, Math.round(left + cellWidth), Math.round(top + cellHeight));
     }
 
     private String colorName(CourseColor color) {
-        Context context = getContext();
+        var context = getContext();
         switch (color) {
             case RED:
                 return context.getString(R.string.color_red);
@@ -174,18 +174,18 @@ public class ColorSwatchPicker extends View {
 
         @Override
         protected int getVirtualViewAt(float x, float y) {
-            int index = indexAt(x, y);
+            var index = indexAt(x, y);
             return index < 0 ? INVALID_ID : index;
         }
 
         @Override
         protected void getVisibleVirtualViews(List<Integer> virtualViewIds) {
-            for (int i = 0; i < colors.length; i++) virtualViewIds.add(i);
+            for (var i = 0; i < colors.length; i++) virtualViewIds.add(i);
         }
 
         @Override
         protected void onPopulateNodeForVirtualView(int id, @NonNull AccessibilityNodeInfoCompat node) {
-            Rect bounds = new Rect();
+            var bounds = new Rect();
             cellBounds(id, bounds);
             node.setBoundsInParent(bounds);
             node.setContentDescription(colorName(colors[id]));

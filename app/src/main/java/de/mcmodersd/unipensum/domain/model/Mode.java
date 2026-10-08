@@ -16,7 +16,7 @@ public enum Mode {
     }
 
     public static Mode fromKey(String key) {
-        for (Mode value : values()) {
+        for (var value : values()) {
             if (value.key.equals(key)) return value;
         }
         throw new IllegalArgumentException("Unknown mode: " + key);

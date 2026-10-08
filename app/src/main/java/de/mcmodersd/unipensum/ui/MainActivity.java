@@ -55,16 +55,16 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         pane = findViewById(R.id.pane);
         View side = findViewById(R.id.side);
         ViewCompat.setOnApplyWindowInsetsListener(pane, (view, windowInsets) -> {
-            Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
+            var bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
                     | WindowInsetsCompat.Type.displayCutout());
-            Insets ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
+            var ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
             // Only the pane holds text fields, so only it makes room for the keyboard.
             side.setPadding(0, 0, 0, Math.max(0, ime.bottom - bars.bottom));
             return windowInsets;
         });
 
-        FragmentManager manager = getSupportFragmentManager();
+        var manager = getSupportFragmentManager();
         manager.registerFragmentLifecycleCallbacks(new CloseIcon(), false);
         manager.addOnBackStackChangedListener(() -> pane.setSideOpen(paneHasPage(), true));
         // After the screen was recreated, the pane is open again right away, without sliding in. Nothing is
@@ -107,12 +107,12 @@ public class MainActivity extends AppCompatActivity implements Navigator {
     }
 
     private void openSessionOfIntent(Intent intent) {
-        long sessionId = intent.getLongExtra(EXTRA_SESSION_ID, 0);
+        var sessionId = intent.getLongExtra(EXTRA_SESSION_ID, 0);
         if (sessionId == 0) return;
         // Taken from the intent, so turning the screen or coming back does not open it again.
         intent.removeExtra(EXTRA_SESSION_ID);
-        FragmentManager manager = getSupportFragmentManager();
-        Fragment shown = manager.findFragmentByTag(SessionDetailSheet.TAG);
+        var manager = getSupportFragmentManager();
+        var shown = manager.findFragmentByTag(SessionDetailSheet.TAG);
         if (shown instanceof DialogFragment) ((DialogFragment) shown).dismissAllowingStateLoss();
         SessionDetailSheet.show(manager, sessionId);
     }
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements Navigator {
      */
     @SuppressLint("SourceLockedOrientationActivity")
     private void lockPhonesToPortrait() {
-        boolean tablet = getResources().getConfiguration().smallestScreenWidthDp >= TABLET_MIN_SMALLEST_WIDTH_DP;
+        var tablet = getResources().getConfiguration().smallestScreenWidthDp >= TABLET_MIN_SMALLEST_WIDTH_DP;
         setRequestedOrientation(tablet
                 ? ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
@@ -146,8 +146,8 @@ public class MainActivity extends AppCompatActivity implements Navigator {
 
     @Override
     public void toggle(Fragment fragment) {
-        Fragment current = getSupportFragmentManager().findFragmentById(R.id.side);
-        boolean onlyThisPage = current != null && FIRST_PAGE.equals(current.getTag())
+        var current = getSupportFragmentManager().findFragmentById(R.id.side);
+        var onlyThisPage = current != null && FIRST_PAGE.equals(current.getTag())
                 && current.getClass() == fragment.getClass();
         if (onlyThisPage) pop();
         else open(fragment);
@@ -159,12 +159,12 @@ public class MainActivity extends AppCompatActivity implements Navigator {
      * to it but no longer added.
      */
     private boolean paneHasPage() {
-        Fragment page = getSupportFragmentManager().findFragmentById(R.id.side);
+        var page = getSupportFragmentManager().findFragmentById(R.id.side);
         return page != null && page.isAdded();
     }
 
     private void show(Fragment fragment, boolean firstPage) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().setReorderingAllowed(true);
+        var transaction = getSupportFragmentManager().beginTransaction().setReorderingAllowed(true);
         if (firstPage && pane.isSplit()) {
             // The pane slides in and out by itself; the page only has to stay put while it does.
             transaction.setCustomAnimations(0, 0, 0, R.animator.pane_hold);
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         View view = page == null ? null : page.getView();
         ImageView back = view == null ? null : view.findViewById(R.id.back);
         if (back == null) return;
-        boolean closes = pane.isSplit() && page != null && FIRST_PAGE.equals(page.getTag());
+        var closes = pane.isSplit() && page != null && FIRST_PAGE.equals(page.getTag());
         back.setImageResource(closes ? R.drawable.ic_close : R.drawable.ic_chevron_left);
         back.setContentDescription(getString(closes ? R.string.action_close : R.string.action_back));
     }

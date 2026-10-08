@@ -71,18 +71,18 @@ public class BackupStoreTest {
 
     /** Lecturers, a semester, a course with two events, one session moved to another day and room. */
     private static void fill(SQLiteDatabase db, String courseName) {
-        long weber = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Weber", "anna@uni.example", "030 123"));
-        long koch = TimetableStore.saveLecturer(db, new Lecturer(0, "", "Prof. Koch", null, null));
-        long semester = TimetableStore.saveSemester(db, new Semester(0, START, END, "Winter term"));
-        SessionDetails lecture = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
+        var weber = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Weber", "anna@uni.example", "030 123"));
+        var koch = TimetableStore.saveLecturer(db, new Lecturer(0, "", "Prof. Koch", null, null));
+        var semester = TimetableStore.saveSemester(db, new Semester(0, START, END, "Winter term"));
+        var lecture = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
                 "A1", "https://meet.example/x", weber, "bring laptop", SessionDetails.NO_REMINDER);
-        SessionDetails exercise = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
+        var exercise = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
                 null, "https://meet.example/y", koch, null, SessionDetails.NO_REMINDER);
         TimetableStore.createCourse(db, new Course(0, semester, courseName, CourseColor.TEAL, "https://moodle.example/c"),
                 List.of(new Series(0, 0, lecture, new Schedule(DayOfWeek.MONDAY, START, END, 1)),
                         new Series(0, 0, exercise, new Schedule(DayOfWeek.THURSDAY, START, END, 2))));
-        Session third = TimetableStore.loadTimetable(db).on(START.plusWeeks(2)).get(0).session();
-        SessionDetails moved = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
+        var third = TimetableStore.loadTimetable(db).on(START.plusWeeks(2)).get(0).session();
+        var moved = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
                 "B7", "https://meet.example/x", weber, "bring laptop", SessionDetails.NO_REMINDER);
         TimetableStore.editSession(db, third.id(), EditScope.THIS_ONLY, moved, START.plusWeeks(2).plusDays(1), null);
     }
@@ -92,23 +92,23 @@ public class BackupStoreTest {
      * the same signature hold the same timetable even though their ids differ.
      */
     private static List<String> signature(SQLiteDatabase db) {
-        List<String> lines = new ArrayList<>();
-        Map<Long, String> lecturerNames = new HashMap<>();
-        for (Lecturer l : TimetableStore.listLecturers(db)) {
+        var lines = new ArrayList<String>();
+        var lecturerNames = new HashMap<Long, String>();
+        for (var l : TimetableStore.listLecturers(db)) {
             lecturerNames.put(l.id(), l.firstName() + " " + l.lastName());
             lines.add("L|" + l.firstName() + "|" + l.lastName() + "|" + l.email() + "|" + l.phone());
         }
         LocalDate first = null;
         LocalDate last = null;
-        for (Semester s : TimetableStore.listSemesters(db)) {
+        for (var s : TimetableStore.listSemesters(db)) {
             lines.add("S|" + s.start() + "|" + s.end() + "|" + s.customName());
             if (first == null || s.start().isBefore(first)) first = s.start();
             if (last == null || s.end().isAfter(last)) last = s.end();
             for (var c : TimetableStore.listCourses(db, s.id())) {
                 lines.add("C|" + s.start() + "|" + c.course().name() + "|" + c.course().color() + "|"
                         + c.course().moodleLink());
-                for (Series r : c.series()) {
-                    SessionDetails d = r.details();
+                for (var r : c.series()) {
+                    var d = r.details();
                     lines.add("R|" + c.course().name() + "|" + r.schedule() + "|" + d.type() + "|" + d.startMin()
                             + "|" + d.endMin() + "|" + d.mode() + "|" + d.hybrid() + "|" + d.room() + "|" + d.link()
                             + "|" + (d.lecturerId() == 0 ? "-" : lecturerNames.get(d.lecturerId())) + "|" + d.note());
@@ -116,10 +116,10 @@ public class BackupStoreTest {
             }
         }
         if (first != null) {
-            Timetable timetable = TimetableStore.loadTimetable(db);
-            for (LocalDate day = first; !day.isAfter(last); day = day.plusDays(1)) {
-                for (SessionView v : timetable.on(day)) {
-                    SessionDetails d = v.session().details();
+            var timetable = TimetableStore.loadTimetable(db);
+            for (var day = first; !day.isAfter(last); day = day.plusDays(1)) {
+                for (var v : timetable.on(day)) {
+                    var d = v.session().details();
                     lines.add("X|" + day + "|" + v.courseName() + "|" + d.type() + "|" + d.startMin() + "|" + d.endMin()
                             + "|" + d.mode() + "|" + d.hybrid() + "|" + d.room() + "|" + d.link() + "|"
                             + (v.lecturer() == null ? "-" : v.lecturer().lastName()) + "|" + d.note());
@@ -151,7 +151,7 @@ public class BackupStoreTest {
         fill(a, "Math");
         TimetableStore.replaceAll(b, TimetableStore.exportData(a));
 
-        for (String line : signature(b)) assertFalse(line, line.contains("Old course"));
+        for (var line : signature(b)) assertFalse(line, line.contains("Old course"));
         assertEquals(2, TimetableStore.listLecturers(b).size());          // not 4
         assertEquals(1, TimetableStore.listSemesters(b).size());
         assertEquals(TimetableStore.exportData(a).sessions().size(), DatabaseUtils.queryNumEntries(b, "session"));
@@ -176,8 +176,8 @@ public class BackupStoreTest {
         fill(b, "Old course");                // advances b's counters, so its new ids differ from a's
         TimetableStore.replaceAll(b, TimetableStore.exportData(a));
 
-        BackupData exported = TimetableStore.exportData(b);
-        BackupCleaner.Result checked = BackupCleaner.clean(exported, 0, 0);
+        var exported = TimetableStore.exportData(b);
+        var checked = BackupCleaner.clean(exported, 0, 0);
 
         // Nothing is left out or adjusted: every course finds its semester, every session its event.
         assertTrue(checked.report().isClean());
@@ -190,9 +190,9 @@ public class BackupStoreTest {
     public void importedEventsCanBeEditedAndDeletedLikeAnyOther() {
         fill(a, "Math");
         TimetableStore.replaceAll(b, TimetableStore.exportData(a));
-        long before = DatabaseUtils.queryNumEntries(b, "session");
+        var before = DatabaseUtils.queryNumEntries(b, "session");
 
-        Session monday = TimetableStore.loadTimetable(b).on(START).get(0).session();
+        var monday = TimetableStore.loadTimetable(b).on(START).get(0).session();
         TimetableStore.deleteSession(b, monday.id(), EditScope.ALL);
 
         assertTrue(DatabaseUtils.queryNumEntries(b, "session") < before);
@@ -202,15 +202,15 @@ public class BackupStoreTest {
     @Test
     public void ifSomethingGoesWrong_theOldDataIsStillThere() {
         fill(b, "Old course");
-        List<String> before = signature(b);
+        var before = signature(b);
 
         fill(a, "Math");
-        BackupData good = TimetableStore.exportData(a);
+        var good = TimetableStore.exportData(a);
         // The last series names a course that is not in the data, so the import fails after the early rows.
-        List<Series> series = new ArrayList<>(good.series());
-        Series orphan = series.remove(series.size() - 1);
+        var series = new ArrayList<Series>(good.series());
+        var orphan = series.remove(series.size() - 1);
         series.add(new Series(orphan.id(), 424242, orphan.details(), orphan.schedule()));
-        BackupData broken = new BackupData(good.lecturers(), good.semesters(), good.courses(), series, good.sessions());
+        var broken = new BackupData(good.lecturers(), good.semesters(), good.courses(), series, good.sessions());
 
         assertThrows(IllegalArgumentException.class, () -> TimetableStore.replaceAll(b, broken));
 

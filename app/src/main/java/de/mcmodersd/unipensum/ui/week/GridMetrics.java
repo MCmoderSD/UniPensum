@@ -21,7 +21,7 @@ final class GridMetrics {
     final int headerHeight;
 
     GridMetrics(Context context) {
-        Resources res = context.getResources();
+        var res = context.getResources();
         gutter = res.getDimensionPixelSize(R.dimen.grid_gutter);
         minHourHeight = res.getDimensionPixelSize(R.dimen.grid_min_hour_height);
         verticalPadding = res.getDimensionPixelSize(R.dimen.grid_vertical_padding);

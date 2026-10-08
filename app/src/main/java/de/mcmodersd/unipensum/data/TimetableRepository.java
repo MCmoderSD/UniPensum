@@ -57,7 +57,7 @@ public final class TimetableRepository {
 
     public void loadSemester(long semesterId, Callback<Semester> callback) {
         database.read(db -> {
-            for (Semester semester : TimetableStore.listSemesters(db)) {
+            for (var semester : TimetableStore.listSemesters(db)) {
                 if (semester.id() == semesterId) return semester;
             }
             throw new IllegalArgumentException("No semester with id " + semesterId);

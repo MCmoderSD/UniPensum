@@ -29,9 +29,9 @@ public final class NowIndicator {
      *                  still counts as visible
      */
     public static Optional<Position> at(LocalDate monday, LocalDateTime now, int startHour, int endHour) {
-        long dayIndex = ChronoUnit.DAYS.between(monday, now.toLocalDate());
+        var dayIndex = ChronoUnit.DAYS.between(monday, now.toLocalDate());
         if (dayIndex < 0 || dayIndex > 4) return Optional.empty();
-        int minutes = now.getHour() * 60 + now.getMinute();
+        var minutes = now.getHour() * 60 + now.getMinute();
         if (minutes < startHour * 60 || minutes > endHour * 60) return Optional.empty();
         return Optional.of(new Position((int) dayIndex, minutes));
     }

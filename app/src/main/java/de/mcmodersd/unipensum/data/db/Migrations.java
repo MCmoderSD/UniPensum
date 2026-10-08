@@ -26,8 +26,8 @@ final class Migrations {
     }
 
     static void upgrade(SQLiteDatabase db, int from, int to) {
-        for (int version = from; version < to; version++) {
-            int index = version - 1;
+        for (var version = from; version < to; version++) {
+            var index = version - 1;
             if (index < 0 || index >= STEPS.length) {
                 throw new IllegalStateException("No migration from version " + version + " to " + (version + 1));
             }
@@ -41,7 +41,7 @@ final class Migrations {
      * when the code does.
      */
     private static void reminders(SQLiteDatabase db) {
-        for (String table : new String[]{"series", "session"}) {
+        for (var table : new String[]{"series", "session"}) {
             db.execSQL("ALTER TABLE " + table + " ADD COLUMN reminder_min INTEGER");
             db.execSQL("UPDATE " + table + " SET reminder_min = CASE mode WHEN 'online' THEN 5 ELSE 30 END");
         }
@@ -70,7 +70,7 @@ final class Migrations {
                 + "UNION SELECT TRIM(lecturer) FROM session WHERE lecturer IS NOT NULL) "
                 + "WHERE name <> '' ORDER BY name");
 
-        for (String table : new String[]{"series", "session"}) {
+        for (var table : new String[]{"series", "session"}) {
             db.execSQL("UPDATE " + table + " SET lecturer_id = ("
                     + "SELECT l.id FROM lecturer l WHERE l.first_name = '' AND l.last_name = TRIM(" + table + ".lecturer)) "
                     + "WHERE lecturer IS NOT NULL AND TRIM(lecturer) <> ''");

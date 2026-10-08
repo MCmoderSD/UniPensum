@@ -32,13 +32,13 @@ public final class ConfirmSheet extends UpSheet {
 
     public static void show(FragmentManager manager, String requestKey, CharSequence title, CharSequence message,
                             CharSequence confirmLabel, boolean destructive) {
-        Bundle args = new Bundle();
+        var args = new Bundle();
         args.putString(ARG_KEY, requestKey);
         args.putCharSequence(ARG_TITLE, title);
         args.putCharSequence(ARG_MESSAGE, message);
         args.putCharSequence(ARG_CONFIRM, confirmLabel);
         args.putBoolean(ARG_DESTRUCTIVE, destructive);
-        ConfirmSheet sheet = new ConfirmSheet();
+        var sheet = new ConfirmSheet();
         sheet.setArguments(args);
         sheet.show(manager, "confirm:" + requestKey);
     }
@@ -52,26 +52,26 @@ public final class ConfirmSheet extends UpSheet {
     @Override
     protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
                                  @Nullable Bundle savedInstanceState) {
-        Bundle args = requireArguments();
-        Context context = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
+        var args = requireArguments();
+        var context = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
 
-        LinearLayout column = new LinearLayout(context);
+        var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
 
-        TextView message = new TextView(context);
+        var message = new TextView(context);
         message.setText(args.getCharSequence(ARG_MESSAGE));
         message.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         message.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
         message.setPadding(Math.round(8 * dp), 0, Math.round(8 * dp), Math.round(20 * dp));
         column.addView(message);
 
-        UpButton confirm = new UpButton(context);
+        var confirm = new UpButton(context);
         confirm.setText(args.getCharSequence(ARG_CONFIRM));
         confirm.setVariant(args.getBoolean(ARG_DESTRUCTIVE) ? UpButton.Variant.DESTRUCTIVE : UpButton.Variant.PRIMARY);
         confirm.setOnClickListener(v -> {
             Haptics.confirm(v);
-            Bundle result = new Bundle();
+            var result = new Bundle();
             result.putBoolean(RESULT_CONFIRMED, true);
             getParentFragmentManager().setFragmentResult(args.getString(ARG_KEY), result);
             dismiss();
@@ -79,11 +79,11 @@ public final class ConfirmSheet extends UpSheet {
         column.addView(confirm, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        UpButton cancel = new UpButton(context);
+        var cancel = new UpButton(context);
         cancel.setText(R.string.action_cancel);
         cancel.setVariant(UpButton.Variant.SECONDARY);
         cancel.setOnClickListener(v -> dismiss());
-        LinearLayout.LayoutParams cancelParams = new LinearLayout.LayoutParams(
+        var cancelParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         cancelParams.topMargin = Math.round(8 * dp);
         column.addView(cancel, cancelParams);

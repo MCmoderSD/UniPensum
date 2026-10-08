@@ -19,7 +19,7 @@ public final class PaneMetrics {
      * comfortable on a small tablet and do not stretch on a large one. Never wider than the window.
      */
     public static int sideWidth(int windowWidth, float share, int minWidth, int maxWidth) {
-        int wanted = Math.round(windowWidth * share);
+        var wanted = Math.round(windowWidth * share);
         return Math.min(windowWidth, Math.max(minWidth, Math.min(maxWidth, wanted)));
     }
 }

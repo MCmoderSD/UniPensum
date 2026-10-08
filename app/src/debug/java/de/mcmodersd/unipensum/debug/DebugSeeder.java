@@ -42,24 +42,24 @@ public final class DebugSeeder {
     }
 
     public static void seed(Context context, Intent intent) {
-        int reminderIn = intent.getIntExtra(EXTRA_REMINDER_IN, -1);
+        var reminderIn = intent.getIntExtra(EXTRA_REMINDER_IN, -1);
         UniPensumApp.from(context).database().write(db -> {
-            for (Semester existing : TimetableStore.listSemesters(db)) {
+            for (var existing : TimetableStore.listSemesters(db)) {
                 TimetableStore.deleteSemester(db, existing.id());
             }
-            for (Lecturer existing : TimetableStore.listLecturers(db)) {
+            for (var existing : TimetableStore.listLecturers(db)) {
                 TimetableStore.deleteLecturer(db, existing.id());
             }
-            long weber = lecturer(db, "Anna", "Weber", "anna.weber@uni.example", "+49 30 1234567");
-            long koch = lecturer(db, "Michael", "Koch", "m.koch@uni.example", null);
-            long lang = lecturer(db, "Sabine", "Lang", null, "+49 30 7654321");
-            long neumann = lecturer(db, "Jonas", "Neumann", "j.neumann@uni.example", "+49 30 5550123");
-            long brandt = lecturer(db, "Tobias", "Brandt", "t.brandt@uni.example", "+49 30 5550456");
-            long sommer = lecturer(db, "Lena", "Sommer", "l.sommer@uni.example", null);
+            var weber = lecturer(db, "Anna", "Weber", "anna.weber@uni.example", "+49 30 1234567");
+            var koch = lecturer(db, "Michael", "Koch", "m.koch@uni.example", null);
+            var lang = lecturer(db, "Sabine", "Lang", null, "+49 30 7654321");
+            var neumann = lecturer(db, "Jonas", "Neumann", "j.neumann@uni.example", "+49 30 5550123");
+            var brandt = lecturer(db, "Tobias", "Brandt", "t.brandt@uni.example", "+49 30 5550456");
+            var sommer = lecturer(db, "Lena", "Sommer", "l.sommer@uni.example", null);
 
-            LocalDate start = LocalDate.of(2026, 10, 5);
-            LocalDate end = SemesterDefaults.lectureEnd(start);
-            long semester = TimetableStore.saveSemester(db, new Semester(0, start, end, null));
+            var start = LocalDate.of(2026, 10, 5);
+            var end = SemesterDefaults.lectureEnd(start);
+            var semester = TimetableStore.saveSemester(db, new Semester(0, start, end, null));
 
             TimetableStore.createCourse(db, new Course(0, semester, "Analysis", CourseColor.BLUE,
                     "https://moodle.uni.example/course/view.php?id=101"), List.of(
@@ -91,13 +91,13 @@ public final class DebugSeeder {
 
     /** One session today that begins in {@code minutes} minutes, so the reminder for it comes soon. */
     private static void reminderTest(SQLiteDatabase db, long semester, int minutes) {
-        LocalDateTime begin = LocalDateTime.now().plusMinutes(minutes);
-        int startMin = begin.getHour() * 60 + begin.getMinute();
+        var begin = LocalDateTime.now().plusMinutes(minutes);
+        var startMin = begin.getHour() * 60 + begin.getMinute();
         if (startMin + TEST_LENGTH_MIN > SessionDetails.MINUTES_PER_DAY) return;
-        SessionDetails details = new SessionDetails(SessionType.LECTURE, startMin, startMin + TEST_LENGTH_MIN,
+        var details = new SessionDetails(SessionType.LECTURE, startMin, startMin + TEST_LENGTH_MIN,
                 Mode.IN_PERSON, true, "Test room", "https://meet.example/test", SessionDetails.NO_LECTURER, null,
                 TEST_REMINDER_MIN);
-        LocalDate day = begin.toLocalDate();
+        var day = begin.toLocalDate();
         TimetableStore.createCourse(db, new Course(0, semester, "Reminder test", CourseColor.TEAL,
                 "https://moodle.uni.example/test"), List.of(series(day.getDayOfWeek(), day, day, 1, details)));
     }

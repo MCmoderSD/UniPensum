@@ -53,7 +53,7 @@ public final class LecturerEditorSheet extends UpSheet {
      * @param resultKey if not {@code null}, the saved lecturer's id is delivered under this key
      */
     public static void show(FragmentManager manager, @Nullable Lecturer existing, @Nullable String resultKey) {
-        Bundle args = new Bundle();
+        var args = new Bundle();
         if (existing != null) {
             args.putLong(ARG_ID, existing.id());
             args.putString(ARG_FIRST_NAME, existing.firstName());
@@ -62,7 +62,7 @@ public final class LecturerEditorSheet extends UpSheet {
             args.putString(ARG_PHONE, existing.phone());
         }
         args.putString(ARG_RESULT_KEY, resultKey);
-        LecturerEditorSheet sheet = new LecturerEditorSheet();
+        var sheet = new LecturerEditorSheet();
         sheet.setArguments(args);
         sheet.show(manager, "lecturer-editor");
     }
@@ -76,14 +76,14 @@ public final class LecturerEditorSheet extends UpSheet {
     @Override
     protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
                                  @Nullable Bundle savedInstanceState) {
-        Context context = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
+        var context = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
         repository = UniPensumApp.from(context).repository();
         id = requireArguments().getLong(ARG_ID);
         // A recreated sheet gets back what was typed, not what the lecturer looked like when it opened.
-        Bundle source = savedInstanceState != null ? savedInstanceState : requireArguments();
+        var source = savedInstanceState != null ? savedInstanceState : requireArguments();
 
-        LinearLayout column = new LinearLayout(context);
+        var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
 
         firstNameField = field(context, R.string.lecturer_first_name,
@@ -111,7 +111,7 @@ public final class LecturerEditorSheet extends UpSheet {
         column.addView(saveButton, spaced(dp, 16, 0));
 
         if (id != 0) {
-            UpButton delete = new UpButton(context);
+            var delete = new UpButton(context);
             delete.setText(R.string.action_delete);
             delete.setVariant(UpButton.Variant.DESTRUCTIVE);
             delete.setOnClickListener(v -> ConfirmSheet.show(getParentFragmentManager(), KEY_DELETE,
@@ -139,7 +139,7 @@ public final class LecturerEditorSheet extends UpSheet {
     }
 
     private UpTextField field(Context context, int label, int inputType, int maxLength, @Nullable String text) {
-        UpTextField field = new UpTextField(context);
+        var field = new UpTextField(context);
         field.setLabel(getString(label));
         field.setInputType(inputType);
         field.setMaxLength(maxLength);
@@ -149,10 +149,10 @@ public final class LecturerEditorSheet extends UpSheet {
     }
 
     private void onSave() {
-        Lecturer candidate = new Lecturer(id, firstNameField.getText(), lastNameField.getText(),
+        var candidate = new Lecturer(id, firstNameField.getText(), lastNameField.getText(),
                 emailField.getText(), phoneField.getText()).normalized();
 
-        boolean valid = true;
+        var valid = true;
         if (candidate.lastName().isEmpty()) {
             lastNameField.setError(getString(R.string.lecturer_error_last_name));
             valid = false;
@@ -172,9 +172,9 @@ public final class LecturerEditorSheet extends UpSheet {
             public void onSuccess(Long savedId) {
                 if (!isAdded()) return;
                 Haptics.confirm(saveButton);
-                String resultKey = requireArguments().getString(ARG_RESULT_KEY);
+                var resultKey = requireArguments().getString(ARG_RESULT_KEY);
                 if (resultKey != null) {
-                    Bundle result = new Bundle();
+                    var result = new Bundle();
                     result.putLong(RESULT_LECTURER_ID, savedId);
                     getParentFragmentManager().setFragmentResult(resultKey, result);
                 }
@@ -206,7 +206,7 @@ public final class LecturerEditorSheet extends UpSheet {
     }
 
     private static LinearLayout.LayoutParams spaced(float dp, int topDp, int bottomDp) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);

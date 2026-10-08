@@ -18,7 +18,7 @@ public final class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        for (String statement : Schema.CREATE_STATEMENTS) {
+        for (var statement : Schema.CREATE_STATEMENTS) {
             db.execSQL(statement);
         }
     }

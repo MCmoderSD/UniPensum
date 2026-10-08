@@ -22,9 +22,9 @@ public class BackupCryptoTest {
 
     @Test
     public void whatIsEncrypted_comesBackWithTheSamePassword() throws Exception {
-        BackupCrypto.Params params = BackupCrypto.newParams(ITERATIONS);
+        var params = BackupCrypto.newParams(ITERATIONS);
 
-        byte[] sealed = BackupCrypto.encrypt("correct horse".toCharArray(), params, AAD, PLAIN);
+        var sealed = BackupCrypto.encrypt("correct horse".toCharArray(), params, AAD, PLAIN);
 
         assertFalse(Arrays.equals(PLAIN, sealed));
         assertArrayEquals(PLAIN, BackupCrypto.decrypt("correct horse".toCharArray(), params, AAD, sealed));
@@ -32,18 +32,18 @@ public class BackupCryptoTest {
 
     @Test
     public void passwordsWithUmlautsAndEmoji_work() throws Exception {
-        BackupCrypto.Params params = BackupCrypto.newParams(ITERATIONS);
-        char[] password = "Stundenplan-üß-😀".toCharArray();
+        var params = BackupCrypto.newParams(ITERATIONS);
+        var password = "Stundenplan-üß-😀".toCharArray();
 
-        byte[] sealed = BackupCrypto.encrypt(password.clone(), params, AAD, PLAIN);
+        var sealed = BackupCrypto.encrypt(password.clone(), params, AAD, PLAIN);
 
         assertArrayEquals(PLAIN, BackupCrypto.decrypt(password.clone(), params, AAD, sealed));
     }
 
     @Test
     public void aWrongPassword_isRefused() throws Exception {
-        BackupCrypto.Params params = BackupCrypto.newParams(ITERATIONS);
-        byte[] sealed = BackupCrypto.encrypt("correct horse".toCharArray(), params, AAD, PLAIN);
+        var params = BackupCrypto.newParams(ITERATIONS);
+        var sealed = BackupCrypto.encrypt("correct horse".toCharArray(), params, AAD, PLAIN);
 
         assertThrows(AEADBadTagException.class,
                 () -> BackupCrypto.decrypt("correct hors".toCharArray(), params, AAD, sealed));
@@ -53,10 +53,10 @@ public class BackupCryptoTest {
 
     @Test
     public void changedAdditionalData_isRefused() throws Exception {
-        BackupCrypto.Params params = BackupCrypto.newParams(ITERATIONS);
-        byte[] sealed = BackupCrypto.encrypt("correct horse".toCharArray(), params, AAD, PLAIN);
+        var params = BackupCrypto.newParams(ITERATIONS);
+        var sealed = BackupCrypto.encrypt("correct horse".toCharArray(), params, AAD, PLAIN);
 
-        byte[] otherManifest = "{\"schema\":3}".getBytes(StandardCharsets.UTF_8);
+        var otherManifest = "{\"schema\":3}".getBytes(StandardCharsets.UTF_8);
 
         assertThrows(AEADBadTagException.class,
                 () -> BackupCrypto.decrypt("correct horse".toCharArray(), params, otherManifest, sealed));
@@ -64,8 +64,8 @@ public class BackupCryptoTest {
 
     @Test
     public void changedEncryptedData_isRefused() throws Exception {
-        BackupCrypto.Params params = BackupCrypto.newParams(ITERATIONS);
-        byte[] sealed = BackupCrypto.encrypt("correct horse".toCharArray(), params, AAD, PLAIN);
+        var params = BackupCrypto.newParams(ITERATIONS);
+        var sealed = BackupCrypto.encrypt("correct horse".toCharArray(), params, AAD, PLAIN);
         sealed[sealed.length / 2] ^= 0x01;
 
         assertThrows(AEADBadTagException.class,
@@ -74,8 +74,8 @@ public class BackupCryptoTest {
 
     @Test
     public void everyFileGetsItsOwnSaltAndNonce_soTheSameDataLooksDifferent() throws Exception {
-        BackupCrypto.Params first = BackupCrypto.newParams(ITERATIONS);
-        BackupCrypto.Params second = BackupCrypto.newParams(ITERATIONS);
+        var first = BackupCrypto.newParams(ITERATIONS);
+        var second = BackupCrypto.newParams(ITERATIONS);
 
         assertEquals(BackupCrypto.SALT_BYTES, first.salt().length);
         assertEquals(BackupCrypto.IV_BYTES, first.iv().length);

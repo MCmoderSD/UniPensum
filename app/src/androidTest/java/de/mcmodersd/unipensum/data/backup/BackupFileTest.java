@@ -81,13 +81,13 @@ public class BackupFileTest {
 
     /** Two lecturers, a semester with a custom name, a course with a Moodle link and two events, one session moved. */
     private BackupData sample() {
-        long weber = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Weber", "anna@uni.example", "+49 30 123"));
-        long koch = TimetableStore.saveLecturer(db, new Lecturer(0, "", "Prof. Koch", null, null));
-        long semester = TimetableStore.saveSemester(db, new Semester(0, START, END, "Winter term"));
+        var weber = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Weber", "anna@uni.example", "+49 30 123"));
+        var koch = TimetableStore.saveLecturer(db, new Lecturer(0, "", "Prof. Koch", null, null));
+        var semester = TimetableStore.saveSemester(db, new Semester(0, START, END, "Winter term"));
 
-        SessionDetails lecture = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
+        var lecture = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
                 "A1", "https://meet.example/x", weber, "bring laptop\n\nroom B2", 45);
-        SessionDetails exercise = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
+        var exercise = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
                 null, "https://meet.example/y", koch, null, SessionDetails.NO_REMINDER);
         TimetableStore.createCourse(db,
                 new Course(0, semester, "Math", CourseColor.TEAL, "https://moodle.example/c/1"),
@@ -95,8 +95,8 @@ public class BackupFileTest {
                         new Series(0, 0, exercise, new Schedule(DayOfWeek.THURSDAY, START, END, 2))));
 
         // One session of the lecture deviates: another day and room.
-        Session first = TimetableStore.loadTimetable(db).on(START.plusWeeks(2)).get(0).session();
-        SessionDetails moved = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
+        var first = TimetableStore.loadTimetable(db).on(START.plusWeeks(2)).get(0).session();
+        var moved = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
                 "B7", "https://meet.example/x", weber, "bring laptop\n\nroom B2", 45);
         TimetableStore.editSession(db, first.id(), EditScope.THIS_ONLY, moved, START.plusWeeks(2).plusDays(1), null);
         return TimetableStore.exportData(db);
@@ -114,11 +114,11 @@ public class BackupFileTest {
 
     @Test
     public void withoutAPassword_everythingComesBack() throws Exception {
-        BackupData data = sample();
+        var data = sample();
 
-        byte[] file = BackupFile.write(data, META, null);
-        BackupFile.Opened opened = open(file);
-        BackupCleaner.Result result = opened.read(null);
+        var file = BackupFile.write(data, META, null);
+        var opened = open(file);
+        var result = opened.read(null);
 
         assertFalse(opened.isEncrypted());
         assertEquals(data, result.data());
@@ -128,7 +128,7 @@ public class BackupFileTest {
 
     @Test
     public void theManifestSaysWhichVersionWroteTheFile() throws Exception {
-        BackupInfo info = open(BackupFile.write(sample(), META, null)).info();
+        var info = open(BackupFile.write(sample(), META, null)).info();
 
         assertEquals(BackupFile.FORMAT, info.format());
         assertEquals(Schema.VERSION, info.schema());
@@ -140,10 +140,10 @@ public class BackupFileTest {
 
     @Test
     public void theFileIsAZipArchiveWithAReadableManifest() throws Exception {
-        Map<String, byte[]> entries = unzip(BackupFile.write(sample(), META, null));
+        var entries = unzip(BackupFile.write(sample(), META, null));
 
         assertEquals(2, entries.size());
-        String manifest = new String(entries.get("manifest.json"), StandardCharsets.UTF_8);
+        var manifest = new String(entries.get("manifest.json"), StandardCharsets.UTF_8);
         assertTrue(manifest, manifest.contains("\"app\":\"UniPensum\""));
         assertTrue(manifest, manifest.contains("\"schema\":" + Schema.VERSION));
         assertFalse(manifest, manifest.contains("encryption"));
@@ -152,27 +152,27 @@ public class BackupFileTest {
 
     @Test
     public void withAPassword_theDataIsNotReadableWithoutIt() throws Exception {
-        BackupData data = sample();
+        var data = sample();
 
-        byte[] file = BackupFile.write(data, META, PASSWORD.clone(), ITERATIONS);
-        Map<String, byte[]> entries = unzip(file);
+        var file = BackupFile.write(data, META, PASSWORD.clone(), ITERATIONS);
+        var entries = unzip(file);
 
         assertTrue(entries.containsKey("data.enc"));
         assertFalse(entries.containsKey("data.json"));
-        String manifest = new String(entries.get("manifest.json"), StandardCharsets.UTF_8);
+        var manifest = new String(entries.get("manifest.json"), StandardCharsets.UTF_8);
         assertTrue(manifest, manifest.contains("AES-256-GCM"));
         assertTrue(manifest, manifest.contains("\"iterations\":" + ITERATIONS));
         // The lecturer's name appears nowhere in the file, not even compressed away.
         assertEquals(-1, indexOf(entries.get("data.enc"), "Weber".getBytes(StandardCharsets.UTF_8)));
 
-        BackupFile.Opened opened = open(file);
+        var opened = open(file);
         assertTrue(opened.isEncrypted());
         assertEquals(data, opened.read(PASSWORD.clone()).data());
     }
 
     @Test
     public void aWrongOrMissingPassword_isRefused() throws Exception {
-        BackupFile.Opened opened = open(BackupFile.write(sample(), META, PASSWORD.clone(), ITERATIONS));
+        var opened = open(BackupFile.write(sample(), META, PASSWORD.clone(), ITERATIONS));
 
         assertEquals(BackupException.Reason.WRONG_PASSWORD, reasonOf(() -> opened.read("wrong horse".toCharArray())));
         assertEquals(BackupException.Reason.WRONG_PASSWORD, reasonOf(() -> opened.read(null)));
@@ -183,13 +183,13 @@ public class BackupFileTest {
 
     @Test
     public void aChangedManifest_makesAProtectedBackupFail() throws Exception {
-        byte[] file = BackupFile.write(sample(), META, PASSWORD.clone(), ITERATIONS);
-        Map<String, byte[]> entries = unzip(file);
-        String manifest = new String(entries.get("manifest.json"), StandardCharsets.UTF_8);
+        var file = BackupFile.write(sample(), META, PASSWORD.clone(), ITERATIONS);
+        var entries = unzip(file);
+        var manifest = new String(entries.get("manifest.json"), StandardCharsets.UTF_8);
         entries.put("manifest.json", manifest.replace("\"appVersion\":\"1.0\"", "\"appVersion\":\"6.6\"")
                 .getBytes(StandardCharsets.UTF_8));
 
-        BackupFile.Opened opened = open(zip(entries));
+        var opened = open(zip(entries));
 
         assertEquals("6.6", opened.info().appVersion());
         assertEquals(BackupException.Reason.WRONG_PASSWORD, reasonOf(() -> opened.read(PASSWORD.clone())));
@@ -197,11 +197,11 @@ public class BackupFileTest {
 
     @Test
     public void changedEncryptedData_makesAProtectedBackupFail() throws Exception {
-        Map<String, byte[]> entries = unzip(BackupFile.write(sample(), META, PASSWORD.clone(), ITERATIONS));
-        byte[] data = entries.get("data.enc");
+        var entries = unzip(BackupFile.write(sample(), META, PASSWORD.clone(), ITERATIONS));
+        var data = entries.get("data.enc");
         data[data.length / 2] ^= 0x01;
 
-        BackupFile.Opened opened = open(zip(entries));
+        var opened = open(zip(entries));
 
         assertEquals(BackupException.Reason.WRONG_PASSWORD, reasonOf(() -> opened.read(PASSWORD.clone())));
     }
@@ -218,11 +218,11 @@ public class BackupFileTest {
 
     @Test
     public void aZipWithoutOurManifest_isNotABackup() throws Exception {
-        Map<String, byte[]> other = new LinkedHashMap<>();
+        var other = new LinkedHashMap<String, byte[]>();
         other.put("photo.jpg", new byte[]{1, 2, 3});
         assertEquals(BackupException.Reason.NOT_A_BACKUP, reasonOf(() -> open(zip(other))));
 
-        Map<String, byte[]> foreign = new LinkedHashMap<>();
+        var foreign = new LinkedHashMap<String, byte[]>();
         foreign.put("manifest.json", "{\"app\":\"SomethingElse\",\"format\":1,\"schema\":1}".getBytes(StandardCharsets.UTF_8));
         foreign.put("data.json", "{}".getBytes(StandardCharsets.UTF_8));
         assertEquals(BackupException.Reason.NOT_A_BACKUP, reasonOf(() -> open(zip(foreign))));
@@ -230,18 +230,18 @@ public class BackupFileTest {
 
     @Test
     public void aTruncatedFile_isDamaged() throws Exception {
-        byte[] file = BackupFile.write(sample(), META, null);
+        var file = BackupFile.write(sample(), META, null);
         // Cut a few bytes into the second entry, the data.
-        int cut = secondEntry(file) + 39 + 10;
+        var cut = secondEntry(file) + 39 + 10;
 
-        byte[] truncated = Arrays.copyOf(file, cut);
+        var truncated = Arrays.copyOf(file, cut);
 
         assertEquals(BackupException.Reason.DAMAGED, reasonOf(() -> open(truncated)));
     }
 
     @Test
     public void aManifestThatIsNoJson_isDamaged() throws Exception {
-        Map<String, byte[]> entries = new LinkedHashMap<>();
+        var entries = new LinkedHashMap<String, byte[]>();
         entries.put("manifest.json", "this is not json".getBytes(StandardCharsets.UTF_8));
         entries.put("data.json", "{}".getBytes(StandardCharsets.UTF_8));
 
@@ -250,7 +250,7 @@ public class BackupFileTest {
 
     @Test
     public void aBackupWithoutItsData_isDamaged() throws Exception {
-        Map<String, byte[]> entries = unzip(BackupFile.write(sample(), META, null));
+        var entries = unzip(BackupFile.write(sample(), META, null));
         entries.remove("data.json");
 
         assertEquals(BackupException.Reason.DAMAGED, reasonOf(() -> open(zip(entries))));
@@ -258,10 +258,10 @@ public class BackupFileTest {
 
     @Test
     public void dataThatIsNoJson_isDamaged() throws Exception {
-        Map<String, byte[]> entries = unzip(BackupFile.write(sample(), META, null));
+        var entries = unzip(BackupFile.write(sample(), META, null));
         entries.put("data.json", "[1, 2, 3]".getBytes(StandardCharsets.UTF_8));
 
-        BackupFile.Opened opened = open(zip(entries));
+        var opened = open(zip(entries));
 
         assertEquals(BackupException.Reason.DAMAGED, reasonOf(() -> opened.read(null)));
     }
@@ -274,14 +274,14 @@ public class BackupFileTest {
 
     @Test
     public void aSmallFileThatUnpacksToTooMuch_isRefused() throws Exception {
-        ByteArrayOutputStream bomb = new ByteArrayOutputStream();
-        try (ZipOutputStream zip = new ZipOutputStream(bomb)) {
+        var bomb = new ByteArrayOutputStream();
+        try (var zip = new ZipOutputStream(bomb)) {
             zip.putNextEntry(new ZipEntry("data.json"));
-            byte[] zeros = new byte[1024 * 1024];
-            for (int i = 0; i < 70; i++) zip.write(zeros);
+            var zeros = new byte[1024 * 1024];
+            for (var i = 0; i < 70; i++) zip.write(zeros);
             zip.closeEntry();
         }
-        byte[] file = bomb.toByteArray();
+        var file = bomb.toByteArray();
 
         assertTrue("The test file should be small, was " + file.length, file.length < BackupFile.MAX_FILE_BYTES);
         assertEquals(BackupException.Reason.TOO_LARGE, reasonOf(() -> open(file)));
@@ -289,9 +289,9 @@ public class BackupFileTest {
 
     @Test
     public void aProtectionThisVersionDoesNotKnow_isReportedAsSuch() throws Exception {
-        String manifest = "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"encryption\":"
+        var manifest = "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"encryption\":"
                 + "{\"cipher\":\"ChaCha20\",\"kdf\":\"Argon2\",\"iterations\":3,\"salt\":\"AAAA\",\"iv\":\"AAAA\"}}";
-        Map<String, byte[]> entries = new LinkedHashMap<>();
+        var entries = new LinkedHashMap<String, byte[]>();
         entries.put("manifest.json", manifest.getBytes(StandardCharsets.UTF_8));
         entries.put("data.enc", new byte[]{1, 2, 3});
 
@@ -300,11 +300,11 @@ public class BackupFileTest {
 
     @Test
     public void implausibleKeyParameters_areRefused() throws Exception {
-        for (int iterations : new int[]{1, 5_000, 50_000_000}) {
-            String manifest = "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"encryption\":"
+        for (var iterations : new int[]{1, 5_000, 50_000_000}) {
+            var manifest = "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"encryption\":"
                     + "{\"cipher\":\"AES-256-GCM\",\"kdf\":\"PBKDF2WithHmacSHA256\",\"iterations\":" + iterations
                     + ",\"salt\":\"AAAAAAAAAAAAAAAAAAAAAA==\",\"iv\":\"AAAAAAAAAAAAAAAA\"}}";
-            Map<String, byte[]> entries = new LinkedHashMap<>();
+            var entries = new LinkedHashMap<String, byte[]>();
             entries.put("manifest.json", manifest.getBytes(StandardCharsets.UTF_8));
             entries.put("data.enc", new byte[]{1, 2, 3});
 
@@ -317,7 +317,7 @@ public class BackupFileTest {
     @Test
     public void aFixedSampleOfTheCurrentFormat_isStillUnderstood() throws Exception {
         // Do not "fix" this sample when the code changes: it stands for files that already exist.
-        BackupFile.Opened opened = open(zip(sampleFile(
+        var opened = open(zip(sampleFile(
                 "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"appVersion\":\"1.0\",\"appVersionCode\":1,"
                         + "\"exportedAt\":\"2026-10-05T10:00:00Z\"}",
                 "{\"lecturers\":[{\"id\":1,\"firstName\":\"Anna\",\"lastName\":\"Weber\",\"email\":\"anna@uni.example\","
@@ -335,10 +335,10 @@ public class BackupFileTest {
                         + "{\"id\":2,\"series\":1,\"day\":\"2026-10-13\",\"type\":\"exercise\",\"startMin\":600,"
                         + "\"endMin\":700,\"mode\":\"online\",\"link\":\"https://meet.example/y\",\"lecturer\":2}]}")));
 
-        BackupCleaner.Result result = opened.read(null);
+        var result = opened.read(null);
 
         assertEquals(new BackupReport(2, 1, 1, 1, 2, 0, 0), result.report());
-        BackupData data = result.data();
+        var data = result.data();
         assertEquals("anna@uni.example", data.lecturers().get(0).email());
         assertEquals("", data.lecturers().get(1).firstName());
         assertEquals("Winter term", data.semesters().get(0).customName());
@@ -347,7 +347,7 @@ public class BackupFileTest {
         assertEquals("https://moodle.example/c/1", data.courses().get(0).moodleLink());
         assertEquals(DayOfWeek.MONDAY, data.series().get(0).schedule().weekday());
         assertEquals(1, data.series().get(0).details().lecturerId());
-        Session moved = data.sessions().get(1);
+        var moved = data.sessions().get(1);
         assertEquals(LocalDate.of(2026, 10, 13), moved.day());
         assertEquals(SessionType.EXERCISE, moved.details().type());
         assertEquals(Mode.ONLINE, moved.details().mode());
@@ -358,7 +358,7 @@ public class BackupFileTest {
     @Test
     public void aFileFromBeforeTheReminders_getsTheDefaultOfEachEvent() throws Exception {
         // Do not "fix" this sample when the code changes: it stands for files that already exist.
-        BackupFile.Opened opened = open(zip(sampleFile(
+        var opened = open(zip(sampleFile(
                 "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"appVersion\":\"1.0\",\"appVersionCode\":1}",
                 "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
                         + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
@@ -371,7 +371,7 @@ public class BackupFileTest {
                         + "{\"id\":2,\"series\":2,\"day\":\"2026-10-06\",\"type\":\"lab\",\"startMin\":480,"
                         + "\"endMin\":600,\"mode\":\"online\"}]}")));
 
-        BackupCleaner.Result result = opened.read(null);
+        var result = opened.read(null);
 
         // Nothing was changed by the reader: a file that never had the field is not a damaged one.
         assertEquals(new BackupReport(0, 1, 1, 2, 2, 0, 0), result.report());
@@ -383,7 +383,7 @@ public class BackupFileTest {
 
     @Test
     public void remindersInAFile_areKeptBroughtIntoRangeOrReplacedByTheDefault() throws Exception {
-        BackupFile.Opened opened = open(zip(sampleFile(
+        var opened = open(zip(sampleFile(
                 "{\"app\":\"UniPensum\",\"format\":1,\"schema\":3}",
                 "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
                         + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
@@ -396,9 +396,9 @@ public class BackupFileTest {
                         + "{\"id\":4,\"course\":1,\"weekday\":4,\"first\":\"2026-10-08\",\"last\":\"2026-10-08\","
                         + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"online\",\"reminder\":\"soon\"}]}")));
 
-        BackupCleaner.Result result = opened.read(null);
+        var result = opened.read(null);
 
-        List<Series> series = result.data().series();
+        var series = result.data().series();
         assertEquals(0, series.get(0).details().reminderMin());
         assertEquals(SessionDetails.NO_REMINDER, series.get(1).details().reminderMin());
         assertEquals(SessionDetails.MAX_REMINDER_MIN, series.get(2).details().reminderMin());
@@ -409,7 +409,7 @@ public class BackupFileTest {
 
     @Test
     public void aNewerVersionsFile_isReadAsFarAsItIsUnderstood() throws Exception {
-        BackupFile.Opened opened = open(zip(sampleFile(
+        var opened = open(zip(sampleFile(
                 "{\"app\":\"UniPensum\",\"format\":1,\"schema\":99,\"appVersion\":\"9.9\",\"appVersionCode\":999,"
                         + "\"somethingNew\":{\"x\":1}}",
                 "{\"futureThings\":[1,2,3],"
@@ -421,7 +421,7 @@ public class BackupFileTest {
                         + "\"sessions\":[{\"id\":1,\"series\":1,\"day\":\"2026-10-05\",\"type\":\"lecture\","
                         + "\"startMin\":480,\"endMin\":600,\"mode\":\"hologram\"}]}")));
 
-        BackupCleaner.Result result = opened.read(null);
+        var result = opened.read(null);
 
         assertEquals(BackupInfo.Compatibility.NEWER, opened.info().compatibility(BackupFile.FORMAT, Schema.VERSION, 1));
         // Taken over, with a default where the value is unknown: the color, the event's type, the session's mode.
@@ -433,7 +433,7 @@ public class BackupFileTest {
 
     @Test
     public void entriesThatCannotBeReadAreSkippedAndCounted_theRestIsTakenOver() throws Exception {
-        BackupFile.Opened opened = open(zip(sampleFile(
+        var opened = open(zip(sampleFile(
                 "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
                 "{\"lecturers\":[{\"id\":1,\"lastName\":\"Weber\"},{\"id\":2,\"firstName\":\"X\"},42],"
                         + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"},"
@@ -442,7 +442,7 @@ public class BackupFileTest {
                         + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":6,\"first\":\"2026-10-05\",\"last\":\"2026-10-12\","
                         + "\"startMin\":480,\"endMin\":600}]}")));
 
-        BackupCleaner.Result result = opened.read(null);
+        var result = opened.read(null);
 
         // Skipped: a lecturer without a last name, a value that is no object, an impossible date, a course
         // without a name, a series on a Saturday. Adjusted: the course that names no color.
@@ -452,17 +452,17 @@ public class BackupFileTest {
 
     @Test
     public void optionalFieldsMayBeMissing() throws Exception {
-        BackupFile.Opened opened = open(zip(sampleFile(
+        var opened = open(zip(sampleFile(
                 "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
                 "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
                         + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
                         + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":3,\"first\":\"2026-10-07\",\"last\":\"2026-10-07\","
                         + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"}]}")));
 
-        BackupCleaner.Result result = opened.read(null);
+        var result = opened.read(null);
 
         assertEquals(new BackupReport(0, 1, 1, 1, 0, 0, 0), result.report());
-        SessionDetails details = result.data().series().get(0).details();
+        var details = result.data().series().get(0).details();
         assertEquals(1, result.data().series().get(0).schedule().intervalWeeks());
         assertFalse(details.hybrid());
         assertNull(details.room());
@@ -475,14 +475,14 @@ public class BackupFileTest {
 
     @Test
     public void textInAFileIsCleanedLikeTypedText() throws Exception {
-        BackupFile.Opened opened = open(zip(sampleFile(
+        var opened = open(zip(sampleFile(
                 "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
                 "{\"lecturers\":[{\"id\":1,\"firstName\":\" Anna\\u200b \",\"lastName\":\"  Weber \\t Koch\","
                         + "\"email\":\" a @uni.example \"}],"
                         + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
                         + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"  Math \\u202e II \",\"moodle\":\"javascript:alert(1)\"}]}")));
 
-        BackupCleaner.Result result = opened.read(null);
+        var result = opened.read(null);
 
         assertEquals("Anna", result.data().lecturers().get(0).firstName());
         assertEquals("Weber Koch", result.data().lecturers().get(0).lastName());
@@ -494,16 +494,16 @@ public class BackupFileTest {
     // --- helpers ---
 
     private static Map<String, byte[]> sampleFile(String manifest, String data) {
-        Map<String, byte[]> entries = new LinkedHashMap<>();
+        var entries = new LinkedHashMap<String, byte[]>();
         entries.put("manifest.json", manifest.getBytes(StandardCharsets.UTF_8));
         entries.put("data.json", data.getBytes(StandardCharsets.UTF_8));
         return entries;
     }
 
     private static byte[] zip(Map<String, byte[]> entries) throws IOException {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        try (ZipOutputStream zip = new ZipOutputStream(bytes)) {
-            for (Map.Entry<String, byte[]> entry : entries.entrySet()) {
+        var bytes = new ByteArrayOutputStream();
+        try (var zip = new ZipOutputStream(bytes)) {
+            for (var entry : entries.entrySet()) {
                 zip.putNextEntry(new ZipEntry(entry.getKey()));
                 zip.write(entry.getValue());
                 zip.closeEntry();
@@ -513,12 +513,12 @@ public class BackupFileTest {
     }
 
     private static Map<String, byte[]> unzip(byte[] file) throws IOException {
-        Map<String, byte[]> entries = new LinkedHashMap<>();
-        try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(file))) {
+        var entries = new LinkedHashMap<String, byte[]>();
+        try (var zip = new ZipInputStream(new ByteArrayInputStream(file))) {
             ZipEntry entry;
             while ((entry = zip.getNextEntry()) != null) {
-                ByteArrayOutputStream content = new ByteArrayOutputStream();
-                byte[] buffer = new byte[4096];
+                var content = new ByteArrayOutputStream();
+                var buffer = new byte[4096];
                 int read;
                 while ((read = zip.read(buffer)) != -1) content.write(buffer, 0, read);
                 entries.put(entry.getName(), content.toByteArray());
@@ -530,7 +530,7 @@ public class BackupFileTest {
     /** Where the second local file header of a zip begins. */
     private static int secondEntry(byte[] file) {
         byte[] signature = {0x50, 0x4b, 0x03, 0x04};
-        int first = indexOf(file, signature, 0);
+        var first = indexOf(file, signature, 0);
         return indexOf(file, signature, first + 1);
     }
 
@@ -540,8 +540,8 @@ public class BackupFileTest {
 
     private static int indexOf(byte[] haystack, byte[] needle, int from) {
         outer:
-        for (int i = from; i <= haystack.length - needle.length; i++) {
-            for (int j = 0; j < needle.length; j++) {
+        for (var i = from; i <= haystack.length - needle.length; i++) {
+            for (var j = 0; j < needle.length; j++) {
                 if (haystack[i + j] != needle[j]) continue outer;
             }
             return i;

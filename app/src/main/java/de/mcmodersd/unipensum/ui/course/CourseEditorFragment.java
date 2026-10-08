@@ -106,7 +106,7 @@ public class CourseEditorFragment extends Fragment {
         // The event rows name their lecturer, so they follow changes to the lecturers and to the name style.
         repository.lecturers().observe(getViewLifecycleOwner(), list -> {
             lecturers.clear();
-            for (Lecturer lecturer : list) lecturers.put(lecturer.id(), lecturer);
+            for (var lecturer : list) lecturers.put(lecturer.id(), lecturer);
             renderEvents();
         });
         UniPensumApp.from(requireContext()).settings().lecturerNameStyle()
@@ -117,9 +117,9 @@ public class CourseEditorFragment extends Fragment {
 
         // With the calendar beside this page, the semester of the course can be deleted, or all data replaced
         // by an import, while the editor is open. Then there is nothing left to save the course into.
-        long semesterId = draft.semester().id();
+        var semesterId = draft.semester().id();
         repository.semesters().observe(getViewLifecycleOwner(), semesters -> {
-            for (Semester existing : semesters) {
+            for (var existing : semesters) {
                 if (existing.id() == semesterId) return;
             }
             Navigator.of(this).pop();
@@ -140,14 +140,14 @@ public class CourseEditorFragment extends Fragment {
     private void renderEvents() {
         events.removeAllViews();
         eventsError.setVisibility(View.GONE);
-        float dp = getResources().getDisplayMetrics().density;
-        List<Series> series = draft.series();
-        for (int i = 0; i < series.size(); i++) {
-            final int index = i;
-            Series entry = series.get(i);
-            UpRow row = new UpRow(requireContext());
+        var dp = getResources().getDisplayMetrics().density;
+        var series = draft.series();
+        for (var i = 0; i < series.size(); i++) {
+            final var index = i;
+            var entry = series.get(i);
+            var row = new UpRow(requireContext());
             row.setTitle(SeriesFormat.title(requireContext(), entry));
-            Lecturer lecturer = lecturers.get(entry.details().lecturerId());
+            var lecturer = lecturers.get(entry.details().lecturerId());
             row.setSubtitle(SeriesFormat.subtitle(requireContext(), entry,
                     lecturer == null ? null : lecturer.name(nameStyle)));
             row.setAction(R.drawable.ic_close, getString(R.string.event_remove), v -> {
@@ -155,7 +155,7 @@ public class CourseEditorFragment extends Fragment {
                 renderEvents();
             });
             row.setOnClickListener(v -> Navigator.of(this).push(SessionEditorFragment.forSeries(index)));
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+            var params = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.bottomMargin = Math.round(8 * dp);
             events.addView(row, params);
@@ -164,8 +164,8 @@ public class CourseEditorFragment extends Fragment {
 
     private void save() {
         // What is stored is the cleaned text, so a name of only blanks or invisible characters counts as empty.
-        String name = TextSanitizer.line(draft.name(), TextSanitizer.MAX_NAME);
-        boolean valid = true;
+        var name = TextSanitizer.line(draft.name(), TextSanitizer.MAX_NAME);
+        var valid = true;
         if (name.isEmpty()) {
             nameField.setError(getString(R.string.course_error_name));
             valid = false;
@@ -185,10 +185,10 @@ public class CourseEditorFragment extends Fragment {
         }
 
         saveButton.setEnabled(false);
-        Course course = new Course(draft.courseId(), draft.semester().id(), name, draft.color(),
+        var course = new Course(draft.courseId(), draft.semester().id(), name, draft.color(),
                 draft.moodleLink());
         // The database thread gets its own copy, the draft stays editable while it works.
-        List<Series> snapshot = new ArrayList<>(draft.series());
+        var snapshot = new ArrayList<Series>(draft.series());
         if (draft.isNew()) {
             repository.createCourse(course, snapshot, new Done<Long>());
         } else {

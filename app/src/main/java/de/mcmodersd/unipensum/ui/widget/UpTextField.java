@@ -67,7 +67,7 @@ public class UpTextField extends LinearLayout {
         addView(error);
 
         if (attrs != null) {
-            TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.UpTextField);
+            var array = context.obtainStyledAttributes(attrs, R.styleable.UpTextField);
             label.setText(array.getText(R.styleable.UpTextField_upLabel));
             input.setHint(array.getText(R.styleable.UpTextField_upHint));
             array.recycle();
@@ -90,9 +90,9 @@ public class UpTextField extends LinearLayout {
 
     /** A copy of the text as characters, for passwords: unlike a String it can be wiped after use. */
     public char[] getTextChars() {
-        Editable text = input.getText();
+        var text = input.getText();
         if (text == null) return new char[0];
-        char[] chars = new char[text.length()];
+        var chars = new char[text.length()];
         text.getChars(0, chars.length, chars, 0);
         return chars;
     }
@@ -160,7 +160,7 @@ public class UpTextField extends LinearLayout {
     }
 
     private void updateStroke(boolean focused) {
-        boolean hasError = error.getVisibility() == VISIBLE;
+        var hasError = error.getVisibility() == VISIBLE;
         if (hasError) {
             background.setStroke(Math.round(1.5f * dp), ContextCompat.getColor(getContext(), R.color.danger));
         } else if (focused) {

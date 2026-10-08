@@ -31,14 +31,14 @@ public final class DatePickerSheet extends UpSheet {
      */
     public static void show(FragmentManager manager, String requestKey, CharSequence title, LocalDate selected,
                             @Nullable LocalDate min, @Nullable LocalDate max, boolean weekdaysOnly) {
-        Bundle args = new Bundle();
+        var args = new Bundle();
         args.putString(ARG_KEY, requestKey);
         args.putCharSequence(ARG_TITLE, title);
         args.putLong(ARG_SELECTED, selected.toEpochDay());
         args.putLong(ARG_MIN, min == null ? LocalDate.of(2000, 1, 1).toEpochDay() : min.toEpochDay());
         args.putLong(ARG_MAX, max == null ? LocalDate.of(2100, 12, 31).toEpochDay() : max.toEpochDay());
         args.putBoolean(ARG_WEEKDAYS_ONLY, weekdaysOnly);
-        DatePickerSheet sheet = new DatePickerSheet();
+        var sheet = new DatePickerSheet();
         sheet.setArguments(args);
         sheet.show(manager, "date:" + requestKey);
     }
@@ -52,13 +52,13 @@ public final class DatePickerSheet extends UpSheet {
     @Override
     protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
                                  @Nullable Bundle savedInstanceState) {
-        Bundle args = requireArguments();
-        MonthCalendarView calendar = new MonthCalendarView(requireContext());
+        var args = requireArguments();
+        var calendar = new MonthCalendarView(requireContext());
         calendar.setWeekdaysOnly(args.getBoolean(ARG_WEEKDAYS_ONLY));
         calendar.setRange(LocalDate.ofEpochDay(args.getLong(ARG_MIN)), LocalDate.ofEpochDay(args.getLong(ARG_MAX)));
         calendar.setSelected(LocalDate.ofEpochDay(args.getLong(ARG_SELECTED)));
         calendar.setOnDateSelectedListener(date -> {
-            Bundle result = new Bundle();
+            var result = new Bundle();
             result.putLong(RESULT_EPOCH_DAY, date.toEpochDay());
             getParentFragmentManager().setFragmentResult(args.getString(ARG_KEY), result);
             dismiss();

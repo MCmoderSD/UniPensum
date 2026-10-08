@@ -44,9 +44,9 @@ public final class BackupImportSheet extends UpSheet {
     private LinearLayout column;
 
     public static void show(FragmentManager manager, Uri source) {
-        Bundle args = new Bundle();
+        var args = new Bundle();
         args.putString(ARG_SOURCE, source.toString());
-        BackupImportSheet sheet = new BackupImportSheet();
+        var sheet = new BackupImportSheet();
         sheet.setArguments(args);
         sheet.show(manager, "backup-import");
     }
@@ -106,21 +106,21 @@ public final class BackupImportSheet extends UpSheet {
     }
 
     private void askForPassword() {
-        Context context = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
+        var context = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
 
         column.addView(text(R.string.backup_protected, 16, R.color.text_secondary, 0, 12));
-        UpTextField password = new UpTextField(context);
+        var password = new UpTextField(context);
         password.setLabel(getString(R.string.backup_password));
         password.setPassword();
         if (model.wrongPassword()) password.setError(getString(R.string.backup_error_wrong_password));
         password.addTextWatcher(ignored -> password.setError(null));
         column.addView(password, params(dp, 0, 12));
 
-        UpButton next = new UpButton(context);
+        var next = new UpButton(context);
         next.setText(R.string.action_continue);
         next.setOnClickListener(v -> {
-            char[] chars = password.getTextChars();
+            var chars = password.getTextChars();
             if (chars.length == 0) {
                 Haptics.reject(next);
                 return;
@@ -132,16 +132,16 @@ public final class BackupImportSheet extends UpSheet {
     }
 
     private void review() {
-        Context context = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
-        BackupInfo info = model.info();
-        BackupReport report = model.report();
+        var context = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
+        var info = model.info();
+        var report = model.report();
         if (info == null || report == null) {
             finished(R.string.backup_error_generic, true);
             return;
         }
 
-        StringBuilder origin = new StringBuilder();
+        var origin = new StringBuilder();
         if (info.exportedAt() != null) {
             origin.append(getString(R.string.backup_created, TimeFormat.dateMedium(context,
                     info.exportedAt().atZone(ZoneId.systemDefault()).toLocalDate())));
@@ -152,8 +152,8 @@ public final class BackupImportSheet extends UpSheet {
         }
         if (origin.length() > 0) column.addView(plainText(origin.toString(), 14, R.color.text_secondary, 0, 12));
 
-        BackupManager.Current current = model.current();
-        BackupInfo.Compatibility compatibility =
+        var current = model.current();
+        var compatibility =
                 info.compatibility(current.format(), current.schema(), current.appVersionCode());
         if (compatibility != BackupInfo.Compatibility.SAME) {
             column.addView(text(compatibility == BackupInfo.Compatibility.NEWER
@@ -176,7 +176,7 @@ public final class BackupImportSheet extends UpSheet {
         }
 
         column.addView(text(R.string.backup_replace_warning, 15, R.color.text_primary, 8, 12));
-        UpButton replace = new UpButton(context);
+        var replace = new UpButton(context);
         replace.setText(R.string.backup_action_replace);
         replace.setVariant(UpButton.Variant.DESTRUCTIVE);
         replace.setOnClickListener(v -> model.confirm());
@@ -185,9 +185,9 @@ public final class BackupImportSheet extends UpSheet {
     }
 
     private void finished(@StringRes int message, boolean error) {
-        float dp = getResources().getDisplayMetrics().density;
+        var dp = getResources().getDisplayMetrics().density;
         column.addView(text(message, 16, error ? R.color.danger : R.color.text_primary, 8, 16));
-        UpButton done = new UpButton(requireContext());
+        var done = new UpButton(requireContext());
         done.setText(error ? R.string.action_close : R.string.action_done);
         done.setOnClickListener(v -> dismiss());
         column.addView(done, params(dp, 0, 0));
@@ -200,14 +200,14 @@ public final class BackupImportSheet extends UpSheet {
     // --- pieces ---
 
     private UpRow countRow(@StringRes int title, int count) {
-        UpRow row = new UpRow(requireContext());
+        var row = new UpRow(requireContext());
         row.setTitle(getString(title));
         row.setValue(String.valueOf(count));
         return row;
     }
 
     private UpButton cancelButton() {
-        UpButton cancel = new UpButton(requireContext());
+        var cancel = new UpButton(requireContext());
         cancel.setText(R.string.action_cancel);
         cancel.setVariant(UpButton.Variant.SECONDARY);
         cancel.setOnClickListener(v -> dismiss());
@@ -219,8 +219,8 @@ public final class BackupImportSheet extends UpSheet {
     }
 
     private TextView plainText(String value, float sp, int colorRes, int topDp, int bottomDp) {
-        float dp = getResources().getDisplayMetrics().density;
-        TextView view = new TextView(requireContext());
+        var dp = getResources().getDisplayMetrics().density;
+        var view = new TextView(requireContext());
         view.setText(value);
         view.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
         view.setTextColor(ContextCompat.getColor(requireContext(), colorRes));
@@ -229,7 +229,7 @@ public final class BackupImportSheet extends UpSheet {
     }
 
     private static LinearLayout.LayoutParams params(float dp, int topDp, int bottomDp) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);

@@ -18,7 +18,7 @@ public class WeekLayoutTest {
     }
 
     private static Placement placement(List<Placement> all, long id) {
-        for (Placement p : all) {
+        for (var p : all) {
             if (p.id() == id) return p;
         }
         throw new AssertionError("No placement for " + id);
@@ -31,20 +31,20 @@ public class WeekLayoutTest {
 
     @Test
     public void single_fillsFullWidth() {
-        List<Placement> result = WeekLayout.layout(List.of(block(1, 8, 10)));
+        var result = WeekLayout.layout(List.of(block(1, 8, 10)));
         assertEquals(new Placement(1, 0, 1, false), result.get(0));
     }
 
     @Test
     public void touching_doesNotOverlap() {
-        List<Placement> result = WeekLayout.layout(List.of(block(1, 8, 10), block(2, 10, 12)));
+        var result = WeekLayout.layout(List.of(block(1, 8, 10), block(2, 10, 12)));
         assertEquals(new Placement(1, 0, 1, false), placement(result, 1));
         assertEquals(new Placement(2, 0, 1, false), placement(result, 2));
     }
 
     @Test
     public void overlappingPair_sharesTwoColumns() {
-        List<Placement> result = WeekLayout.layout(List.of(block(1, 8, 10), block(2, 9, 11)));
+        var result = WeekLayout.layout(List.of(block(1, 8, 10), block(2, 9, 11)));
         assertEquals(new Placement(1, 0, 2, true), placement(result, 1));
         assertEquals(new Placement(2, 1, 2, true), placement(result, 2));
     }
@@ -52,7 +52,7 @@ public class WeekLayoutTest {
     @Test
     public void chain_reusesFreedColumnButStaysOneGroup() {
         // 1 overlaps 2, 2 overlaps 3, but 1 and 3 do not overlap each other.
-        List<Placement> result = WeekLayout.layout(List.of(block(1, 8, 10), block(2, 9, 11), block(3, 10, 12)));
+        var result = WeekLayout.layout(List.of(block(1, 8, 10), block(2, 9, 11), block(3, 10, 12)));
         assertEquals(new Placement(1, 0, 2, true), placement(result, 1));
         assertEquals(new Placement(2, 1, 2, true), placement(result, 2));
         assertEquals(new Placement(3, 0, 2, true), placement(result, 3));
@@ -60,7 +60,7 @@ public class WeekLayoutTest {
 
     @Test
     public void tripleOverlap_usesThreeColumns() {
-        List<Placement> result = WeekLayout.layout(List.of(block(1, 8, 12), block(2, 9, 11), block(3, 10, 13)));
+        var result = WeekLayout.layout(List.of(block(1, 8, 12), block(2, 9, 11), block(3, 10, 13)));
         assertEquals(3, placement(result, 1).columns());
         assertEquals(0, placement(result, 1).column());
         assertEquals(1, placement(result, 2).column());
@@ -69,7 +69,7 @@ public class WeekLayoutTest {
 
     @Test
     public void separateGroups_areLaidOutIndependently() {
-        List<Placement> result = WeekLayout.layout(List.of(block(1, 8, 10), block(2, 9, 11), block(3, 14, 16)));
+        var result = WeekLayout.layout(List.of(block(1, 8, 10), block(2, 9, 11), block(3, 14, 16)));
         assertEquals(2, placement(result, 1).columns());
         assertEquals(new Placement(3, 0, 1, false), placement(result, 3));
         assertFalse(placement(result, 3).overlapping());
@@ -77,7 +77,7 @@ public class WeekLayoutTest {
 
     @Test
     public void unsortedInput_givesSameResult() {
-        List<Placement> result = WeekLayout.layout(List.of(block(3, 10, 12), block(2, 9, 11), block(1, 8, 10)));
+        var result = WeekLayout.layout(List.of(block(3, 10, 12), block(2, 9, 11), block(1, 8, 10)));
         assertEquals(new Placement(1, 0, 2, true), placement(result, 1));
         assertEquals(new Placement(2, 1, 2, true), placement(result, 2));
         assertEquals(new Placement(3, 0, 2, true), placement(result, 3));

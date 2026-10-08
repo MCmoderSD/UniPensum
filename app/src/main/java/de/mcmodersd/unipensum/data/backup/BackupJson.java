@@ -55,11 +55,11 @@ final class BackupJson {
     // --- writing ---
 
     static void write(BackupData data, OutputStream out) throws IOException {
-        JsonWriter json = new JsonWriter(new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8)));
+        var json = new JsonWriter(new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8)));
         json.beginObject();
 
         json.name("lecturers").beginArray();
-        for (Lecturer lecturer : data.lecturers()) {
+        for (var lecturer : data.lecturers()) {
             json.beginObject();
             json.name("id").value(lecturer.id());
             json.name("firstName").value(lecturer.firstName());
@@ -71,7 +71,7 @@ final class BackupJson {
         json.endArray();
 
         json.name("semesters").beginArray();
-        for (Semester semester : data.semesters()) {
+        for (var semester : data.semesters()) {
             json.beginObject();
             json.name("id").value(semester.id());
             json.name("start").value(semester.start().toString());
@@ -82,7 +82,7 @@ final class BackupJson {
         json.endArray();
 
         json.name("courses").beginArray();
-        for (Course course : data.courses()) {
+        for (var course : data.courses()) {
             json.beginObject();
             json.name("id").value(course.id());
             json.name("semester").value(course.semesterId());
@@ -94,7 +94,7 @@ final class BackupJson {
         json.endArray();
 
         json.name("series").beginArray();
-        for (Series series : data.series()) {
+        for (var series : data.series()) {
             json.beginObject();
             json.name("id").value(series.id());
             json.name("course").value(series.courseId());
@@ -108,7 +108,7 @@ final class BackupJson {
         json.endArray();
 
         json.name("sessions").beginArray();
-        for (Session session : data.sessions()) {
+        for (var session : data.sessions()) {
             json.beginObject();
             json.name("id").value(session.id());
             json.name("series").value(session.seriesId());
@@ -188,7 +188,7 @@ final class BackupJson {
 
         /** Reads a list of objects; one that cannot be turned into a record is skipped and counted. */
         private <T> List<T> array(JsonReader json, Function<Map<String, Object>, T> parse) throws IOException {
-            List<T> result = new ArrayList<>();
+            var result = new ArrayList<T>();
             if (json.peek() != JsonToken.BEGIN_ARRAY) {
                 json.skipValue();
                 return result;
@@ -200,7 +200,7 @@ final class BackupJson {
                     skipped++;
                     continue;
                 }
-                Map<String, Object> fields = object(json);
+                var fields = object(json);
                 try {
                     result.add(parse.apply(fields));
                 } catch (RuntimeException unreadable) {
@@ -214,10 +214,10 @@ final class BackupJson {
 
         /** Reads one object into a map of its plain values; nested values are skipped. */
         private static Map<String, Object> object(JsonReader json) throws IOException {
-            Map<String, Object> fields = new HashMap<>();
+            var fields = new HashMap<String, Object>();
             json.beginObject();
             while (json.hasNext()) {
-                String name = json.nextName();
+                var name = json.nextName();
                 switch (json.peek()) {
                     case STRING:
                     case NUMBER:
@@ -250,9 +250,9 @@ final class BackupJson {
 
         private Course course(Map<String, Object> f) {
             // The required fields first: a default only counts as an adjustment if the entry is kept.
-            long id = requiredLong(f, "id");
-            long semester = requiredLong(f, "semester");
-            String name = requiredText(f, "name");
+            var id = requiredLong(f, "id");
+            var semester = requiredLong(f, "semester");
+            var name = requiredText(f, "name");
             CourseColor color;
             try {
                 color = CourseColor.fromKey(text(f, "color"));
@@ -264,7 +264,7 @@ final class BackupJson {
         }
 
         private Series series(Map<String, Object> f) {
-            Schedule schedule = new Schedule(DayOfWeek.of((int) requiredLong(f, "weekday")),
+            var schedule = new Schedule(DayOfWeek.of((int) requiredLong(f, "weekday")),
                     LocalDate.parse(requiredText(f, "first")), LocalDate.parse(requiredText(f, "last")),
                     f.containsKey("interval") ? (int) requiredLong(f, "interval") : 1);
             return new Series(requiredLong(f, "id"), requiredLong(f, "course"), details(f), schedule);
@@ -276,9 +276,9 @@ final class BackupJson {
         }
 
         private SessionDetails details(Map<String, Object> f) {
-            int startMin = (int) requiredLong(f, "startMin");
-            int endMin = (int) requiredLong(f, "endMin");
-            long lecturer = f.containsKey("lecturer") ? requiredLong(f, "lecturer") : SessionDetails.NO_LECTURER;
+            var startMin = (int) requiredLong(f, "startMin");
+            var endMin = (int) requiredLong(f, "endMin");
+            var lecturer = f.containsKey("lecturer") ? requiredLong(f, "lecturer") : SessionDetails.NO_LECTURER;
             SessionType type;
             try {
                 type = SessionType.fromKey(text(f, "type"));
@@ -310,7 +310,7 @@ final class BackupJson {
         }
 
         private static String text(Map<String, Object> f, String key) {
-            Object value = f.get(key);
+            var value = f.get(key);
             return value instanceof String ? (String) value : null;
         }
 
@@ -319,7 +319,7 @@ final class BackupJson {
         }
 
         private static String requiredText(Map<String, Object> f, String key) {
-            String value = text(f, key);
+            var value = text(f, key);
             if (value == null) throw new IllegalArgumentException("Missing " + key);
             return value;
         }

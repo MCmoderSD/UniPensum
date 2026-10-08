@@ -20,7 +20,7 @@ public final class Timetable {
     /** @param sessions expected in display order; that order is kept within each day */
     public Timetable(List<Semester> semesters, List<SessionView> sessions) {
         this.semesters = List.copyOf(semesters);
-        for (SessionView view : sessions) {
+        for (var view : sessions) {
             byDay.computeIfAbsent(view.session().day(), ignored -> new ArrayList<>()).add(view);
         }
     }
@@ -31,15 +31,15 @@ public final class Timetable {
 
     /** Sessions on that day, ordered by start time; empty if there are none. */
     public List<SessionView> on(LocalDate day) {
-        List<SessionView> sessions = byDay.get(day);
+        var sessions = byDay.get(day);
         return sessions == null ? Collections.emptyList() : Collections.unmodifiableList(sessions);
     }
 
     /** Whether a session on {@code from} or later has a reminder. */
     public boolean hasReminderFrom(LocalDate from) {
-        for (Map.Entry<LocalDate, List<SessionView>> day : byDay.entrySet()) {
+        for (var day : byDay.entrySet()) {
             if (day.getKey().isBefore(from)) continue;
-            for (SessionView view : day.getValue()) {
+            for (var view : day.getValue()) {
                 if (view.session().details().hasReminder()) return true;
             }
         }
@@ -48,7 +48,7 @@ public final class Timetable {
 
     /** @return the semester containing that day, or {@code null} outside every semester */
     public Semester semesterAt(LocalDate day) {
-        for (Semester semester : semesters) {
+        for (var semester : semesters) {
             if (semester.contains(day)) return semester;
         }
         return null;

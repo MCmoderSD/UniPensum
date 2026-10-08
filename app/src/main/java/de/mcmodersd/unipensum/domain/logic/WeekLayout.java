@@ -26,18 +26,18 @@ public final class WeekLayout {
 
     /** Result is ordered by start time, then end time, then id. */
     public static List<Placement> layout(List<Block> blocks) {
-        List<Block> sorted = new ArrayList<>(blocks);
+        var sorted = new ArrayList<Block>(blocks);
         sorted.sort(Comparator.comparingInt(Block::startMin)
                 .thenComparingInt(Block::endMin)
                 .thenComparingLong(Block::id));
 
-        List<Placement> result = new ArrayList<>();
-        List<Block> group = new ArrayList<>();
-        List<Integer> groupColumns = new ArrayList<>();
-        List<Integer> columnEnds = new ArrayList<>();
-        int groupEnd = Integer.MIN_VALUE;
+        var result = new ArrayList<Placement>();
+        var group = new ArrayList<Block>();
+        var groupColumns = new ArrayList<Integer>();
+        var columnEnds = new ArrayList<Integer>();
+        var groupEnd = Integer.MIN_VALUE;
 
-        for (Block block : sorted) {
+        for (var block : sorted) {
             if (!group.isEmpty() && block.startMin() >= groupEnd) {
                 flush(group, groupColumns, columnEnds.size(), result);
                 group.clear();
@@ -45,8 +45,8 @@ public final class WeekLayout {
                 columnEnds.clear();
             }
 
-            int column = -1;
-            for (int i = 0; i < columnEnds.size(); i++) {
+            var column = -1;
+            for (var i = 0; i < columnEnds.size(); i++) {
                 if (columnEnds.get(i) <= block.startMin()) {
                     column = i;
                     break;
@@ -68,8 +68,8 @@ public final class WeekLayout {
     }
 
     private static void flush(List<Block> group, List<Integer> columns, int columnCount, List<Placement> out) {
-        boolean overlapping = group.size() > 1;
-        for (int i = 0; i < group.size(); i++) {
+        var overlapping = group.size() > 1;
+        for (var i = 0; i < group.size(); i++) {
             out.add(new Placement(group.get(i).id(), columns.get(i), columnCount, overlapping));
         }
     }

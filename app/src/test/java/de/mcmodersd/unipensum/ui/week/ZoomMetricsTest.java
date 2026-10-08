@@ -22,11 +22,11 @@ public class ZoomMetricsTest {
 
     @Test
     public void scrollAfterZoom_keepsTheTimeUnderTheFingersInPlace() {
-        float scrollY = 100f;
-        float focusY = 200f;
-        float ratio = 2f;
+        var scrollY = 100f;
+        var focusY = 200f;
+        var ratio = 2f;
         // What lies at the focus before: 300 px into the content, 290 px below the first hour line.
-        float newScroll = ZoomMetrics.scrollAfterZoom(scrollY, focusY, PADDING, ratio);
+        var newScroll = ZoomMetrics.scrollAfterZoom(scrollY, focusY, PADDING, ratio);
         // The same time is now twice as far below the first line, and still at the focus on the screen.
         assertEquals(PADDING + 290f * ratio, newScroll + focusY, 0.001f);
     }
@@ -39,7 +39,7 @@ public class ZoomMetricsTest {
 
     @Test
     public void scrollAfterZoom_undoesItselfWhenTheZoomIsReversed() {
-        float zoomedIn = ZoomMetrics.scrollAfterZoom(80f, 250f, PADDING, 2.5f);
+        var zoomedIn = ZoomMetrics.scrollAfterZoom(80f, 250f, PADDING, 2.5f);
         assertEquals(80f, ZoomMetrics.scrollAfterZoom(zoomedIn, 250f, PADDING, 1f / 2.5f), 0.001f);
     }
 }

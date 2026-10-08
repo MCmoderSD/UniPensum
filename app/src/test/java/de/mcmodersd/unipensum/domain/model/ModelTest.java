@@ -33,7 +33,7 @@ public class ModelTest {
 
     @Test
     public void semester_containsBothBoundaries() {
-        Semester semester = new Semester(1, date(10, 5), date(11, 2), null);
+        var semester = new Semester(1, date(10, 5), date(11, 2), null);
         assertTrue(semester.contains(date(10, 5)));
         assertTrue(semester.contains(date(11, 2)));
         assertFalse(semester.contains(date(10, 4)));
@@ -42,7 +42,7 @@ public class ModelTest {
 
     @Test
     public void normalized_online_dropsRoomAndHybridButKeepsLink() {
-        SessionDetails result = details(Mode.ONLINE, true, "A1", "https://meet.example/x").normalized();
+        var result = details(Mode.ONLINE, true, "A1", "https://meet.example/x").normalized();
         assertNull(result.room());
         assertFalse(result.hybrid());
         assertEquals("https://meet.example/x", result.link());
@@ -50,14 +50,14 @@ public class ModelTest {
 
     @Test
     public void normalized_inPersonWithoutHybrid_dropsLink() {
-        SessionDetails result = details(Mode.IN_PERSON, false, "A1", "https://meet.example/x").normalized();
+        var result = details(Mode.IN_PERSON, false, "A1", "https://meet.example/x").normalized();
         assertEquals("A1", result.room());
         assertNull(result.link());
     }
 
     @Test
     public void normalized_hybrid_keepsRoomAndLink() {
-        SessionDetails result = details(Mode.IN_PERSON, true, "A1", "https://meet.example/x").normalized();
+        var result = details(Mode.IN_PERSON, true, "A1", "https://meet.example/x").normalized();
         assertEquals("A1", result.room());
         assertEquals("https://meet.example/x", result.link());
         assertTrue(result.hybrid());
@@ -65,17 +65,17 @@ public class ModelTest {
 
     @Test
     public void normalized_blankTextBecomesNull() {
-        SessionDetails result = details(Mode.IN_PERSON, false, "  ", null).normalized();
+        var result = details(Mode.IN_PERSON, false, "  ", null).normalized();
         assertNull(result.room());
         assertNull(result.note());
     }
 
     @Test
     public void normalized_cleansTextAndTheLink() {
-        SessionDetails dirty = new SessionDetails(SessionType.LECTURE, 480, 570, Mode.IN_PERSON, true,
+        var dirty = new SessionDetails(SessionType.LECTURE, 480, 570, Mode.IN_PERSON, true,
                 "  A1\t ​", " meet.example/abc ", 0, " bring ‮laptop \r\n\r\n\r\n room B2 ", SessionDetails.NO_REMINDER);
 
-        SessionDetails result = dirty.normalized();
+        var result = dirty.normalized();
 
         assertEquals("A1", result.room());
         assertEquals("https://meet.example/abc", result.link());
@@ -84,7 +84,7 @@ public class ModelTest {
 
     @Test
     public void normalized_isIdempotent() {
-        SessionDetails once = new SessionDetails(SessionType.LAB, 480, 570, Mode.IN_PERSON, true,
+        var once = new SessionDetails(SessionType.LAB, 480, 570, Mode.IN_PERSON, true,
                 " A1 ", "HTTPS://meet.example/a b", 3, " x \n\n\n y ", SessionDetails.NO_REMINDER).normalized();
         assertEquals(once, once.normalized());
     }
@@ -104,7 +104,7 @@ public class ModelTest {
 
     @Test
     public void normalized_keepsALecturerAndMapsInvalidIdsToNone() {
-        SessionDetails base = details(Mode.IN_PERSON, false, "A1", null);
+        var base = details(Mode.IN_PERSON, false, "A1", null);
         assertEquals(7, withLecturer(base, 7).normalized().lecturerId());
         assertEquals(SessionDetails.NO_LECTURER, withLecturer(base, -3).normalized().lecturerId());
     }
@@ -116,7 +116,7 @@ public class ModelTest {
 
     @Test
     public void normalized_bringsTheReminderIntoItsRange() {
-        SessionDetails base = details(Mode.IN_PERSON, false, "A1", null);
+        var base = details(Mode.IN_PERSON, false, "A1", null);
         assertEquals(30, base.withReminder(30).normalized().reminderMin());
         assertEquals(0, base.withReminder(0).normalized().reminderMin());
         assertEquals(SessionDetails.MAX_REMINDER_MIN, base.withReminder(180).normalized().reminderMin());
@@ -140,7 +140,7 @@ public class ModelTest {
 
     @Test
     public void with_changesOnlyThatField() {
-        SessionDetails base = details(Mode.ONLINE, false, null, "https://meet.example/x").withReminder(15);
+        var base = details(Mode.ONLINE, false, null, "https://meet.example/x").withReminder(15);
 
         assertEquals(base.withLecturer(9), new SessionDetails(base.type(), base.startMin(), base.endMin(), base.mode(),
                 base.hybrid(), base.room(), base.link(), 9, base.note(), 15));
@@ -159,21 +159,21 @@ public class ModelTest {
 
     @Test
     public void lecturer_nameFollowsTheStyle() {
-        Lecturer lecturer = new Lecturer(1, "Anna", "Weber", null, null);
+        var lecturer = new Lecturer(1, "Anna", "Weber", null, null);
         assertEquals("Weber", lecturer.name(NameStyle.LAST_NAME));
         assertEquals("Anna Weber", lecturer.name(NameStyle.FULL_NAME));
     }
 
     @Test
     public void lecturer_withoutFirstName_showsTheLastNameInBothStyles() {
-        Lecturer lecturer = new Lecturer(1, "", "Prof. Weber", null, null);
+        var lecturer = new Lecturer(1, "", "Prof. Weber", null, null);
         assertEquals("Prof. Weber", lecturer.name(NameStyle.LAST_NAME));
         assertEquals("Prof. Weber", lecturer.name(NameStyle.FULL_NAME));
     }
 
     @Test
     public void lecturer_normalized_cleansEveryField() {
-        Lecturer result = new Lecturer(2, " Anna​\n ", "‮Weber  Koch", " anna .weber@uni.example ",
+        var result = new Lecturer(2, " Anna​\n ", "‮Weber  Koch", " anna .weber@uni.example ",
                 "tel: +49 (30) 123").normalized();
 
         assertEquals("Anna", result.firstName());
@@ -184,13 +184,13 @@ public class ModelTest {
 
     @Test
     public void lecturer_normalized_isIdempotent() {
-        Lecturer once = new Lecturer(2, " Anna ", " Weber ", " a@b.example ", " 030  123 ").normalized();
+        var once = new Lecturer(2, " Anna ", " Weber ", " a@b.example ", " 030  123 ").normalized();
         assertEquals(once, once.normalized());
     }
 
     @Test
     public void lecturer_normalized_trimsAndTurnsBlankContactsIntoNull() {
-        Lecturer result = new Lecturer(4, "  Anna ", " Weber  ", "   ", " +49 30 123 ").normalized();
+        var result = new Lecturer(4, "  Anna ", " Weber  ", "   ", " +49 30 123 ").normalized();
         assertEquals("Anna", result.firstName());
         assertEquals("Weber", result.lastName());
         assertNull(result.email());
@@ -200,9 +200,9 @@ public class ModelTest {
 
     @Test
     public void keys_roundTrip() {
-        for (SessionType value : SessionType.values()) assertEquals(value, SessionType.fromKey(value.key()));
-        for (Mode value : Mode.values()) assertEquals(value, Mode.fromKey(value.key()));
-        for (CourseColor value : CourseColor.values()) assertEquals(value, CourseColor.fromKey(value.key()));
+        for (var value : SessionType.values()) assertEquals(value, SessionType.fromKey(value.key()));
+        for (var value : Mode.values()) assertEquals(value, Mode.fromKey(value.key()));
+        for (var value : CourseColor.values()) assertEquals(value, CourseColor.fromKey(value.key()));
         assertThrows(IllegalArgumentException.class, () -> SessionType.fromKey("nope"));
     }
 }

@@ -75,8 +75,8 @@ public final class PaneLayout extends ViewGroup {
 
     /** Whether the window is wide enough for the calendar and the pane to sit next to each other. */
     public boolean isSplit() {
-        float density = getResources().getDisplayMetrics().density;
-        int windowWidth = Math.round(getResources().getConfiguration().screenWidthDp * density);
+        var density = getResources().getDisplayMetrics().density;
+        var windowWidth = Math.round(getResources().getConfiguration().screenWidthDp * density);
         return PaneMetrics.isSplit(windowWidth, splitMinWidth);
     }
 
@@ -86,12 +86,12 @@ public final class PaneLayout extends ViewGroup {
      * @param animate slide it, unless the layout has not been shown yet (after the screen was recreated)
      */
     public void setSideOpen(boolean open, boolean animate) {
-        boolean covered = open && !isSplit();
+        var covered = open && !isSplit();
         main.setImportantForAccessibility(covered
                 ? IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS : IMPORTANT_FOR_ACCESSIBILITY_AUTO);
         main.setDescendantFocusability(covered ? FOCUS_BLOCK_DESCENDANTS : FOCUS_BEFORE_DESCENDANTS);
 
-        float target = open ? 1f : 0f;
+        var target = open ? 1f : 0f;
         if (animator != null) animator.cancel();
         if (!animate || !isLaidOut() || !isSplit()) {
             progress = target;
@@ -101,7 +101,7 @@ public final class PaneLayout extends ViewGroup {
         }
         if (progress == target) return;
 
-        ValueAnimator slide = ValueAnimator.ofFloat(progress, target);
+        var slide = ValueAnimator.ofFloat(progress, target);
         slide.setDuration(open ? OPEN_MILLIS : CLOSE_MILLIS);
         slide.setInterpolator(AnimationUtils.loadInterpolator(getContext(),
                 open ? android.R.interpolator.decelerate_cubic : android.R.interpolator.accelerate_cubic));
@@ -122,15 +122,15 @@ public final class PaneLayout extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
+        var width = MeasureSpec.getSize(widthMeasureSpec);
+        var height = MeasureSpec.getSize(heightMeasureSpec);
         setMeasuredDimension(width, height);
 
-        int innerWidth = Math.max(0, width - getPaddingLeft() - getPaddingRight());
-        int innerHeight = Math.max(0, height - getPaddingTop() - getPaddingBottom());
+        var innerWidth = Math.max(0, width - getPaddingLeft() - getPaddingRight());
+        var innerHeight = Math.max(0, height - getPaddingTop() - getPaddingBottom());
         split = isSplit();
-        int mainWidth = innerWidth;
-        int sideWidth = innerWidth;
+        var mainWidth = innerWidth;
+        var sideWidth = innerWidth;
         if (split) {
             // The pane keeps its final width while it slides, so its page is laid out once and not on every frame.
             sideWidth = PaneMetrics.sideWidth(innerWidth, SIDE_SHARE, sideMinWidth, sideMaxWidth);
@@ -147,13 +147,13 @@ public final class PaneLayout extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int innerLeft = getPaddingLeft();
-        int innerTop = getPaddingTop();
-        int innerRight = right - left - getPaddingRight();
+        var innerLeft = getPaddingLeft();
+        var innerTop = getPaddingTop();
+        var innerRight = right - left - getPaddingRight();
 
         main.layout(innerLeft, innerTop, innerLeft + main.getMeasuredWidth(), innerTop + main.getMeasuredHeight());
         // Closed, the pane lies just outside the right edge and is clipped away.
-        int sideLeft = split ? innerRight - Math.round(side.getMeasuredWidth() * progress) : innerLeft;
+        var sideLeft = split ? innerRight - Math.round(side.getMeasuredWidth() * progress) : innerLeft;
         side.layout(sideLeft, innerTop, sideLeft + side.getMeasuredWidth(), innerTop + side.getMeasuredHeight());
     }
 

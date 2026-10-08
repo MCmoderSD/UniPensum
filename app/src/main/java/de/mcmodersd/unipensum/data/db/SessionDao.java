@@ -30,7 +30,7 @@ public final class SessionDao {
 
     /** @return {@code null} if there is no such session */
     public static Session get(SQLiteDatabase db, long id) {
-        try (Cursor cursor = db.query("session", null, "id = ?", new String[]{String.valueOf(id)},
+        try (var cursor = db.query("session", null, "id = ?", new String[]{String.valueOf(id)},
                 null, null, null)) {
             return cursor.moveToFirst() ? read(cursor) : null;
         }
@@ -38,8 +38,8 @@ public final class SessionDao {
 
     /** Ordered by date. */
     public static List<Session> listBySeries(SQLiteDatabase db, long seriesId) {
-        List<Session> result = new ArrayList<>();
-        try (Cursor cursor = db.query("session", null, "series_id = ?", new String[]{String.valueOf(seriesId)},
+        var result = new ArrayList<Session>();
+        try (var cursor = db.query("session", null, "series_id = ?", new String[]{String.valueOf(seriesId)},
                 null, null, "day, id")) {
             while (cursor.moveToNext()) result.add(read(cursor));
         }
@@ -47,10 +47,10 @@ public final class SessionDao {
     }
 
     public static List<Session> listBySemester(SQLiteDatabase db, long semesterId) {
-        List<Session> result = new ArrayList<>();
-        String sql = "SELECT s.* FROM session s JOIN series r ON s.series_id = r.id "
+        var result = new ArrayList<Session>();
+        var sql = "SELECT s.* FROM session s JOIN series r ON s.series_id = r.id "
                 + "JOIN course c ON r.course_id = c.id WHERE c.semester_id = ? ORDER BY s.day, s.id";
-        try (Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(semesterId)})) {
+        try (var cursor = db.rawQuery(sql, new String[]{String.valueOf(semesterId)})) {
             while (cursor.moveToNext()) result.add(read(cursor));
         }
         return result;
@@ -66,7 +66,7 @@ public final class SessionDao {
     }
 
     private static ContentValues values(Session session) {
-        ContentValues values = new ContentValues();
+        var values = new ContentValues();
         values.put("series_id", session.seriesId());
         values.put("day", session.day().toEpochDay());
         Rows.putDetails(values, session.details());

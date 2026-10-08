@@ -17,7 +17,7 @@ public class SemesterDefaultsTest {
 
     @Test
     public void withoutSemesters_suggestsTheComingWinterTerm() {
-        Period period = SemesterDefaults.suggest(LocalDate.of(2026, 10, 4), List.of());
+        var period = SemesterDefaults.suggest(LocalDate.of(2026, 10, 4), List.of());
 
         assertEquals(LocalDate.of(2026, 10, 5), period.start());
         assertEquals(DayOfWeek.MONDAY, period.start().getDayOfWeek());
@@ -28,7 +28,7 @@ public class SemesterDefaultsTest {
 
     @Test
     public void afterTheTermHasEnded_suggestsTheNextSummerTerm() {
-        Period period = SemesterDefaults.suggest(LocalDate.of(2027, 1, 25), List.of());
+        var period = SemesterDefaults.suggest(LocalDate.of(2027, 1, 25), List.of());
 
         assertEquals(LocalDate.of(2027, 4, 5), period.start());
         assertEquals(LocalDate.of(2027, 7, 23), period.end());
@@ -36,25 +36,25 @@ public class SemesterDefaultsTest {
 
     @Test
     public void skipsTermsThatOverlapAnExistingSemester() {
-        Semester winter = new Semester(1, LocalDate.of(2026, 10, 5), LocalDate.of(2027, 2, 12), null);
+        var winter = new Semester(1, LocalDate.of(2026, 10, 5), LocalDate.of(2027, 2, 12), null);
 
-        Period period = SemesterDefaults.suggest(LocalDate.of(2026, 10, 4), List.of(winter));
+        var period = SemesterDefaults.suggest(LocalDate.of(2026, 10, 4), List.of(winter));
 
         assertEquals(LocalDate.of(2027, 4, 5), period.start());
     }
 
     @Test
     public void aTermInProgress_isStillSuggested() {
-        Period period = SemesterDefaults.suggest(LocalDate.of(2026, 11, 18), List.of());
+        var period = SemesterDefaults.suggest(LocalDate.of(2026, 11, 18), List.of());
 
         assertEquals(LocalDate.of(2026, 10, 5), period.start());
     }
 
     @Test
     public void lectureEnd_isSixteenWeeksAfterTheStart_endingOnAFridayForAMonday() {
-        LocalDate start = LocalDate.of(2026, 10, 5);
+        var start = LocalDate.of(2026, 10, 5);
 
-        LocalDate end = SemesterDefaults.lectureEnd(start);
+        var end = SemesterDefaults.lectureEnd(start);
 
         assertEquals(DayOfWeek.FRIDAY, end.getDayOfWeek());
         assertEquals(15, ChronoUnit.WEEKS.between(start, end));       // 15 full weeks plus the days of the 16th
@@ -69,13 +69,13 @@ public class SemesterDefaultsTest {
 
     @Test
     public void lectureEnd_neverFallsOnAWeekend() {
-        LocalDate start = LocalDate.of(2026, 10, 1);
-        for (int i = 0; i < 400; i++) {
-            LocalDate end = SemesterDefaults.lectureEnd(start.plusDays(i));
-            DayOfWeek day = end.getDayOfWeek();
+        var start = LocalDate.of(2026, 10, 1);
+        for (var i = 0; i < 400; i++) {
+            var end = SemesterDefaults.lectureEnd(start.plusDays(i));
+            var day = end.getDayOfWeek();
             assertTrue("Weekend end for start " + start.plusDays(i), day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY);
             // Never longer than 16 weeks, and the weekend move costs at most two days.
-            long days = ChronoUnit.DAYS.between(start.plusDays(i), end) + 1;
+            var days = ChronoUnit.DAYS.between(start.plusDays(i), end) + 1;
             assertTrue(days <= 16 * 7 && days >= 16 * 7 - 2);
         }
     }

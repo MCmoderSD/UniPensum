@@ -45,7 +45,7 @@ public final class BackupManager {
     private final Database database;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final ExecutorService worker = Executors.newSingleThreadExecutor(runnable -> {
-        Thread thread = new Thread(runnable, "unipensum-backup");
+        var thread = new Thread(runnable, "unipensum-backup");
         thread.setDaemon(true);
         return thread;
     });
@@ -57,7 +57,7 @@ public final class BackupManager {
 
     public Current current() {
         try {
-            PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            var info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return new Current(BackupFile.FORMAT, Schema.VERSION, (int) info.getLongVersionCode(),
                     info.versionName == null ? "" : info.versionName);
         } catch (PackageManager.NameNotFoundException ownPackage) {
@@ -74,11 +74,11 @@ public final class BackupManager {
             public void onSuccess(BackupData data) {
                 worker.execute(() -> {
                     try {
-                        Current current = current();
-                        BackupFile.Meta meta = new BackupFile.Meta(current.schema(), current.appVersionCode(),
+                        var current = current();
+                        var meta = new BackupFile.Meta(current.schema(), current.appVersionCode(),
                                 current.appVersion(), Instant.now());
-                        byte[] file = BackupFile.write(data, meta, password);
-                        try (OutputStream out = context.getContentResolver().openOutputStream(target, "wt")) {
+                        var file = BackupFile.write(data, meta, password);
+                        try (var out = context.getContentResolver().openOutputStream(target, "wt")) {
                             if (out == null) throw new IOException("Cannot write to " + target);
                             out.write(file);
                         }
@@ -136,10 +136,10 @@ public final class BackupManager {
     }
 
     private byte[] readLimited(Uri source) throws IOException, BackupException {
-        try (InputStream in = context.getContentResolver().openInputStream(source)) {
+        try (var in = context.getContentResolver().openInputStream(source)) {
             if (in == null) throw new IOException("Cannot read " + source);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            byte[] buffer = new byte[8192];
+            var out = new ByteArrayOutputStream();
+            var buffer = new byte[8192];
             long total = 0;
             int read;
             while ((read = in.read(buffer)) != -1) {

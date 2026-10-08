@@ -53,10 +53,10 @@ public final class Reminders {
 
     /** @return the reminder of the session, empty if it has none */
     public static Optional<Due> of(Session session) {
-        SessionDetails details = session.details();
+        var details = session.details();
         if (!details.hasReminder()) return Optional.empty();
-        LocalDateTime start = session.day().atStartOfDay().plusMinutes(details.startMin());
-        LocalDateTime end = session.day().atStartOfDay().plusMinutes(details.endMin());
+        var start = session.day().atStartOfDay().plusMinutes(details.startMin());
+        var end = session.day().atStartOfDay().plusMinutes(details.endMin());
         return Optional.of(new Due(session, start.minusMinutes(details.reminderMin()), start, end));
     }
 
@@ -65,8 +65,8 @@ public final class Reminders {
      * use, which is until their session is over. Earliest first.
      */
     public static List<Due> due(List<Session> sessions, LocalDateTime after, LocalDateTime now) {
-        List<Due> result = new ArrayList<>();
-        for (Session session : sessions) {
+        var result = new ArrayList<Due>();
+        for (var session : sessions) {
             of(session).ifPresent(due -> {
                 if (due.remindAt().isAfter(after) && !due.remindAt().isAfter(now) && due.end().isAfter(now)) {
                     result.add(due);
@@ -80,8 +80,8 @@ public final class Reminders {
     /** @return the time of the first reminder after {@code now}, empty if none is to come */
     public static Optional<LocalDateTime> next(List<Session> sessions, LocalDateTime now) {
         LocalDateTime next = null;
-        for (Session session : sessions) {
-            Optional<Due> due = of(session);
+        for (var session : sessions) {
+            var due = of(session);
             if (!due.isPresent() || !due.get().remindAt().isAfter(now)) continue;
             if (next == null || due.get().remindAt().isBefore(next)) next = due.get().remindAt();
         }

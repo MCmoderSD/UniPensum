@@ -45,8 +45,8 @@ final class BackupCrypto {
 
     /** Fresh salt and nonce. A nonce is never used twice with one key; every file has its own salt. */
     static Params newParams(int iterations) {
-        byte[] salt = new byte[SALT_BYTES];
-        byte[] iv = new byte[IV_BYTES];
+        var salt = new byte[SALT_BYTES];
+        var iv = new byte[IV_BYTES];
         RANDOM.nextBytes(salt);
         RANDOM.nextBytes(iv);
         return new Params(iterations, salt, iv);
@@ -54,7 +54,7 @@ final class BackupCrypto {
 
     /** @param aad data that is not encrypted but must be unchanged when the result is opened */
     static byte[] encrypt(char[] password, Params params, byte[] aad, byte[] plain) throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        var cipher = Cipher.getInstance("AES/GCM/NoPadding");
         cipher.init(Cipher.ENCRYPT_MODE, key(password, params), new GCMParameterSpec(TAG_BITS, params.iv()));
         cipher.updateAAD(aad);
         return cipher.doFinal(plain);
@@ -64,16 +64,16 @@ final class BackupCrypto {
      * @throws javax.crypto.AEADBadTagException if the password is wrong or the data or {@code aad} was changed
      */
     static byte[] decrypt(char[] password, Params params, byte[] aad, byte[] sealed) throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        var cipher = Cipher.getInstance("AES/GCM/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE, key(password, params), new GCMParameterSpec(TAG_BITS, params.iv()));
         cipher.updateAAD(aad);
         return cipher.doFinal(sealed);
     }
 
     private static SecretKey key(char[] password, Params params) throws GeneralSecurityException {
-        PBEKeySpec spec = new PBEKeySpec(password, params.salt(), params.iterations(), KEY_BITS);
+        var spec = new PBEKeySpec(password, params.salt(), params.iterations(), KEY_BITS);
         try {
-            byte[] bytes = SecretKeyFactory.getInstance(KDF_NAME).generateSecret(spec).getEncoded();
+            var bytes = SecretKeyFactory.getInstance(KDF_NAME).generateSecret(spec).getEncoded();
             return new SecretKeySpec(bytes, "AES");
         } finally {
             spec.clearPassword();

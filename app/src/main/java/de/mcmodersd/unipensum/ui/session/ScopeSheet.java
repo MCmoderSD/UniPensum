@@ -33,11 +33,11 @@ public final class ScopeSheet extends UpSheet {
 
     /** @param day the date of the session in question, shown to make the options concrete */
     public static void show(FragmentManager manager, String requestKey, CharSequence title, LocalDate day) {
-        Bundle args = new Bundle();
+        var args = new Bundle();
         args.putString(ARG_KEY, requestKey);
         args.putCharSequence(ARG_TITLE, title);
         args.putLong(ARG_DAY, day.toEpochDay());
-        ScopeSheet sheet = new ScopeSheet();
+        var sheet = new ScopeSheet();
         sheet.setArguments(args);
         sheet.show(manager, "scope:" + requestKey);
     }
@@ -51,12 +51,12 @@ public final class ScopeSheet extends UpSheet {
     @Override
     protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
                                  @Nullable Bundle savedInstanceState) {
-        Context context = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
-        LocalDate day = LocalDate.ofEpochDay(requireArguments().getLong(ARG_DAY));
-        String date = TimeFormat.dateMedium(context, day);
+        var context = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
+        var day = LocalDate.ofEpochDay(requireArguments().getLong(ARG_DAY));
+        var date = TimeFormat.dateMedium(context, day);
 
-        LinearLayout column = new LinearLayout(context);
+        var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
         column.addView(row(context, dp, EditScope.THIS_ONLY, R.string.scope_this_only, date));
         column.addView(row(context, dp, EditScope.THIS_AND_FOLLOWING, R.string.scope_this_and_following,
@@ -66,17 +66,17 @@ public final class ScopeSheet extends UpSheet {
     }
 
     private UpRow row(Context context, float dp, EditScope scope, int titleRes, @Nullable String subtitle) {
-        UpRow row = new UpRow(context);
+        var row = new UpRow(context);
         row.setTitle(getString(titleRes));
         row.setSubtitle(subtitle);
         row.setChevronVisible(true);
         row.setOnClickListener(v -> {
-            Bundle result = new Bundle();
+            var result = new Bundle();
             result.putString(RESULT_SCOPE, scope.name());
             getParentFragmentManager().setFragmentResult(requireArguments().getString(ARG_KEY), result);
             dismiss();
         });
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.bottomMargin = Math.round(8 * dp);
         row.setLayoutParams(params);

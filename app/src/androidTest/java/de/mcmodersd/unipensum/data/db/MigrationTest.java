@@ -75,8 +75,8 @@ public class MigrationTest {
         context = ApplicationProvider.getApplicationContext();
         context.deleteDatabase(NAME);
 
-        SQLiteDatabase old = context.openOrCreateDatabase(NAME, Context.MODE_PRIVATE, null);
-        for (String statement : VERSION_1) old.execSQL(statement);
+        var old = context.openOrCreateDatabase(NAME, Context.MODE_PRIVATE, null);
+        for (var statement : VERSION_1) old.execSQL(statement);
         old.execSQL("INSERT INTO semester VALUES (1, " + MONDAY.toEpochDay() + ", "
                 + LocalDate.of(2027, 2, 12).toEpochDay() + ", NULL)");
         old.execSQL("INSERT INTO course (id, semester_id, name, color) VALUES (1, 1, 'Math', 'blue')");
@@ -119,15 +119,15 @@ public class MigrationTest {
 
     @Test
     public void everyDistinctTextBecomesOneLecturerWithThatLastName() {
-        SQLiteDatabase db = migrate();
+        var db = migrate();
 
-        List<Lecturer> lecturers = TimetableStore.listLecturers(db);
+        var lecturers = TimetableStore.listLecturers(db);
 
         // "Dr. Lang" and "Prof. Weber" once each, although Weber appeared with and without spaces.
         assertEquals(2, lecturers.size());
         assertEquals("Dr. Lang", lecturers.get(0).lastName());
         assertEquals("Prof. Weber", lecturers.get(1).lastName());
-        for (Lecturer lecturer : lecturers) {
+        for (var lecturer : lecturers) {
             assertEquals("", lecturer.firstName());
             assertNull(lecturer.email());
             assertNull(lecturer.phone());
@@ -137,19 +137,19 @@ public class MigrationTest {
 
     @Test
     public void seriesAndSessionsPointAtTheirLecturerAndKeepTheirDeviations() {
-        SQLiteDatabase db = migrate();
-        long lang = TimetableStore.listLecturers(db).get(0).id();
-        long weber = TimetableStore.listLecturers(db).get(1).id();
+        var db = migrate();
+        var lang = TimetableStore.listLecturers(db).get(0).id();
+        var weber = TimetableStore.listLecturers(db).get(1).id();
 
-        List<Series> series = TimetableStore.listCourses(db, 1).get(0).series();
+        var series = TimetableStore.listCourses(db, 1).get(0).series();
         assertEquals(weber, series.get(0).details().lecturerId());                         // Monday
         assertEquals(weber, series.get(1).details().lecturerId());                         // Tuesday
         assertEquals(SessionDetails.NO_LECTURER, series.get(2).details().lecturerId());    // Wednesday
         assertEquals(SessionDetails.NO_LECTURER, series.get(3).details().lecturerId());    // Thursday
 
-        Timetable timetable = TimetableStore.loadTimetable(db);
-        SessionView first = timetable.on(MONDAY).get(0);
-        SessionView deviating = timetable.on(NEXT_MONDAY).get(0);
+        var timetable = TimetableStore.loadTimetable(db);
+        var first = timetable.on(MONDAY).get(0);
+        var deviating = timetable.on(NEXT_MONDAY).get(0);
         assertEquals(weber, first.session().details().lecturerId());
         assertEquals("Prof. Weber", first.lecturer().lastName());
         assertEquals(lang, deviating.session().details().lecturerId());
@@ -161,7 +161,7 @@ public class MigrationTest {
 
     @Test
     public void nothingElseIsLostAndTheOldTextIsGone() {
-        SQLiteDatabase db = migrate();
+        var db = migrate();
 
         assertEquals(2, DatabaseUtils.queryNumEntries(db, "series", "weekday <= 2"));
         assertEquals(4, DatabaseUtils.queryNumEntries(db, "series"));
@@ -176,12 +176,12 @@ public class MigrationTest {
 
     @Test
     public void theMigratedDatabaseKeepsWorking() {
-        SQLiteDatabase db = migrate();
-        long weber = TimetableStore.listLecturers(db).get(1).id();
+        var db = migrate();
+        var weber = TimetableStore.listLecturers(db).get(1).id();
 
         // New data on top of the migrated layout, which still has the unused text columns.
-        long created = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Neu", "neu@uni.example", null));
-        SessionDetails details = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.IN_PERSON, false,
+        var created = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Neu", "neu@uni.example", null));
+        var details = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.IN_PERSON, false,
                 "B1", null, created, null, SessionDetails.NO_REMINDER);
         TimetableStore.addSeries(db, 1, new Series(0, 0, details,
                 new Schedule(DayOfWeek.FRIDAY, MONDAY, NEXT_MONDAY.plusDays(4), 1)));
@@ -194,7 +194,7 @@ public class MigrationTest {
         assertEquals(5 + 2, DatabaseUtils.queryNumEntries(db, "session"));
 
         // The columns that were added are indexed.
-        try (Cursor cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE '%lecturer'", null)) {
+        try (var cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE '%lecturer'", null)) {
             assertEquals(2, cursor.getCount());
         }
         assertNotEquals(0, created);
@@ -204,14 +204,14 @@ public class MigrationTest {
 
     @Test
     public void fromVersion1_everyEventAndSessionGetsTheDefaultReminder() {
-        SQLiteDatabase db = migrate();
+        var db = migrate();
 
         // All of the version 1 rows are in person.
         assertEquals(0, DatabaseUtils.queryNumEntries(db, "series", "reminder_min IS NULL OR reminder_min <> 30"));
         assertEquals(0, DatabaseUtils.queryNumEntries(db, "session", "reminder_min IS NULL OR reminder_min <> 30"));
-        List<ReminderView> reminders = TimetableStore.loadReminders(db, MONDAY);
+        var reminders = TimetableStore.loadReminders(db, MONDAY);
         assertEquals(5, reminders.size());
-        for (ReminderView view : reminders) assertEquals(30, view.session().details().reminderMin());
+        for (var view : reminders) assertEquals(30, view.session().details().reminderMin());
         db.close();
     }
 
@@ -240,14 +240,14 @@ public class MigrationTest {
     @Test
     public void fromVersion2_onlineEventsGetFiveMinutesAndTheRestThirty() {
         context.deleteDatabase(NAME);
-        SQLiteDatabase old = context.openOrCreateDatabase(NAME, Context.MODE_PRIVATE, null);
-        for (String statement : VERSION_2) old.execSQL(statement);
+        var old = context.openOrCreateDatabase(NAME, Context.MODE_PRIVATE, null);
+        for (var statement : VERSION_2) old.execSQL(statement);
         old.execSQL("INSERT INTO semester VALUES (1, " + MONDAY.toEpochDay() + ", "
                 + LocalDate.of(2027, 2, 12).toEpochDay() + ", NULL)");
         old.execSQL("INSERT INTO course (id, semester_id, name, color) VALUES (1, 1, 'Math', 'blue')");
         // Series 1 is in person, series 2 online, series 3 hybrid.
         String[] modes = {"'in_person', 0", "'online', 0", "'in_person', 1"};
-        for (int i = 0; i < 3; i++) {
+        for (var i = 0; i < 3; i++) {
             old.execSQL("INSERT INTO series (id, course_id, type, weekday, start_min, end_min, mode, hybrid, "
                     + "first_day, last_day, interval_weeks) VALUES (" + (i + 1) + ", 1, 'lecture', " + (i + 1)
                     + ", 480, 570, " + modes[i] + ", " + MONDAY.toEpochDay() + ", " + MONDAY.toEpochDay() + ", 1)");
@@ -258,9 +258,9 @@ public class MigrationTest {
         old.setVersion(2);
         old.close();
 
-        SQLiteDatabase db = migrate();
+        var db = migrate();
 
-        List<ReminderView> reminders = TimetableStore.loadReminders(db, MONDAY);
+        var reminders = TimetableStore.loadReminders(db, MONDAY);
         assertEquals(3, reminders.size());
         assertEquals(30, reminders.get(0).session().details().reminderMin());
         assertEquals(5, reminders.get(1).session().details().reminderMin());
@@ -274,14 +274,14 @@ public class MigrationTest {
     public void aFreshDatabaseHasTheSameShape() {
         context.deleteDatabase(NAME);
 
-        SQLiteDatabase db = new DbHelper(context, NAME).getWritableDatabase();
-        long id = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Weber", null, null));
+        var db = new DbHelper(context, NAME).getWritableDatabase();
+        var id = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Weber", null, null));
 
         assertEquals(Schema.VERSION, db.getVersion());
         assertEquals(1, TimetableStore.listLecturers(db).size());
         assertEquals("Weber", TimetableStore.listLecturers(db).get(0).lastName());
         assertNotEquals(0, id);
-        try (Cursor cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE '%lecturer'", null)) {
+        try (var cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE '%lecturer'", null)) {
             assertEquals(2, cursor.getCount());
         }
         db.close();

@@ -45,9 +45,9 @@ public final class SeriesFormat {
      */
     public static String place(Context context, SessionDetails details) {
         if (details.mode() == Mode.ONLINE) return context.getString(R.string.mode_online);
-        String room = details.room() == null ? "" : details.room();
+        var room = details.room() == null ? "" : details.room();
         if (!details.hybrid()) return room;
-        String hybrid = context.getString(R.string.mode_hybrid);
+        var hybrid = context.getString(R.string.mode_hybrid);
         return room.isEmpty() ? hybrid : room + " | " + hybrid;
     }
 
@@ -64,9 +64,9 @@ public final class SeriesFormat {
      * @param lecturerName the series' lecturer as it should be shown, {@code null} for none
      */
     public static String subtitle(Context context, Series series, @Nullable String lecturerName) {
-        List<String> parts = new ArrayList<>();
+        var parts = new ArrayList<String>();
         parts.add(repeat(context, series.schedule().intervalWeeks()));
-        String place = place(context, series.details());
+        var place = place(context, series.details());
         if (!place.isEmpty()) parts.add(place);
         if (lecturerName != null) parts.add(lecturerName);
         return String.join(" · ", parts);

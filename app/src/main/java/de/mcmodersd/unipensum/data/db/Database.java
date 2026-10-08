@@ -35,7 +35,7 @@ public final class Database {
 
     private final DbHelper helper;
     private final ExecutorService executor = Executors.newSingleThreadExecutor(runnable -> {
-        Thread thread = new Thread(runnable, "unipensum-db");
+        var thread = new Thread(runnable, "unipensum-db");
         thread.setDaemon(true);
         return thread;
     });
@@ -68,7 +68,7 @@ public final class Database {
                 return;
             }
             revision.postValue(revisionCounter.incrementAndGet());
-            Runnable listener = writeListener;
+            var listener = writeListener;
             if (listener != null) listener.run();
             deliverSuccess(callback, result);
         });
@@ -102,10 +102,10 @@ public final class Database {
     }
 
     private <T> T inTransaction(Task<T> task) throws Exception {
-        SQLiteDatabase db = helper.getWritableDatabase();
+        var db = helper.getWritableDatabase();
         db.beginTransaction();
         try {
-            T result = task.run(db);
+            var result = task.run(db);
             db.setTransactionSuccessful();
             return result;
         } finally {

@@ -60,7 +60,7 @@ public class MonthCalendarView extends LinearLayout {
         super(context, attrs);
         setOrientation(VERTICAL);
 
-        LinearLayout header = new LinearLayout(context);
+        var header = new LinearLayout(context);
         header.setGravity(Gravity.CENTER_VERTICAL);
         previous = new UpIconButton(context);
         previous.setImageResource(R.drawable.ic_chevron_left);
@@ -118,8 +118,8 @@ public class MonthCalendarView extends LinearLayout {
 
     private void refresh() {
         monthTitle.setText(TimeFormat.monthYear(getContext(), month));
-        boolean hasPrevious = month.isAfter(YearMonth.from(min));
-        boolean hasNext = month.isBefore(YearMonth.from(max));
+        var hasPrevious = month.isAfter(YearMonth.from(min));
+        var hasNext = month.isBefore(YearMonth.from(max));
         previous.setEnabled(hasPrevious);
         previous.setVisibility(hasPrevious ? VISIBLE : INVISIBLE);
         next.setEnabled(hasNext);
@@ -178,14 +178,14 @@ public class MonthCalendarView extends LinearLayout {
 
         /** Row of the day within the month, counted from the week of the 1st. */
         private int weekRowOf(LocalDate day) {
-            int offset = columnOf(month.atDay(1));
+            var offset = columnOf(month.atDay(1));
             return (offset + day.getDayOfMonth() - 1) / 7;
         }
 
         /** In weekdays-only mode a month can start on a weekend, which leaves its first week row empty. */
         private int firstVisibleRow() {
-            for (int d = 1; d <= month.lengthOfMonth(); d++) {
-                LocalDate day = month.atDay(d);
+            for (var d = 1; d <= month.lengthOfMonth(); d++) {
+                var day = month.atDay(d);
                 if (columnOf(day) < columns()) return weekRowOf(day);
             }
             return 0;
@@ -197,37 +197,37 @@ public class MonthCalendarView extends LinearLayout {
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             // Always reserve the maximum, so the sheet keeps its height and the month arrows do not jump.
-            int height = Math.round(labelHeight + MAX_ROWS * cellHeight);
+            var height = Math.round(labelHeight + MAX_ROWS * cellHeight);
             setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), height);
         }
 
         @Override
         protected void onDraw(Canvas canvas) {
-            Locale locale = TimeFormat.locale(getContext());
-            float cellWidth = getWidth() / (float) columns();
+            var locale = TimeFormat.locale(getContext());
+            var cellWidth = getWidth() / (float) columns();
 
-            for (int c = 0; c < columns(); c++) {
-                String label = DayOfWeek.of(c + 1).getDisplayName(TextStyle.SHORT, locale);
+            for (var c = 0; c < columns(); c++) {
+                var label = DayOfWeek.of(c + 1).getDisplayName(TextStyle.SHORT, locale);
                 canvas.drawText(label, cellWidth * (c + 0.5f), labelHeight * 0.7f, labelPaint);
             }
 
-            LocalDate today = LocalDate.now();
-            for (int d = 1; d <= month.lengthOfMonth(); d++) {
-                LocalDate day = month.atDay(d);
-                int column = columnOf(day);
+            var today = LocalDate.now();
+            for (var d = 1; d <= month.lengthOfMonth(); d++) {
+                var day = month.atDay(d);
+                var column = columnOf(day);
                 if (column >= columns()) continue;
-                float centerX = cellWidth * (column + 0.5f);
-                float centerY = labelHeight + (weekRowOf(day) - firstVisibleRow() + 0.5f) * cellHeight;
-                float radius = Math.min(cellWidth, cellHeight) * 0.42f;
+                var centerX = cellWidth * (column + 0.5f);
+                var centerY = labelHeight + (weekRowOf(day) - firstVisibleRow() + 0.5f) * cellHeight;
+                var radius = Math.min(cellWidth, cellHeight) * 0.42f;
 
-                boolean enabled = isSelectable(day);
-                boolean isSelected = day.equals(selected);
+                var enabled = isSelectable(day);
+                var isSelected = day.equals(selected);
                 if (isSelected) canvas.drawCircle(centerX, centerY, radius, fillPaint);
                 else if (day.equals(today)) canvas.drawCircle(centerX, centerY, radius, ringPaint);
 
                 textPaint.setColor(isSelected ? onAccent : (enabled ? textColor : disabledColor));
                 textPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-                Paint.FontMetrics fm = textPaint.getFontMetrics();
+                var fm = textPaint.getFontMetrics();
                 canvas.drawText(String.valueOf(d), centerX, centerY - (fm.ascent + fm.descent) / 2f, textPaint);
             }
         }
@@ -263,17 +263,17 @@ public class MonthCalendarView extends LinearLayout {
         /** @return the day drawn at that point, or {@code null} for gaps and the weekday labels */
         private LocalDate dayAt(float x, float y) {
             if (y < labelHeight || x < 0 || x >= getWidth()) return null;
-            int column = (int) (x / (getWidth() / (float) columns()));
-            int row = (int) ((y - labelHeight) / cellHeight) + firstVisibleRow();
-            for (int d = 1; d <= month.lengthOfMonth(); d++) {
-                LocalDate day = month.atDay(d);
+            var column = (int) (x / (getWidth() / (float) columns()));
+            var row = (int) ((y - labelHeight) / cellHeight) + firstVisibleRow();
+            for (var d = 1; d <= month.lengthOfMonth(); d++) {
+                var day = month.atDay(d);
                 if (columnOf(day) == column && weekRowOf(day) == row) return day;
             }
             return null;
         }
 
         private void select(float x, float y) {
-            LocalDate day = dayAt(x, y);
+            var day = dayAt(x, y);
             if (day == null) return;
             choose(day);
         }
@@ -290,9 +290,9 @@ public class MonthCalendarView extends LinearLayout {
         }
 
         private void cellBounds(LocalDate day, Rect out) {
-            float cellWidth = getWidth() / (float) columns();
-            int left = Math.round(cellWidth * columnOf(day));
-            int top = Math.round(labelHeight + (weekRowOf(day) - firstVisibleRow()) * cellHeight);
+            var cellWidth = getWidth() / (float) columns();
+            var left = Math.round(cellWidth * columnOf(day));
+            var top = Math.round(labelHeight + (weekRowOf(day) - firstVisibleRow()) * cellHeight);
             out.set(left, top, Math.round(left + cellWidth), Math.round(top + cellHeight));
         }
 
@@ -305,22 +305,22 @@ public class MonthCalendarView extends LinearLayout {
 
             @Override
             protected int getVirtualViewAt(float x, float y) {
-                LocalDate day = dayAt(x, y);
+                var day = dayAt(x, y);
                 return day == null ? INVALID_ID : day.getDayOfMonth();
             }
 
             @Override
             protected void getVisibleVirtualViews(List<Integer> virtualViewIds) {
-                for (int d = 1; d <= month.lengthOfMonth(); d++) {
+                for (var d = 1; d <= month.lengthOfMonth(); d++) {
                     if (columnOf(month.atDay(d)) < columns()) virtualViewIds.add(d);
                 }
             }
 
             @Override
             protected void onPopulateNodeForVirtualView(int id, @NonNull AccessibilityNodeInfoCompat node) {
-                LocalDate day = month.atDay(id);
-                Context context = getContext();
-                Rect bounds = new Rect();
+                var day = month.atDay(id);
+                var context = getContext();
+                var bounds = new Rect();
                 cellBounds(day, bounds);
                 node.setBoundsInParent(bounds);
                 node.setContentDescription(day.getDayOfWeek().getDisplayName(TextStyle.FULL, TimeFormat.locale(context))

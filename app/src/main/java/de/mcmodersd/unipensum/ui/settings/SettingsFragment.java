@@ -108,7 +108,7 @@ public class SettingsFragment extends Fragment {
     /** Nothing is rebuilt here: the grid and the sheets read the style from the settings when they draw. */
     private void bindLecturerNames(UpSegmentedControl control) {
         control.setOptions(getString(R.string.lecturer_name_last), getString(R.string.lecturer_name_full));
-        NameStyle current = settings.lecturerNameStyle().getValue();
+        var current = settings.lecturerNameStyle().getValue();
         control.setSelectedIndex(current == null ? NameStyle.LAST_NAME.ordinal() : current.ordinal());
         control.setOnSelectionChangedListener(index -> settings.setLecturerNameStyle(NameStyle.values()[index]));
     }
@@ -140,21 +140,21 @@ public class SettingsFragment extends Fragment {
     private void bindHours(UpStepper start, UpStepper end) {
         hoursStart = start;
         hoursEnd = end;
-        TimeWindow window = settings.timeWindow().getValue();
+        var window = settings.timeWindow().getValue();
         UpStepper.Formatter hourLabel = value -> String.format(Locale.ROOT, "%02d:00", value);
         start.setFormatter(hourLabel);
         end.setFormatter(hourLabel);
         applyHourRanges(window);
 
         start.setOnValueChangedListener(value -> {
-            TimeWindow current = settings.timeWindow().getValue();
-            TimeWindow updated = new TimeWindow(value, current.endHour());
+            var current = settings.timeWindow().getValue();
+            var updated = new TimeWindow(value, current.endHour());
             settings.setTimeWindow(updated);
             applyHourRanges(updated);
         });
         end.setOnValueChangedListener(value -> {
-            TimeWindow current = settings.timeWindow().getValue();
-            TimeWindow updated = new TimeWindow(current.startHour(), value);
+            var current = settings.timeWindow().getValue();
+            var updated = new TimeWindow(current.startHour(), value);
             settings.setTimeWindow(updated);
             applyHourRanges(updated);
         });
@@ -170,7 +170,7 @@ public class SettingsFragment extends Fragment {
 
     private String versionName() {
         try {
-            String name = requireContext().getPackageManager()
+            var name = requireContext().getPackageManager()
                     .getPackageInfo(requireContext().getPackageName(), 0).versionName;
             return getString(R.string.about_version, name);
         } catch (PackageManager.NameNotFoundException unknown) {

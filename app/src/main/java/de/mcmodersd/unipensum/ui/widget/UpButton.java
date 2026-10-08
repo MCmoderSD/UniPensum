@@ -24,7 +24,7 @@ public class UpButton extends AppCompatTextView {
 
     public UpButton(Context context, AttributeSet attrs) {
         super(context, attrs);
-        float dp = getResources().getDisplayMetrics().density;
+        var dp = getResources().getDisplayMetrics().density;
 
         setGravity(Gravity.CENTER);
         setMinHeight(Math.round(52 * dp));
@@ -35,9 +35,9 @@ public class UpButton extends AppCompatTextView {
         setFocusable(true);
         setAllCaps(false);
 
-        Variant variant = Variant.PRIMARY;
+        var variant = Variant.PRIMARY;
         if (attrs != null) {
-            TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.UpButton);
+            var array = context.obtainStyledAttributes(attrs, R.styleable.UpButton);
             variant = Variant.values()[array.getInt(R.styleable.UpButton_upVariant, 0)];
             array.recycle();
         }
@@ -62,7 +62,7 @@ public class UpButton extends AppCompatTextView {
                 text = R.color.text_on_accent;
                 break;
         }
-        GradientDrawable background = new GradientDrawable();
+        var background = new GradientDrawable();
         background.setCornerRadius(14 * getResources().getDisplayMetrics().density);
         background.setColor(ContextCompat.getColor(getContext(), fill));
         setBackground(background);

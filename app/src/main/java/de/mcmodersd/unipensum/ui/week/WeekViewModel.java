@@ -21,7 +21,7 @@ public class WeekViewModel extends AndroidViewModel {
 
     public WeekViewModel(@NonNull Application application) {
         super(application);
-        UniPensumApp app = UniPensumApp.from(application);
+        var app = UniPensumApp.from(application);
         timetable = app.repository().timetable();
         timeWindow = app.settings().timeWindow();
         lecturerNameStyle = app.settings().lecturerNameStyle();

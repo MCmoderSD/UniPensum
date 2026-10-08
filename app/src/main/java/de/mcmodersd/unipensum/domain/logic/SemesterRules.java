@@ -33,16 +33,16 @@ public final class SemesterRules {
     /** @param others all other semesters; one with the same id as the candidate is ignored */
     public static SemesterCheck check(Semester candidate, List<Semester> others) {
         if (!candidate.end().isAfter(candidate.start())) return SemesterCheck.INVALID_RANGE;
-        for (Semester other : others) {
+        for (var other : others) {
             if (other.id() == candidate.id()) continue;
-            boolean overlaps = !candidate.start().isAfter(other.end()) && !other.start().isAfter(candidate.end());
+            var overlaps = !candidate.start().isAfter(other.end()) && !other.start().isAfter(candidate.end());
             if (overlaps) return SemesterCheck.OVERLAPS_OTHER;
         }
         return SemesterCheck.OK;
     }
 
     public static boolean isWeekday(LocalDate day) {
-        DayOfWeek weekday = day.getDayOfWeek();
+        var weekday = day.getDayOfWeek();
         return weekday != DayOfWeek.SATURDAY && weekday != DayOfWeek.SUNDAY;
     }
 
@@ -69,27 +69,27 @@ public final class SemesterRules {
      * @param sessions all sessions of those series
      */
     public static ChangeSet resize(Semester old, Semester updated, List<Series> series, List<Session> sessions) {
-        ChangeSet changes = new ChangeSet();
-        Set<Long> deletedSeries = new HashSet<>();
+        var changes = new ChangeSet();
+        var deletedSeries = new HashSet<Long>();
 
-        for (Series current : series) {
-            Schedule schedule = current.schedule();
+        for (var current : series) {
+            var schedule = current.schedule();
 
-            LocalDate newFirst = schedule.first();
+            var newFirst = schedule.first();
             if (newFirst.isBefore(updated.start())) {
                 // Keep the phase of the chain for intervals above one week.
                 newFirst = Recurrence.firstOnOrAfter(schedule, updated.start()).orElse(updated.start());
             }
 
-            LocalDate newLast = schedule.last();
+            var newLast = schedule.last();
             if (newLast.isAfter(updated.end())) {
                 newLast = updated.end();
             } else if (newLast.equals(old.end()) && updated.end().isAfter(old.end())) {
                 newLast = updated.end();
             }
 
-            Schedule resized = new Schedule(schedule.weekday(), newFirst, newLast, schedule.intervalWeeks());
-            boolean keepsSessions = sessions.stream()
+            var resized = new Schedule(schedule.weekday(), newFirst, newLast, schedule.intervalWeeks());
+            var keepsSessions = sessions.stream()
                     .anyMatch(s -> s.seriesId() == current.id() && updated.contains(s.day()));
             if (Recurrence.occurrences(resized).isEmpty() && !keepsSessions) {
                 changes.deletedSeriesIds.add(current.id());
@@ -101,7 +101,7 @@ public final class SemesterRules {
                 changes.updatedSeries.add(current.withSchedule(resized));
             }
             if (newLast.isAfter(schedule.last())) {
-                for (LocalDate day : Recurrence.occurrences(resized)) {
+                for (var day : Recurrence.occurrences(resized)) {
                     if (day.isAfter(schedule.last())) {
                         changes.newSessions.add(new Session(0, current.id(), day, current.details()));
                     }
@@ -109,7 +109,7 @@ public final class SemesterRules {
             }
         }
 
-        for (Session session : sessions) {
+        for (var session : sessions) {
             if (deletedSeries.contains(session.seriesId())) continue;
             if (!updated.contains(session.day())) changes.deletedSessionIds.add(session.id());
         }

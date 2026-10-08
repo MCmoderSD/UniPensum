@@ -25,27 +25,27 @@ public final class TimeFormat {
 
     /** "08:00" on 24h devices, "8:00 AM" otherwise. */
     public static String time(Context context, int minutesSinceMidnight) {
-        LocalTime time = LocalTime.of(minutesSinceMidnight / 60 % 24, minutesSinceMidnight % 60);
-        String pattern = DateFormat.is24HourFormat(context) ? "HH:mm" : "h:mm a";
+        var time = LocalTime.of(minutesSinceMidnight / 60 % 24, minutesSinceMidnight % 60);
+        var pattern = DateFormat.is24HourFormat(context) ? "HH:mm" : "h:mm a";
         return DateTimeFormatter.ofPattern(pattern, locale(context)).format(time);
     }
 
     /** Full hour for the grid axis: "07:00" or "7 AM". */
     public static String hour(Context context, int hour) {
-        LocalTime time = LocalTime.of(hour % 24, 0);
-        String pattern = DateFormat.is24HourFormat(context) ? "HH:mm" : "h a";
+        var time = LocalTime.of(hour % 24, 0);
+        var pattern = DateFormat.is24HourFormat(context) ? "HH:mm" : "h a";
         return DateTimeFormatter.ofPattern(pattern, locale(context)).format(time);
     }
 
     /** "Oct 5" or "5. Okt": the order and the punctuation of the app language, which needs no translated pattern. */
     public static String dateShort(Context context, LocalDate date) {
-        Locale locale = locale(context);
+        var locale = locale(context);
         return DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "MMMd"), locale).format(date);
     }
 
     /** "October 2026" for the title of a month, in the form of the app language. */
     public static String monthYear(Context context, YearMonth month) {
-        Locale locale = locale(context);
+        var locale = locale(context);
         return DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "yyyyLLLL"), locale).format(month);
     }
 

@@ -70,24 +70,24 @@ final class WeekHeaderView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Locale locale = TimeFormat.locale(getContext());
-        float columnWidth = metrics.columnWidth(getWidth());
-        float weekdayBaseline = getHeight() * 0.36f;
-        float numberCenter = getHeight() * 0.70f;
-        float radius = numberPaint.getTextSize() * 0.95f;
+        var locale = TimeFormat.locale(getContext());
+        var columnWidth = metrics.columnWidth(getWidth());
+        var weekdayBaseline = getHeight() * 0.36f;
+        var numberCenter = getHeight() * 0.70f;
+        var radius = numberPaint.getTextSize() * 0.95f;
 
-        for (int i = 0; i < 5; i++) {
-            LocalDate day = monday.plusDays(i);
-            float centerX = metrics.gutter + columnWidth * (i + 0.5f);
+        for (var i = 0; i < 5; i++) {
+            var day = monday.plusDays(i);
+            var centerX = metrics.gutter + columnWidth * (i + 0.5f);
 
-            String weekday = DayOfWeek.of(i + 1).getDisplayName(TextStyle.SHORT, locale);
+            var weekday = DayOfWeek.of(i + 1).getDisplayName(TextStyle.SHORT, locale);
             canvas.drawText(weekday.toUpperCase(locale), centerX, weekdayBaseline, weekdayPaint);
 
-            boolean isToday = day.equals(today);
+            var isToday = day.equals(today);
             if (isToday) canvas.drawCircle(centerX, numberCenter, radius, circlePaint);
             numberPaint.setColor(isToday ? onAccent : primary);
-            Paint.FontMetrics fm = numberPaint.getFontMetrics();
-            float baseline = numberCenter - (fm.ascent + fm.descent) / 2f;
+            var fm = numberPaint.getFontMetrics();
+            var baseline = numberCenter - (fm.ascent + fm.descent) / 2f;
             canvas.drawText(String.valueOf(day.getDayOfMonth()), centerX, baseline, numberPaint);
         }
     }

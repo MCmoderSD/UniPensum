@@ -44,18 +44,18 @@ final class Rows {
     }
 
     static int nullableInt(Cursor cursor, String column, int whenNull) {
-        int index = cursor.getColumnIndexOrThrow(column);
+        var index = cursor.getColumnIndexOrThrow(column);
         return cursor.isNull(index) ? whenNull : cursor.getInt(index);
     }
 
     /** {@code NULL} reads as 0, which is how the domain says "no lecturer". */
     static long longOrZero(Cursor cursor, String column) {
-        int index = cursor.getColumnIndexOrThrow(column);
+        var index = cursor.getColumnIndexOrThrow(column);
         return cursor.isNull(index) ? 0 : cursor.getLong(index);
     }
 
     static String string(Cursor cursor, String column) {
-        int index = cursor.getColumnIndexOrThrow(column);
+        var index = cursor.getColumnIndexOrThrow(column);
         return cursor.isNull(index) ? null : cursor.getString(index);
     }
 

@@ -48,8 +48,8 @@ public final class BackupCleaner {
 
     private Map<Long, Lecturer> cleanLecturers(List<Lecturer> raw) {
         var kept = new LinkedHashMap<Long, Lecturer>();
-        for (Lecturer lecturer : raw) {
-            Lecturer clean = lecturer.normalized();
+        for (var lecturer : raw) {
+            var clean = lecturer.normalized();
             if (lecturer.id() <= 0 || kept.containsKey(lecturer.id()) || clean.lastName().isEmpty()) {
                 skipped++;
                 continue;

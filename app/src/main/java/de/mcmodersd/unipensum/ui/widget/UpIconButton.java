@@ -45,8 +45,8 @@ public class UpIconButton extends AppCompatImageView {
 
     public UpIconButton(Context context, AttributeSet attrs) {
         super(context, attrs);
-        float dp = getResources().getDisplayMetrics().density;
-        int padding = Math.round(10 * dp);
+        var dp = getResources().getDisplayMetrics().density;
+        var padding = Math.round(10 * dp);
         setPadding(padding, padding, padding, padding);
         setScaleType(ImageView.ScaleType.FIT_CENTER);
         setClickable(true);
@@ -57,7 +57,7 @@ public class UpIconButton extends AppCompatImageView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int size = Math.round(44 * getResources().getDisplayMetrics().density);
+        var size = Math.round(44 * getResources().getDisplayMetrics().density);
         setMeasuredDimension(resolveSize(size, widthMeasureSpec), resolveSize(size, heightMeasureSpec));
     }
 
@@ -99,9 +99,9 @@ public class UpIconButton extends AppCompatImageView {
                     removeCallbacks(repeater);
                     if (held) {
                         // The hold has done the steps already, so letting go must not count as one more tap.
-                        MotionEvent cancel = MotionEvent.obtain(event);
+                        var cancel = MotionEvent.obtain(event);
                         cancel.setAction(MotionEvent.ACTION_CANCEL);
-                        boolean handled = super.onTouchEvent(cancel);
+                        var handled = super.onTouchEvent(cancel);
                         cancel.recycle();
                         return handled;
                     }

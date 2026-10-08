@@ -52,10 +52,10 @@ public final class LecturerSheet extends UpSheet {
 
     /** @param selectedId the lecturer to mark as chosen, {@link SessionDetails#NO_LECTURER} for none */
     public static void showPicker(FragmentManager manager, String requestKey, long selectedId) {
-        Bundle args = new Bundle();
+        var args = new Bundle();
         args.putString(ARG_PICK_KEY, requestKey);
         args.putLong(ARG_SELECTED, selectedId);
-        LecturerSheet sheet = new LecturerSheet();
+        var sheet = new LecturerSheet();
         sheet.setArguments(args);
         sheet.show(manager, "lecturer-picker");
     }
@@ -66,7 +66,7 @@ public final class LecturerSheet extends UpSheet {
 
     @Nullable
     private String pickKey() {
-        Bundle args = getArguments();
+        var args = getArguments();
         return args == null ? null : args.getString(ARG_PICK_KEY);
     }
 
@@ -79,10 +79,10 @@ public final class LecturerSheet extends UpSheet {
     @Override
     protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
                                  @Nullable Bundle savedInstanceState) {
-        Context context = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
+        var context = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
 
-        LinearLayout column = new LinearLayout(context);
+        var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
 
         list = new LinearLayout(context);
@@ -90,11 +90,11 @@ public final class LecturerSheet extends UpSheet {
         column.addView(list, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        UpButton create = new UpButton(context);
+        var create = new UpButton(context);
         create.setText(R.string.lecturer_new);
         create.setOnClickListener(v ->
                 LecturerEditorSheet.show(getParentFragmentManager(), null, picking() ? KEY_CREATED : null));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.topMargin = Math.round(12 * dp);
         column.addView(create, params);
@@ -113,13 +113,13 @@ public final class LecturerSheet extends UpSheet {
     }
 
     private void render(List<Lecturer> lecturers) {
-        Context context = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
-        long selected = picking() ? requireArguments().getLong(ARG_SELECTED) : SessionDetails.NO_LECTURER;
+        var context = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
+        var selected = picking() ? requireArguments().getLong(ARG_SELECTED) : SessionDetails.NO_LECTURER;
         list.removeAllViews();
 
         if (picking()) {
-            UpRow none = new UpRow(context);
+            var none = new UpRow(context);
             none.setTitle(getString(R.string.lecturer_none));
             if (selected == SessionDetails.NO_LECTURER) none.setTrailingIcon(R.drawable.ic_check);
             none.setOnClickListener(v -> pick(SessionDetails.NO_LECTURER));
@@ -127,7 +127,7 @@ public final class LecturerSheet extends UpSheet {
         }
 
         if (lecturers.isEmpty() && !picking()) {
-            TextView empty = new TextView(context);
+            var empty = new TextView(context);
             empty.setText(R.string.lecturers_empty);
             empty.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
             empty.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
@@ -136,8 +136,8 @@ public final class LecturerSheet extends UpSheet {
             return;
         }
 
-        for (Lecturer lecturer : lecturers) {
-            UpRow row = new UpRow(context);
+        for (var lecturer : lecturers) {
+            var row = new UpRow(context);
             row.setTitle(lecturer.name(NameStyle.FULL_NAME));
             if (picking()) {
                 if (lecturer.id() == selected) row.setTrailingIcon(R.drawable.ic_check);
@@ -151,14 +151,14 @@ public final class LecturerSheet extends UpSheet {
     }
 
     private void pick(long lecturerId) {
-        Bundle result = new Bundle();
+        var result = new Bundle();
         result.putLong(RESULT_LECTURER_ID, lecturerId);
         getParentFragmentManager().setFragmentResult(requireArguments().getString(ARG_PICK_KEY), result);
         dismiss();
     }
 
     private static LinearLayout.LayoutParams rowParams(float dp) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.bottomMargin = Math.round(8 * dp);
         return params;

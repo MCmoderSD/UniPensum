@@ -115,8 +115,8 @@ final class WeekPageView extends LinearLayout {
     void bind(LocalDate monday, LocalDate today, TimeWindow window, NameStyle nameStyle, Timetable timetable,
               WeekGridView.OnSessionClickListener clickListener) {
         header.bind(monday, today);
-        List<List<SessionView>> perDay = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        var perDay = new ArrayList<List<SessionView>>();
+        for (var i = 0; i < 5; i++) {
             perDay.add(timetable == null ? List.of() : timetable.on(monday.plusDays(i)));
         }
         grid.bind(monday, window, nameStyle, perDay, clickListener);
@@ -179,7 +179,7 @@ final class WeekPageView extends LinearLayout {
     /** Sees every touch before the children do, and takes the touch away from them once it becomes a pinch. */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        int action = event.getActionMasked();
+        var action = event.getActionMasked();
         if (action == MotionEvent.ACTION_DOWN) {
             stopReset();
             swallowing = false;
@@ -188,14 +188,14 @@ final class WeekPageView extends LinearLayout {
             getParent().requestDisallowInterceptTouchEvent(true);
         }
 
-        boolean wasSwallowing = swallowing;
+        var wasSwallowing = swallowing;
         pinch.onTouchEvent(event);
         taps.onTouchEvent(event);
         if (!swallowing) return super.dispatchTouchEvent(event);
 
         if (!wasSwallowing) {
             // The scroll the first finger started ends here, without a fling.
-            MotionEvent cancel = MotionEvent.obtain(event);
+            var cancel = MotionEvent.obtain(event);
             cancel.setAction(MotionEvent.ACTION_CANCEL);
             super.dispatchTouchEvent(cancel);
             cancel.recycle();
@@ -218,12 +218,12 @@ final class WeekPageView extends LinearLayout {
      * Sets the zoom and keeps the time at {@code focusY} (measured in this page) where it is.
      */
     private void zoomTo(float requested, float focusY, boolean settled) {
-        float old = grid.zoom();
-        float next = ZoomMetrics.clamp(requested);
+        var old = grid.zoom();
+        var next = ZoomMetrics.clamp(requested);
         if (next != old) {
-            float focus = Math.max(0, focusY - scroll.getTop());
+            var focus = Math.max(0, focusY - scroll.getTop());
             float current = pendingScroll != NO_SCROLL ? pendingScroll : scroll.getScrollY();
-            float target = ZoomMetrics.scrollAfterZoom(current, focus, metrics.verticalPadding, next / old);
+            var target = ZoomMetrics.scrollAfterZoom(current, focus, metrics.verticalPadding, next / old);
             grid.setZoom(next);
             scrollAfterLayout(Math.round(target));
         }
@@ -237,7 +237,7 @@ final class WeekPageView extends LinearLayout {
     private void resetZoom(float focusY) {
         if (grid.zoom() == ZoomMetrics.MIN) return;
         stopReset();
-        ValueAnimator animator = ValueAnimator.ofFloat(grid.zoom(), ZoomMetrics.MIN);
+        var animator = ValueAnimator.ofFloat(grid.zoom(), ZoomMetrics.MIN);
         animator.setDuration(RESET_DURATION_MS);
         animator.setInterpolator(new DecelerateInterpolator());
         animator.addUpdateListener(a -> zoomTo((float) a.getAnimatedValue(), focusY, false));
@@ -263,7 +263,7 @@ final class WeekPageView extends LinearLayout {
         pendingScroll = y;
         afterNextLayout(() -> {
             if (pendingScroll == NO_SCROLL) return;
-            int target = pendingScroll;
+            var target = pendingScroll;
             pendingScroll = NO_SCROLL;
             scroll.scrollTo(0, target);
         });
@@ -284,7 +284,7 @@ final class WeekPageView extends LinearLayout {
         getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
-                ViewTreeObserver observer = getViewTreeObserver();
+                var observer = getViewTreeObserver();
                 if (observer.isAlive()) observer.removeOnPreDrawListener(this);
                 action.run();
                 return true;

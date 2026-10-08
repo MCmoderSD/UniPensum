@@ -34,7 +34,7 @@ public final class SemesterDao {
 
     /** @return {@code null} if there is no such semester */
     public static Semester get(SQLiteDatabase db, long id) {
-        try (Cursor cursor = db.query("semester", null, "id = ?", new String[]{String.valueOf(id)},
+        try (var cursor = db.query("semester", null, "id = ?", new String[]{String.valueOf(id)},
                 null, null, null)) {
             return cursor.moveToFirst() ? read(cursor) : null;
         }
@@ -42,15 +42,15 @@ public final class SemesterDao {
 
     /** Ordered by start date. */
     public static List<Semester> list(SQLiteDatabase db) {
-        List<Semester> result = new ArrayList<>();
-        try (Cursor cursor = db.query("semester", null, null, null, null, null, "start_day, id")) {
+        var result = new ArrayList<Semester>();
+        try (var cursor = db.query("semester", null, null, null, null, null, "start_day, id")) {
             while (cursor.moveToNext()) result.add(read(cursor));
         }
         return result;
     }
 
     private static ContentValues values(Semester semester) {
-        ContentValues values = new ContentValues();
+        var values = new ContentValues();
         values.put("start_day", semester.start().toEpochDay());
         values.put("end_day", semester.end().toEpochDay());
         values.put("custom_name", semester.customName());

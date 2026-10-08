@@ -27,7 +27,7 @@ public final class SemesterDefaults {
      * end that would fall on one moves back to the Friday before.
      */
     public static LocalDate lectureEnd(LocalDate start) {
-        LocalDate end = start.plusWeeks(LECTURE_WEEKS).minusDays(1);
+        var end = start.plusWeeks(LECTURE_WEEKS).minusDays(1);
         if (end.getDayOfWeek() == DayOfWeek.SATURDAY) return end.minusDays(1);
         if (end.getDayOfWeek() == DayOfWeek.SUNDAY) return end.minusDays(2);
         return end;
@@ -38,10 +38,10 @@ public final class SemesterDefaults {
      * before {@code today} and does not overlap an existing semester.
      */
     public static Period suggest(LocalDate today, List<Semester> existing) {
-        for (int year = today.getYear() - 1; year <= today.getYear() + 3; year++) {
-            for (int month : new int[]{4, 10}) {
-                LocalDate start = LocalDate.of(year, month, 1).with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
-                LocalDate end = lectureEnd(start);
+        for (var year = today.getYear() - 1; year <= today.getYear() + 3; year++) {
+            for (var month : new int[]{4, 10}) {
+                var start = LocalDate.of(year, month, 1).with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+                var end = lectureEnd(start);
                 if (end.isBefore(today) || overlapsAny(start, end, existing)) continue;
                 return new Period(start, end);
             }
@@ -50,7 +50,7 @@ public final class SemesterDefaults {
     }
 
     private static boolean overlapsAny(LocalDate start, LocalDate end, List<Semester> existing) {
-        for (Semester semester : existing) {
+        for (var semester : existing) {
             if (!start.isAfter(semester.end()) && !semester.start().isAfter(end)) return true;
         }
         return false;

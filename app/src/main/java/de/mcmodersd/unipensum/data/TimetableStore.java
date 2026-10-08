@@ -54,19 +54,19 @@ public final class TimetableStore {
     }
 
     public static Timetable loadTimetable(SQLiteDatabase db) {
-        String sql = "SELECT s.*, c.id AS course_id, c.semester_id AS semester_id, "
+        var sql = "SELECT s.*, c.id AS course_id, c.semester_id AS semester_id, "
                 + "c.name AS course_name, c.color AS course_color, "
                 + "l.id AS lec_id, l.first_name AS lec_first_name, l.last_name AS lec_last_name, "
                 + "l.email AS lec_email, l.phone AS lec_phone "
                 + "FROM session s JOIN series r ON s.series_id = r.id JOIN course c ON r.course_id = c.id "
                 + "LEFT JOIN lecturer l ON s.lecturer_id = l.id "
                 + "ORDER BY s.day, s.start_min, s.id";
-        List<SessionView> views = new ArrayList<>();
-        try (Cursor cursor = db.rawQuery(sql, null)) {
-            int courseId = cursor.getColumnIndexOrThrow("course_id");
-            int semesterId = cursor.getColumnIndexOrThrow("semester_id");
-            int name = cursor.getColumnIndexOrThrow("course_name");
-            int color = cursor.getColumnIndexOrThrow("course_color");
+        var views = new ArrayList<SessionView>();
+        try (var cursor = db.rawQuery(sql, null)) {
+            var courseId = cursor.getColumnIndexOrThrow("course_id");
+            var semesterId = cursor.getColumnIndexOrThrow("semester_id");
+            var name = cursor.getColumnIndexOrThrow("course_name");
+            var color = cursor.getColumnIndexOrThrow("course_color");
             while (cursor.moveToNext()) {
                 views.add(new SessionView(
                         SessionDao.read(cursor),
@@ -85,13 +85,13 @@ public final class TimetableStore {
      * link of their course, which is what a reminder shows. Earliest first.
      */
     public static List<ReminderView> loadReminders(SQLiteDatabase db, LocalDate from) {
-        String sql = "SELECT s.*, c.name AS course_name, c.moodle_link AS moodle_link "
+        var sql = "SELECT s.*, c.name AS course_name, c.moodle_link AS moodle_link "
                 + "FROM session s JOIN series r ON s.series_id = r.id JOIN course c ON r.course_id = c.id "
                 + "WHERE s.day >= ? AND s.reminder_min IS NOT NULL ORDER BY s.day, s.start_min, s.id";
-        List<ReminderView> views = new ArrayList<>();
-        try (Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(from.toEpochDay())})) {
-            int name = cursor.getColumnIndexOrThrow("course_name");
-            int moodle = cursor.getColumnIndexOrThrow("moodle_link");
+        var views = new ArrayList<ReminderView>();
+        try (var cursor = db.rawQuery(sql, new String[]{String.valueOf(from.toEpochDay())})) {
+            var name = cursor.getColumnIndexOrThrow("course_name");
+            var moodle = cursor.getColumnIndexOrThrow("moodle_link");
             while (cursor.moveToNext()) {
                 views.add(new ReminderView(SessionDao.read(cursor), cursor.getString(name),
                         cursor.isNull(moodle) ? null : cursor.getString(moodle)));
@@ -101,8 +101,8 @@ public final class TimetableStore {
     }
 
     public static List<CourseWithSeries> listCourses(SQLiteDatabase db, long semesterId) {
-        List<CourseWithSeries> result = new ArrayList<>();
-        for (Course course : CourseDao.listBySemester(db, semesterId)) {
+        var result = new ArrayList<CourseWithSeries>();
+        for (var course : CourseDao.listBySemester(db, semesterId)) {
             result.add(new CourseWithSeries(course, SeriesDao.listByCourse(db, course.id())));
         }
         return result;
@@ -119,7 +119,7 @@ public final class TimetableStore {
         Series series = require(SeriesDao.get(db, session.seriesId()), "series", session.seriesId());
         Course course = require(CourseDao.get(db, series.courseId()), "course", series.courseId());
         Semester semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
-        long lecturerId = session.details().lecturerId();
+        var lecturerId = session.details().lecturerId();
         Lecturer lecturer = lecturerId == SessionDetails.NO_LECTURER ? null : LecturerDao.get(db, lecturerId);
         return new SessionContext(session, series, course, semester, lecturer);
     }
@@ -128,11 +128,11 @@ public final class TimetableStore {
 
     /** Everything in the database, for a backup. */
     public static BackupData exportData(SQLiteDatabase db) {
-        List<Semester> semesters = SemesterDao.list(db);
-        List<Course> courses = new ArrayList<>();
-        List<Series> series = new ArrayList<>();
-        List<Session> sessions = new ArrayList<>();
-        for (Semester semester : semesters) {
+        var semesters = SemesterDao.list(db);
+        var courses = new ArrayList<Course>();
+        var series = new ArrayList<Series>();
+        var sessions = new ArrayList<Session>();
+        for (var semester : semesters) {
             courses.addAll(CourseDao.listBySemester(db, semester.id()));
             series.addAll(SeriesDao.listBySemester(db, semester.id()));
             sessions.addAll(SessionDao.listBySemester(db, semester.id()));
@@ -153,28 +153,28 @@ public final class TimetableStore {
             SemesterDao.deleteAll(db);
             LecturerDao.deleteAll(db);
 
-            Map<Long, Long> lecturerIds = new HashMap<>();
-            for (Lecturer lecturer : data.lecturers()) {
+            var lecturerIds = new HashMap<Long, Long>();
+            for (var lecturer : data.lecturers()) {
                 lecturerIds.put(lecturer.id(), LecturerDao.insert(db, lecturer));
             }
-            Map<Long, Long> semesterIds = new HashMap<>();
-            for (Semester semester : data.semesters()) {
+            var semesterIds = new HashMap<Long, Long>();
+            for (var semester : data.semesters()) {
                 semesterIds.put(semester.id(), SemesterDao.insert(db, semester));
             }
-            Map<Long, Long> courseIds = new HashMap<>();
-            for (Course course : data.courses()) {
-                long semesterId = mapped(semesterIds, course.semesterId(), "semester");
+            var courseIds = new HashMap<Long, Long>();
+            for (var course : data.courses()) {
+                var semesterId = mapped(semesterIds, course.semesterId(), "semester");
                 courseIds.put(course.id(), CourseDao.insert(db,
                         new Course(0, semesterId, course.name(), course.color(), course.moodleLink())));
             }
-            Map<Long, Long> seriesIds = new HashMap<>();
-            for (Series series : data.series()) {
-                long courseId = mapped(courseIds, series.courseId(), "course");
+            var seriesIds = new HashMap<Long, Long>();
+            for (var series : data.series()) {
+                var courseId = mapped(courseIds, series.courseId(), "course");
                 seriesIds.put(series.id(), SeriesDao.insert(db,
                         new Series(0, courseId, withLecturer(series.details(), lecturerIds), series.schedule())));
             }
-            for (Session session : data.sessions()) {
-                long seriesId = mapped(seriesIds, session.seriesId(), "series");
+            for (var session : data.sessions()) {
+                var seriesId = mapped(seriesIds, session.seriesId(), "series");
                 SessionDao.insert(db, new Session(0, seriesId, session.day(),
                         withLecturer(session.details(), lecturerIds)));
             }
@@ -183,14 +183,14 @@ public final class TimetableStore {
     }
 
     private static long mapped(Map<Long, Long> ids, long oldId, String what) {
-        Long id = ids.get(oldId);
+        var id = ids.get(oldId);
         if (id == null) throw new IllegalArgumentException("The backup refers to a " + what + " it does not hold: " + oldId);
         return id;
     }
 
     /** The details with the lecturer id of the data replaced by the one the lecturer got in the database. */
     private static SessionDetails withLecturer(SessionDetails d, Map<Long, Long> lecturerIds) {
-        long lecturer = d.lecturerId() == SessionDetails.NO_LECTURER
+        var lecturer = d.lecturerId() == SessionDetails.NO_LECTURER
                 ? SessionDetails.NO_LECTURER : mapped(lecturerIds, d.lecturerId(), "lecturer");
         return d.withLecturer(lecturer);
     }
@@ -204,7 +204,7 @@ public final class TimetableStore {
      * @throws IllegalArgumentException if the last name is blank
      */
     public static long saveLecturer(SQLiteDatabase db, Lecturer lecturer) {
-        Lecturer clean = lecturer.normalized();
+        var clean = lecturer.normalized();
         if (clean.lastName().isEmpty()) throw new IllegalArgumentException("The last name must not be empty");
         if (clean.id() == 0) return LecturerDao.insert(db, clean);
         require(LecturerDao.get(db, clean.id()), "lecturer", clean.id());
@@ -226,11 +226,11 @@ public final class TimetableStore {
      * @return the semester id
      */
     public static long saveSemester(SQLiteDatabase db, Semester semester) {
-        String customName = TextSanitizer.lineOrNull(semester.customName(), TextSanitizer.MAX_NAME);
-        Semester clean = new Semester(semester.id(), semester.start(), semester.end(), customName);
+        var customName = TextSanitizer.lineOrNull(semester.customName(), TextSanitizer.MAX_NAME);
+        var clean = new Semester(semester.id(), semester.start(), semester.end(), customName);
 
         return transact(db, () -> {
-            SemesterRules.SemesterCheck check = SemesterRules.check(clean, SemesterDao.list(db));
+            var check = SemesterRules.check(clean, SemesterDao.list(db));
             if (check != SemesterRules.SemesterCheck.OK) {
                 throw new IllegalArgumentException("Invalid semester period: " + check);
             }
@@ -261,9 +261,9 @@ public final class TimetableStore {
     public static long createCourse(SQLiteDatabase db, Course course, List<Series> series) {
         return transact(db, () -> {
             Semester semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
-            long courseId = CourseDao.insert(db, new Course(0, semester.id(), requireName(course.name()),
+            var courseId = CourseDao.insert(db, new Course(0, semester.id(), requireName(course.name()),
                     course.color(), cleanLink(course.moodleLink())));
-            for (Series template : series) insertSeries(db, semester, courseId, template);
+            for (var template : series) insertSeries(db, semester, courseId, template);
             return courseId;
         });
     }
@@ -280,21 +280,21 @@ public final class TimetableStore {
      */
     public static void saveCourse(SQLiteDatabase db, Course course, List<Series> drafts) {
         transact(db, () -> {
-            CourseContext stored = loadCourse(db, course.id());
+            var stored = loadCourse(db, course.id());
             CourseDao.update(db, new Course(course.id(), stored.course().semesterId(),
                     requireName(course.name()), course.color(), cleanLink(course.moodleLink())));
 
-            Map<Long, Series> storedById = new HashMap<>();
-            for (Series series : stored.series()) storedById.put(series.id(), series);
-            Set<Long> kept = new HashSet<>();
-            for (Series draft : drafts) {
+            var storedById = new HashMap<Long, Series>();
+            for (var series : stored.series()) storedById.put(series.id(), series);
+            var kept = new HashSet<Long>();
+            for (var draft : drafts) {
                 if (draft.id() != 0) kept.add(draft.id());
             }
-            for (Series series : stored.series()) {
+            for (var series : stored.series()) {
                 if (!kept.contains(series.id())) SeriesDao.delete(db, series.id());
             }
 
-            for (Series draft : drafts) {
+            for (var draft : drafts) {
                 if (draft.id() == 0) {
                     insertSeries(db, stored.semester(), course.id(), draft);
                     continue;
@@ -303,7 +303,7 @@ public final class TimetableStore {
                 // Untouched events are skipped before their text is validated, so an old value that today's
                 // rules would refuse (a link written long ago) cannot block saving the rest of the course.
                 if (current.details().equals(draft.details()) && current.schedule().equals(draft.schedule())) continue;
-                SessionDetails details = requireValid(db, draft.details());
+                var details = requireValid(db, draft.details());
                 apply(db, SeriesEditor.editSeries(stored.semester(), current,
                         SessionDao.listBySeries(db, current.id()), details, draft.schedule()));
             }
@@ -339,8 +339,8 @@ public final class TimetableStore {
     public static void editSession(SQLiteDatabase db, long sessionId, EditScope scope,
                                    SessionDetails details, LocalDate day, Schedule schedule) {
         transact(db, () -> {
-            SessionContext context = loadSessionContext(db, sessionId);
-            List<Session> sessions = SessionDao.listBySeries(db, context.series().id());
+            var context = loadSessionContext(db, sessionId);
+            var sessions = SessionDao.listBySeries(db, context.series().id());
             apply(db, SeriesEditor.edit(context.semester(), context.series(), sessions, sessionId, scope,
                     requireValid(db, details), day, schedule));
             return null;
@@ -349,8 +349,8 @@ public final class TimetableStore {
 
     public static void deleteSession(SQLiteDatabase db, long sessionId, EditScope scope) {
         transact(db, () -> {
-            SessionContext context = loadSessionContext(db, sessionId);
-            List<Session> sessions = SessionDao.listBySeries(db, context.series().id());
+            var context = loadSessionContext(db, sessionId);
+            var sessions = SessionDao.listBySeries(db, context.series().id());
             apply(db, SeriesEditor.delete(context.series(), sessions, sessionId, scope));
             return null;
         });
@@ -359,13 +359,13 @@ public final class TimetableStore {
     // --- internals ---
 
     private static long insertSeries(SQLiteDatabase db, Semester semester, long courseId, Series template) {
-        SessionDetails details = requireValid(db, template.details());
-        Schedule schedule = template.schedule();
+        var details = requireValid(db, template.details());
+        var schedule = template.schedule();
         if (SemesterRules.checkSchedule(semester, schedule) != SemesterRules.ScheduleCheck.OK) {
             throw new IllegalArgumentException("Schedule does not fit the semester: " + schedule);
         }
-        long seriesId = SeriesDao.insert(db, new Series(0, courseId, details, schedule));
-        for (LocalDate day : Recurrence.occurrences(schedule)) {
+        var seriesId = SeriesDao.insert(db, new Series(0, courseId, details, schedule));
+        for (var day : Recurrence.occurrences(schedule)) {
             SessionDao.insert(db, new Session(0, seriesId, day, details));
         }
         return seriesId;
@@ -374,15 +374,15 @@ public final class TimetableStore {
     private static void apply(SQLiteDatabase db, ChangeSet changes) {
         for (long id : changes.deletedSeriesIds) SeriesDao.delete(db, id);
         for (long id : changes.deletedSessionIds) SessionDao.delete(db, id);
-        for (Series series : changes.updatedSeries) SeriesDao.update(db, series);
-        for (Session session : changes.updatedSessions) SessionDao.update(db, session);
-        for (Session session : changes.newSessions) SessionDao.insert(db, session);
-        for (ChangeSet.NewSeries created : changes.newSeries) {
-            long seriesId = SeriesDao.insert(db, created.series());
-            for (Session session : created.sessions()) {
+        for (var series : changes.updatedSeries) SeriesDao.update(db, series);
+        for (var session : changes.updatedSessions) SessionDao.update(db, session);
+        for (var session : changes.newSessions) SessionDao.insert(db, session);
+        for (var created : changes.newSeries) {
+            var seriesId = SeriesDao.insert(db, created.series());
+            for (var session : created.sessions()) {
                 SessionDao.insert(db, new Session(0, seriesId, session.day(), session.details()));
             }
-            for (Session session : created.adopted()) {
+            for (var session : created.adopted()) {
                 SessionDao.update(db, new Session(session.id(), seriesId, session.day(), session.details()));
             }
         }
@@ -391,7 +391,7 @@ public final class TimetableStore {
     private static <T> T transact(SQLiteDatabase db, Supplier<T> body) {
         db.beginTransaction();
         try {
-            T result = body.get();
+            var result = body.get();
             db.setTransactionSuccessful();
             return result;
         } finally {
@@ -404,7 +404,7 @@ public final class TimetableStore {
      * dropped instead of failing the save, so the rest of the edit still goes through.
      */
     private static SessionDetails requireValid(SQLiteDatabase db, SessionDetails details) {
-        SessionDetails clean = details.normalized();
+        var clean = details.normalized();
         if (!clean.hasValidTimes()) throw new IllegalArgumentException("Invalid start or end time");
         if (clean.lecturerId() != SessionDetails.NO_LECTURER && LecturerDao.get(db, clean.lecturerId()) == null) {
             return clean.withLecturer(SessionDetails.NO_LECTURER);
@@ -418,7 +418,7 @@ public final class TimetableStore {
     }
 
     private static String requireName(String name) {
-        String clean = TextSanitizer.line(name, TextSanitizer.MAX_NAME);
+        var clean = TextSanitizer.line(name, TextSanitizer.MAX_NAME);
         if (clean.isEmpty()) throw new IllegalArgumentException("The name must not be empty");
         return clean;
     }

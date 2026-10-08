@@ -14,7 +14,7 @@ public final class SemesterNames {
     /** The custom name if there is one, otherwise "WiSe 26/27" or "SoSe 27" in the app language. */
     public static String display(Context context, Semester semester) {
         if (semester.customName() != null) return semester.customName();
-        SemesterNamer.Label label = SemesterNamer.label(semester.start());
+        var label = SemesterNamer.label(semester.start());
         if (label.season() == SemesterNamer.Season.WINTER) {
             return context.getString(R.string.semester_winter, label.year() % 100, (label.year() + 1) % 100);
         }

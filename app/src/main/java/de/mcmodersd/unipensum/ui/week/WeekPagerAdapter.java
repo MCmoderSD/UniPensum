@@ -75,7 +75,7 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     @NonNull
     @Override
     public PageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        WeekPageView page = new WeekPageView(parent.getContext(), new GridMetrics(parent.getContext()));
+        var page = new WeekPageView(parent.getContext(), new GridMetrics(parent.getContext()));
         page.setLayoutParams(new RecyclerView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         page.setScrollListener(this::onPageScrolled);
@@ -113,7 +113,7 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
         zoom = newZoom;
         if (zoomListener != null) zoomListener.onZoomChanged(newZoom);
         if (!settled) return;
-        for (WeekPageView page : attached) {
+        for (var page : attached) {
             if (page != source) page.followZoom(newZoom, currentScrollY);
         }
     }
@@ -121,7 +121,7 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     /** Keeps the vertical position the same on every page, so swiping weeks never jumps. */
     private void onPageScrolled(WeekPageView source, int y) {
         scrollY = y;
-        for (WeekPageView page : attached) {
+        for (var page : attached) {
             if (page != source && page.scrollY() != y) page.followWhenReady(currentScrollY);
         }
     }

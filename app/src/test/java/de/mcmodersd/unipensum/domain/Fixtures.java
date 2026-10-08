@@ -24,7 +24,7 @@ public final class Fixtures {
     }
 
     public static LocalDate date(int month, int day) {
-        int year = month >= 9 ? 2026 : 2027;
+        var year = month >= 9 ? 2026 : 2027;
         return LocalDate.of(year, month, day);
     }
 
@@ -62,16 +62,16 @@ public final class Fixtures {
 
     /** One session per occurrence, ids counting up from {@code firstSessionId}. */
     public static List<Session> sessionsOf(Series series, long firstSessionId) {
-        List<Session> result = new ArrayList<>();
-        long id = firstSessionId;
-        for (LocalDate day : Recurrence.occurrences(series.schedule())) {
+        var result = new ArrayList<Session>();
+        var id = firstSessionId;
+        for (var day : Recurrence.occurrences(series.schedule())) {
             result.add(new Session(id++, series.id(), day, series.details()));
         }
         return result;
     }
 
     public static Session byId(List<Session> sessions, long id) {
-        for (Session session : sessions) {
+        for (var session : sessions) {
             if (session.id() == id) return session;
         }
         throw new AssertionError("No session " + id);

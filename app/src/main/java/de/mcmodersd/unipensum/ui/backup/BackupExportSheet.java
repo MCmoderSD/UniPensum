@@ -73,32 +73,32 @@ public final class BackupExportSheet extends UpSheet {
     @Override
     protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
                                  @Nullable Bundle savedInstanceState) {
-        Context context = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
+        var context = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
 
-        LinearLayout column = new LinearLayout(context);
+        var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
 
         // The form: explanation, password switch, password fields, button.
-        LinearLayout formColumn = new LinearLayout(context);
+        var formColumn = new LinearLayout(context);
         formColumn.setOrientation(LinearLayout.VERTICAL);
         form = formColumn;
 
         formColumn.addView(text(context, R.string.backup_export_description, 16, R.color.text_secondary),
                 spaced(dp, 0, 16));
 
-        LinearLayout switchRow = new LinearLayout(context);
+        var switchRow = new LinearLayout(context);
         switchRow.setGravity(Gravity.CENTER_VERTICAL);
         switchRow.setMinimumHeight(Math.round(48 * dp));
         switchRow.setPadding(Math.round(4 * dp), 0, Math.round(4 * dp), 0);
-        TextView switchLabel = text(context, R.string.backup_protect, 16, R.color.text_primary);
+        var switchLabel = text(context, R.string.backup_protect, 16, R.color.text_primary);
         switchRow.addView(switchLabel, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         protect = new UpSwitch(context);
         protect.setContentDescription(getString(R.string.backup_protect));
         switchRow.addView(protect);
         formColumn.addView(switchRow, spaced(dp, 0, 8));
 
-        LinearLayout block = new LinearLayout(context);
+        var block = new LinearLayout(context);
         block.setOrientation(LinearLayout.VERTICAL);
         block.setVisibility(View.GONE);
         passwordBlock = block;
@@ -106,7 +106,7 @@ public final class BackupExportSheet extends UpSheet {
         block.addView(password, spaced(dp, 0, 12));
         repeat = passwordField(context, R.string.backup_password_repeat);
         block.addView(repeat, spaced(dp, 0, 8));
-        TextView hint = text(context, R.string.backup_password_hint, 13, R.color.text_secondary);
+        var hint = text(context, R.string.backup_password_hint, 13, R.color.text_secondary);
         hint.setPadding(Math.round(4 * dp), 0, Math.round(4 * dp), 0);
         block.addView(hint, spaced(dp, 0, 8));
         formColumn.addView(block, spaced(dp, 0, 0));
@@ -132,7 +132,7 @@ public final class BackupExportSheet extends UpSheet {
     }
 
     private UpTextField passwordField(Context context, @StringRes int label) {
-        UpTextField field = new UpTextField(context);
+        var field = new UpTextField(context);
         field.setLabel(getString(label));
         field.setPassword();
         field.addTextWatcher(ignored -> field.setError(null));
@@ -150,8 +150,8 @@ public final class BackupExportSheet extends UpSheet {
         char[] chars = null;
         if (protect.isChecked()) {
             chars = password.getTextChars();
-            char[] again = repeat.getTextChars();
-            boolean valid = true;
+            var again = repeat.getTextChars();
+            var valid = true;
             if (chars.length < MIN_PASSWORD_LENGTH) {
                 password.setError(getResources().getQuantityString(R.plurals.backup_error_password_short,
                         MIN_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH));
@@ -176,9 +176,9 @@ public final class BackupExportSheet extends UpSheet {
 
     /** The answer of the system dialog: where to save, or {@code null} if the user backed out. */
     private void onTargetChosen(@Nullable Uri target) {
-        boolean mine = awaitingTarget;
+        var mine = awaitingTarget;
         awaitingTarget = false;
-        char[] chars = pendingPassword;
+        var chars = pendingPassword;
         pendingPassword = null;
         if (getView() == null) {
             clear(chars);
@@ -225,7 +225,7 @@ public final class BackupExportSheet extends UpSheet {
     }
 
     private TextView text(Context context, @StringRes int resource, float sp, int colorRes) {
-        TextView view = new TextView(context);
+        var view = new TextView(context);
         view.setText(resource);
         view.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
         view.setTextColor(ContextCompat.getColor(context, colorRes));
@@ -237,7 +237,7 @@ public final class BackupExportSheet extends UpSheet {
     }
 
     private static LinearLayout.LayoutParams spaced(float dp, int topDp, int bottomDp) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);

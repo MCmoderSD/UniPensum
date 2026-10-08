@@ -54,9 +54,9 @@ public class UpSegmentedControl extends LinearLayout {
     public UpSegmentedControl(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOrientation(HORIZONTAL);
-        int padding = Math.round(3 * dp);
+        var padding = Math.round(3 * dp);
         setPadding(padding, padding, padding, padding);
-        GradientDrawable background = new GradientDrawable();
+        var background = new GradientDrawable();
         background.setCornerRadius(14 * dp);
         background.setColor(ContextCompat.getColor(context, R.color.surface));
         setBackground(background);
@@ -70,8 +70,8 @@ public class UpSegmentedControl extends LinearLayout {
     public void setOptions(CharSequence... labels) {
         removeAllViews();
         segments.clear();
-        for (int i = 0; i < labels.length; i++) {
-            TextView segment = new TextView(getContext());
+        for (var i = 0; i < labels.length; i++) {
+            var segment = new TextView(getContext());
             segment.setText(labels[i]);
             segment.setGravity(Gravity.CENTER);
             segment.setMaxLines(1);
@@ -81,7 +81,7 @@ public class UpSegmentedControl extends LinearLayout {
             segment.setPadding(Math.round(4 * dp), 0, Math.round(4 * dp), 0);
             segment.setClickable(true);
             segment.setFocusable(true);
-            final int index = i;
+            final var index = i;
             segment.setOnClickListener(v -> select(index));
             addView(segment, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
             segments.add(segment);
@@ -122,9 +122,9 @@ public class UpSegmentedControl extends LinearLayout {
 
     private void moveTo(float newPosition) {
         position = newPosition;
-        for (int i = 0; i < segments.size(); i++) {
+        for (var i = 0; i < segments.size(); i++) {
             // 1 when the pill sits exactly on this segment, 0 once it is a full segment away.
-            float coverage = Math.max(0f, 1f - Math.abs(position - i));
+            var coverage = Math.max(0f, 1f - Math.abs(position - i));
             segments.get(i).setTextColor(ColorUtils.blendARGB(colorIdle, colorSelected, coverage));
             segments.get(i).setSelected(i == selected);
         }
@@ -135,13 +135,13 @@ public class UpSegmentedControl extends LinearLayout {
     protected void onDraw(Canvas canvas) {
         if (segments.isEmpty()) return;
         // Interpolate between the two neighbouring segments, which also keeps right-to-left layouts correct.
-        int from = Math.max(0, Math.min(segments.size() - 1, (int) Math.floor(position)));
-        int to = Math.min(segments.size() - 1, from + 1);
-        float fraction = position - from;
+        var from = Math.max(0, Math.min(segments.size() - 1, (int) Math.floor(position)));
+        var to = Math.min(segments.size() - 1, from + 1);
+        var fraction = position - from;
         View a = segments.get(from);
         View b = segments.get(to);
-        float left = a.getLeft() + (b.getLeft() - a.getLeft()) * fraction;
-        float right = a.getRight() + (b.getRight() - a.getRight()) * fraction;
+        var left = a.getLeft() + (b.getLeft() - a.getLeft()) * fraction;
+        var right = a.getRight() + (b.getRight() - a.getRight()) * fraction;
         pillRect.set(left, getPaddingTop(), right, getHeight() - getPaddingBottom());
         canvas.drawRoundRect(pillRect, 11 * dp, 11 * dp, pillPaint);
     }

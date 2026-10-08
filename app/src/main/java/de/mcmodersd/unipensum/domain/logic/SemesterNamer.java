@@ -21,11 +21,11 @@ public final class SemesterNamer {
     }
 
     public static Label label(LocalDate start) {
-        int month = start.getMonthValue();
+        var month = start.getMonthValue();
         if (month >= 3 && month <= 8) {
             return new Label(Season.SUMMER, start.getYear());
         }
-        int winterYear = month >= 9 ? start.getYear() : start.getYear() - 1;
+        var winterYear = month >= 9 ? start.getYear() : start.getYear() - 1;
         return new Label(Season.WINTER, winterYear);
     }
 }

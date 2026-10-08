@@ -79,9 +79,9 @@ public class WheelPicker extends RecyclerView {
 
     /** The value in the center row; while the wheel is still settling, the one it is settling on. */
     public int getSelectedIndex() {
-        View snapView = snapHelper.findSnapView(layoutManager);
+        var snapView = snapHelper.findSnapView(layoutManager);
         if (snapView != null && !isLayoutRequested()) {
-            int index = getChildAdapterPosition(snapView);
+            var index = getChildAdapterPosition(snapView);
             if (index != RecyclerView.NO_POSITION) return index;
         }
         return selected;
@@ -132,9 +132,9 @@ public class WheelPicker extends RecyclerView {
 
     /** Every value that reaches the center row while the wheel turns is felt, also while it runs out. */
     private void tickOnNewValue() {
-        View snapView = snapHelper.findSnapView(layoutManager);
+        var snapView = snapHelper.findSnapView(layoutManager);
         if (snapView == null) return;
-        int index = getChildAdapterPosition(snapView);
+        var index = getChildAdapterPosition(snapView);
         if (index == RecyclerView.NO_POSITION || index == centered) return;
         centered = index;
         // A jump to a value (setSelectedIndex) moves the center without the wheel turning, which is silent.
@@ -145,9 +145,9 @@ public class WheelPicker extends RecyclerView {
     public void onScrollStateChanged(int state) {
         super.onScrollStateChanged(state);
         if (state != SCROLL_STATE_IDLE) return;
-        View snapView = snapHelper.findSnapView(layoutManager);
+        var snapView = snapHelper.findSnapView(layoutManager);
         if (snapView == null) return;
-        int index = getChildAdapterPosition(snapView);
+        var index = getChildAdapterPosition(snapView);
         if (index != RecyclerView.NO_POSITION && index != selected) {
             selected = index;
             if (listener != null) listener.onSelected(index);
@@ -168,10 +168,10 @@ public class WheelPicker extends RecyclerView {
     }
 
     private void updateAlphas() {
-        float center = getPaddingTop() + itemHeight / 2f;
-        for (int i = 0; i < getChildCount(); i++) {
-            View child = getChildAt(i);
-            float distance = Math.abs((child.getTop() + child.getBottom()) / 2f - center);
+        var center = getPaddingTop() + itemHeight / 2f;
+        for (var i = 0; i < getChildCount(); i++) {
+            var child = getChildAt(i);
+            var distance = Math.abs((child.getTop() + child.getBottom()) / 2f - center);
             child.setAlpha(Math.max(0.2f, 1f - distance / (itemHeight * 2.4f)));
         }
     }
@@ -181,7 +181,7 @@ public class WheelPicker extends RecyclerView {
         @NonNull
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            TextView view = new TextView(parent.getContext());
+            var view = new TextView(parent.getContext());
             view.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, itemHeight));
             view.setGravity(Gravity.CENTER);
             view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
@@ -190,7 +190,7 @@ public class WheelPicker extends RecyclerView {
             RecyclerView.ViewHolder holder = new RecyclerView.ViewHolder(view) {
             };
             view.setOnClickListener(v -> {
-                int position = holder.getBindingAdapterPosition();
+                var position = holder.getBindingAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && position != selected) scrollToIndex(position);
             });
             return holder;

@@ -61,10 +61,10 @@ final class SessionBlockView extends LinearLayout {
         this.radius = getResources().getDimension(R.dimen.radius_block);
         this.dp = getResources().getDisplayMetrics().density;
 
-        int accent = CourseColors.resolve(context, session.color());
+        var accent = CourseColors.resolve(context, session.color());
         barPaint.setColor(accent);
 
-        GradientDrawable background = new GradientDrawable();
+        var background = new GradientDrawable();
         background.setCornerRadius(radius);
         background.setColor(ColorUtils.setAlphaComponent(accent, 0x2E));
         if (overlapping) {
@@ -77,7 +77,7 @@ final class SessionBlockView extends LinearLayout {
         setClickable(true);
         setFocusable(true);
 
-        SessionDetails details = session.session().details();
+        var details = session.session().details();
         title = line(context, true, session.courseName());
         // Two sessions side by side leave very little width; hyphenate instead of breaking inside a word.
         title.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_FULL);
@@ -109,16 +109,16 @@ final class SessionBlockView extends LinearLayout {
         fittedWidth = widthPx;
         fittedHeight = heightPx;
 
-        boolean narrow = widthPx < 52 * dp;
+        var narrow = widthPx < 52 * dp;
         setPadding(barWidth + Math.round((narrow ? 2 : 4) * dp), Math.round(3 * dp),
                 Math.round((narrow ? 1 : 3) * dp), Math.round(3 * dp));
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, narrow ? 9.5f : 11.5f);
-        for (TextView detail : new TextView[]{time, place, type, lecturer}) {
+        for (var detail : new TextView[]{time, place, type, lecturer}) {
             detail.setTextSize(TypedValue.COMPLEX_UNIT_SP, narrow ? 9f : 10f);
         }
 
-        int contentWidth = Math.max(0, widthPx - getPaddingLeft() - getPaddingRight());
-        int budget = Math.max(0, heightPx - getPaddingTop() - getPaddingBottom());
+        var contentWidth = Math.max(0, widthPx - getPaddingLeft() - getPaddingRight());
+        var budget = Math.max(0, heightPx - getPaddingTop() - getPaddingBottom());
         budget -= fit(title, contentWidth, budget, 3, true);
         budget -= fit(time, contentWidth, budget, 2, false);
         budget -= fit(place, contentWidth, budget, 3, false);
@@ -137,9 +137,9 @@ final class SessionBlockView extends LinearLayout {
             view.setVisibility(GONE);
             return 0;
         }
-        int widthSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
-        int heightSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
-        for (int lines = maxLines; lines >= 1; lines--) {
+        var widthSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
+        var heightSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        for (var lines = maxLines; lines >= 1; lines--) {
             view.setMaxLines(lines);
             view.measure(widthSpec, heightSpec);
             if (view.getMeasuredHeight() <= budget || (required && lines == 1)) {
@@ -153,7 +153,7 @@ final class SessionBlockView extends LinearLayout {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        float inset = radius * 0.6f;
+        var inset = radius * 0.6f;
         barRect.set(inset * 0.5f, inset, inset * 0.5f + barWidth, getHeight() - inset);
         canvas.drawRoundRect(barRect, barWidth / 2f, barWidth / 2f, barPaint);
     }
@@ -171,7 +171,7 @@ final class SessionBlockView extends LinearLayout {
     }
 
     private TextView line(Context context, boolean primary, String text) {
-        TextView view = new TextView(context);
+        var view = new TextView(context);
         view.setText(text);
         view.setTextColor(ContextCompat.getColor(context, primary ? R.color.text_primary : R.color.text_secondary));
         view.setEllipsize(TextUtils.TruncateAt.END);

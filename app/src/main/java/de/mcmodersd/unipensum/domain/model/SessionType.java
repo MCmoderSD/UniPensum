@@ -18,7 +18,7 @@ public enum SessionType {
     }
 
     public static SessionType fromKey(String key) {
-        for (SessionType value : values()) {
+        for (var value : values()) {
             if (value.key.equals(key)) return value;
         }
         throw new IllegalArgumentException("Unknown session type: " + key);

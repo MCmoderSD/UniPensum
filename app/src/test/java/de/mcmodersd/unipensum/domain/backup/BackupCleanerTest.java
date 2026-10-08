@@ -64,7 +64,7 @@ public class BackupCleanerTest {
 
     @Test
     public void cleanData_isTakenOverAsItIs() {
-        BackupCleaner.Result result = clean(good());
+        var result = clean(good());
 
         assertEquals(good(), result.data());
         assertEquals(new BackupReport(1, 1, 1, 1, 4, 0, 0), result.report());
@@ -73,7 +73,7 @@ public class BackupCleanerTest {
 
     @Test
     public void whatTheReaderSkippedOrChanged_isAddedToTheReport() {
-        BackupReport report = BackupCleaner.clean(good(), 3, 2).report();
+        var report = BackupCleaner.clean(good(), 3, 2).report();
 
         assertEquals(3, report.skipped());
         assertEquals(2, report.adjusted());
@@ -81,11 +81,11 @@ public class BackupCleanerTest {
 
     @Test
     public void texts_areCleaned() {
-        Course course = new Course(1, 1, "  Math​ \t II ", CourseColor.BLUE, " moodle.example/c/1 ");
-        Semester semester = new Semester(1, SEMESTER.start(), SEMESTER.end(), " Winter‮  term ");
-        Lecturer lecturer = new Lecturer(LECTURER, " Anna​", " Weber ", " a@uni.example ", "tel 030");
+        var course = new Course(1, 1, "  Math​ \t II ", CourseColor.BLUE, " moodle.example/c/1 ");
+        var semester = new Semester(1, SEMESTER.start(), SEMESTER.end(), " Winter‮  term ");
+        var lecturer = new Lecturer(LECTURER, " Anna​", " Weber ", " a@uni.example ", "tel 030");
 
-        BackupData data = clean(with(good(), List.of(lecturer), List.of(semester), List.of(course), null, null)).data();
+        var data = clean(with(good(), List.of(lecturer), List.of(semester), List.of(course), null, null)).data();
 
         assertEquals("Math II", data.courses().get(0).name());
         assertEquals("https://moodle.example/c/1", data.courses().get(0).moodleLink());
@@ -97,11 +97,11 @@ public class BackupCleanerTest {
 
     @Test
     public void reminders_areKeptAndBroughtIntoTheirRange() {
-        Series series = new Series(10, 1, SERIES.details().withReminder(45), SERIES.schedule());
-        Series tooLong = new Series(11, 1, SERIES.details().withReminder(5_000), SERIES.schedule());
-        Series negative = new Series(12, 1, SERIES.details().withReminder(-9), SERIES.schedule());
+        var series = new Series(10, 1, SERIES.details().withReminder(45), SERIES.schedule());
+        var tooLong = new Series(11, 1, SERIES.details().withReminder(5_000), SERIES.schedule());
+        var negative = new Series(12, 1, SERIES.details().withReminder(-9), SERIES.schedule());
 
-        BackupData data = clean(with(good(), null, null, null, List.of(series, tooLong, negative), List.of())).data();
+        var data = clean(with(good(), null, null, null, List.of(series, tooLong, negative), List.of())).data();
 
         assertEquals(45, data.series().get(0).details().reminderMin());
         assertEquals(SessionDetails.MAX_REMINDER_MIN, data.series().get(1).details().reminderMin());
@@ -112,13 +112,13 @@ public class BackupCleanerTest {
 
     @Test
     public void lecturerWithoutALastName_isSkipped_andClearedFromTheEventsThatUsedIt() {
-        Lecturer nameless = new Lecturer(LECTURER, "Anna", " ​ ", null, null);
+        var nameless = new Lecturer(LECTURER, "Anna", " ​ ", null, null);
 
-        BackupCleaner.Result result = clean(with(good(), List.of(nameless), null, null, null, null));
+        var result = clean(with(good(), List.of(nameless), null, null, null, null));
 
         assertTrue(result.data().lecturers().isEmpty());
         assertEquals(SessionDetails.NO_LECTURER, result.data().series().get(0).details().lecturerId());
-        for (Session session : result.data().sessions()) {
+        for (var session : result.data().sessions()) {
             assertEquals(SessionDetails.NO_LECTURER, session.details().lecturerId());
         }
         assertEquals(1, result.report().skipped());
@@ -127,7 +127,7 @@ public class BackupCleanerTest {
 
     @Test
     public void aLecturerThatDoesNotExist_isCleared() {
-        BackupCleaner.Result result = clean(with(good(), List.of(), null, null, null, null));
+        var result = clean(with(good(), List.of(), null, null, null, null));
 
         assertEquals(SessionDetails.NO_LECTURER, result.data().series().get(0).details().lecturerId());
         assertEquals(0, result.report().skipped());
@@ -138,9 +138,9 @@ public class BackupCleanerTest {
 
     @Test
     public void semesterThatEndsBeforeItBegins_isSkippedWithEverythingInIt() {
-        Semester broken = new Semester(1, date(11, 1), date(10, 1), null);
+        var broken = new Semester(1, date(11, 1), date(10, 1), null);
 
-        BackupCleaner.Result result = clean(with(good(), null, List.of(broken), null, null, null));
+        var result = clean(with(good(), null, List.of(broken), null, null, null));
 
         assertTrue(result.data().semesters().isEmpty());
         assertTrue(result.data().courses().isEmpty());
@@ -151,15 +151,15 @@ public class BackupCleanerTest {
 
     @Test
     public void overlappingSemester_isSkipped_theEarlierOneWins() {
-        Semester later = new Semester(2, date(12, 1), LocalDate.of(2027, 3, 1), null);
-        Course laterCourse = new Course(2, 2, "Physics", CourseColor.RED, null);
-        Series laterSeries = new Series(20, 2, details(),
+        var later = new Semester(2, date(12, 1), LocalDate.of(2027, 3, 1), null);
+        var laterCourse = new Course(2, 2, "Physics", CourseColor.RED, null);
+        var laterSeries = new Series(20, 2, details(),
                 weekly(DayOfWeek.TUESDAY, date(12, 1), date(12, 15)));
         List<Semester> semesters = List.of(later, SEMESTER);               // the order in the file does not matter
 
-        BackupData data = new BackupData(List.of(WEBER), semesters, List.of(COURSE, laterCourse),
+        var data = new BackupData(List.of(WEBER), semesters, List.of(COURSE, laterCourse),
                 List.of(SERIES, laterSeries), sessionsOf(SERIES, 100));
-        BackupCleaner.Result result = clean(data);
+        var result = clean(data);
 
         assertEquals(List.of(SEMESTER), result.data().semesters());
         assertEquals(List.of(COURSE), result.data().courses());
@@ -171,9 +171,9 @@ public class BackupCleanerTest {
 
     @Test
     public void courseWithoutAUsableName_isSkippedWithItsEvents() {
-        Course nameless = new Course(1, 1, "​ \t", CourseColor.BLUE, null);
+        var nameless = new Course(1, 1, "​ \t", CourseColor.BLUE, null);
 
-        BackupCleaner.Result result = clean(with(good(), null, null, List.of(nameless), null, null));
+        var result = clean(with(good(), null, null, List.of(nameless), null, null));
 
         assertTrue(result.data().courses().isEmpty());
         assertTrue(result.data().series().isEmpty());
@@ -183,18 +183,18 @@ public class BackupCleanerTest {
 
     @Test
     public void courseWithoutASemester_isSkipped() {
-        Course orphan = new Course(1, 99, "Math", CourseColor.BLUE, null);
+        var orphan = new Course(1, 99, "Math", CourseColor.BLUE, null);
 
-        BackupCleaner.Result result = clean(with(good(), null, null, List.of(orphan), null, null));
+        var result = clean(with(good(), null, null, List.of(orphan), null, null));
 
         assertTrue(result.data().courses().isEmpty());
     }
 
     @Test
     public void aMoodleLinkThatIsNoWebLink_isDropped() {
-        Course course = new Course(1, 1, "Math", CourseColor.BLUE, "javascript:alert(1)");
+        var course = new Course(1, 1, "Math", CourseColor.BLUE, "javascript:alert(1)");
 
-        BackupCleaner.Result result = clean(with(good(), null, null, List.of(course), null, null));
+        var result = clean(with(good(), null, null, List.of(course), null, null));
 
         assertNull(result.data().courses().get(0).moodleLink());
         assertEquals(1, result.report().adjusted());
@@ -205,9 +205,9 @@ public class BackupCleanerTest {
 
     @Test
     public void eventOutsideItsSemester_isSkippedWithItsSessions() {
-        Series outside = new Series(10, 1, details(), weekly(DayOfWeek.MONDAY, date(9, 7), date(10, 26)));
+        var outside = new Series(10, 1, details(), weekly(DayOfWeek.MONDAY, date(9, 7), date(10, 26)));
 
-        BackupCleaner.Result result = clean(with(good(), null, null, null, List.of(outside), null));
+        var result = clean(with(good(), null, null, null, List.of(outside), null));
 
         assertTrue(result.data().series().isEmpty());
         assertTrue(result.data().sessions().isEmpty());
@@ -216,21 +216,21 @@ public class BackupCleanerTest {
 
     @Test
     public void eventWithImpossibleTimes_isSkipped() {
-        Series backwards = new Series(10, 1, withTimes(details(), 600, 500), SERIES.schedule());
+        var backwards = new Series(10, 1, withTimes(details(), 600, 500), SERIES.schedule());
 
-        BackupCleaner.Result result = clean(with(good(), null, null, null, List.of(backwards), null));
+        var result = clean(with(good(), null, null, null, List.of(backwards), null));
 
         assertTrue(result.data().series().isEmpty());
     }
 
     @Test
     public void sessionOnAWeekend_orOutsideTheSemester_orWithoutAnEvent_isSkipped() {
-        List<Session> sessions = new ArrayList<>(sessionsOf(SERIES, 100));
+        var sessions = new ArrayList<Session>(sessionsOf(SERIES, 100));
         sessions.add(new Session(200, 10, date(10, 10), details()));                       // Saturday
         sessions.add(new Session(201, 10, LocalDate.of(2027, 3, 1), details()));           // after the semester
         sessions.add(new Session(202, 77, date(10, 12), details()));                       // no such event
 
-        BackupCleaner.Result result = clean(with(good(), null, null, null, null, sessions));
+        var result = clean(with(good(), null, null, null, null, sessions));
 
         assertEquals(4, result.data().sessions().size());
         assertEquals(3, result.report().skipped());
@@ -238,11 +238,11 @@ public class BackupCleanerTest {
 
     @Test
     public void sessionWithImpossibleTimes_isSkipped() {
-        Session broken = new Session(200, 10, date(10, 12), withTimes(details(), 700, 700));
-        List<Session> sessions = new ArrayList<>(sessionsOf(SERIES, 100));
+        var broken = new Session(200, 10, date(10, 12), withTimes(details(), 700, 700));
+        var sessions = new ArrayList<Session>(sessionsOf(SERIES, 100));
         sessions.add(broken);
 
-        BackupCleaner.Result result = clean(with(good(), null, null, null, null, sessions));
+        var result = clean(with(good(), null, null, null, null, sessions));
 
         assertEquals(4, result.data().sessions().size());
         assertEquals(1, result.report().skipped());
@@ -250,11 +250,11 @@ public class BackupCleanerTest {
 
     @Test
     public void aMeetingLinkThatIsNoWebLink_isDropped_theEventStays() {
-        SessionDetails online = withLink(details(), Mode.ONLINE, "ftp://files.example/x");
-        Series series = new Series(10, 1, online, SERIES.schedule());
-        Session session = new Session(100, 10, date(10, 5), online);
+        var online = withLink(details(), Mode.ONLINE, "ftp://files.example/x");
+        var series = new Series(10, 1, online, SERIES.schedule());
+        var session = new Session(100, 10, date(10, 5), online);
 
-        BackupCleaner.Result result = clean(with(good(), null, null, null, List.of(series), List.of(session)));
+        var result = clean(with(good(), null, null, null, List.of(series), List.of(session)));
 
         assertNull(result.data().series().get(0).details().link());
         assertNull(result.data().sessions().get(0).details().link());
@@ -264,10 +264,10 @@ public class BackupCleanerTest {
 
     @Test
     public void aMeetingLinkWithoutAScheme_getsHttps() {
-        SessionDetails online = withLink(details(), Mode.ONLINE, "meet.example/abc");
-        Series series = new Series(10, 1, online, SERIES.schedule());
+        var online = withLink(details(), Mode.ONLINE, "meet.example/abc");
+        var series = new Series(10, 1, online, SERIES.schedule());
 
-        BackupCleaner.Result result = clean(with(good(), null, null, null, List.of(series), List.of()));
+        var result = clean(with(good(), null, null, null, List.of(series), List.of()));
 
         assertEquals("https://meet.example/abc", result.data().series().get(0).details().link());
         assertEquals(0, result.report().adjusted());
@@ -277,14 +277,14 @@ public class BackupCleanerTest {
 
     @Test
     public void entriesWithAnIdUsedBefore_orBelowOne_areSkipped() {
-        Lecturer duplicate = new Lecturer(LECTURER, "Other", "Person", null, null);
-        Lecturer zero = new Lecturer(0, "Zero", "Id", null, null);
-        List<Session> sessions = new ArrayList<>(sessionsOf(SERIES, 100));
+        var duplicate = new Lecturer(LECTURER, "Other", "Person", null, null);
+        var zero = new Lecturer(0, "Zero", "Id", null, null);
+        var sessions = new ArrayList<Session>(sessionsOf(SERIES, 100));
         sessions.add(new Session(100, 10, date(10, 12), details()));                       // id 100 again
 
-        BackupData data = new BackupData(List.of(WEBER, duplicate, zero), List.of(SEMESTER), List.of(COURSE),
+        var data = new BackupData(List.of(WEBER, duplicate, zero), List.of(SEMESTER), List.of(COURSE),
                 List.of(SERIES), sessions);
-        BackupCleaner.Result result = clean(data);
+        var result = clean(data);
 
         assertEquals(List.of(WEBER), result.data().lecturers());
         assertEquals(4, result.data().sessions().size());

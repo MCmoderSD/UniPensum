@@ -35,17 +35,17 @@ public class UpRow extends LinearLayout {
 
     public UpRow(Context context, AttributeSet attrs) {
         super(context, attrs);
-        float dp = getResources().getDisplayMetrics().density;
+        var dp = getResources().getDisplayMetrics().density;
         setOrientation(HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
         setMinimumHeight(Math.round(56 * dp));
         setPadding(Math.round(16 * dp), Math.round(8 * dp), Math.round(12 * dp), Math.round(8 * dp));
-        GradientDrawable background = new GradientDrawable();
+        var background = new GradientDrawable();
         background.setCornerRadius(14 * dp);
         background.setColor(ContextCompat.getColor(context, R.color.surface));
         setBackground(background);
 
-        LinearLayout texts = new LinearLayout(context);
+        var texts = new LinearLayout(context);
         texts.setOrientation(VERTICAL);
         title = text(context, 16, R.color.text_primary);
         subtitle = text(context, 13, R.color.text_secondary);
@@ -67,7 +67,7 @@ public class UpRow extends LinearLayout {
         addView(chevron, new LayoutParams(Math.round(20 * dp), Math.round(20 * dp)));
 
         if (attrs != null) {
-            TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.UpRow);
+            var array = context.obtainStyledAttributes(attrs, R.styleable.UpRow);
             setTitle(array.getText(R.styleable.UpRow_upTitle));
             setSubtitle(array.getText(R.styleable.UpRow_upSubtitle));
             setValue(array.getText(R.styleable.UpRow_upValue));
@@ -97,13 +97,13 @@ public class UpRow extends LinearLayout {
     /** Shows a colored dot before the title, used for courses. */
     public void setLeadingColor(int color) {
         if (dot == null) {
-            float dp = getResources().getDisplayMetrics().density;
+            var dp = getResources().getDisplayMetrics().density;
             dot = new View(getContext());
-            LayoutParams params = new LayoutParams(Math.round(14 * dp), Math.round(14 * dp));
+            var params = new LayoutParams(Math.round(14 * dp), Math.round(14 * dp));
             params.setMarginEnd(Math.round(14 * dp));
             addView(dot, 0, params);
         }
-        GradientDrawable oval = new GradientDrawable();
+        var oval = new GradientDrawable();
         oval.setShape(GradientDrawable.OVAL);
         oval.setColor(color);
         dot.setBackground(oval);
@@ -112,11 +112,11 @@ public class UpRow extends LinearLayout {
     /** Shows an icon before the title, in the secondary text color. */
     public void setLeadingIcon(@DrawableRes int iconRes) {
         if (leadingIcon == null) {
-            float dp = getResources().getDisplayMetrics().density;
+            var dp = getResources().getDisplayMetrics().density;
             leadingIcon = new ImageView(getContext());
             ImageViewCompat.setImageTintList(leadingIcon,
                     ColorStateList.valueOf(ContextCompat.getColor(getContext(), R.color.text_secondary)));
-            LayoutParams params = new LayoutParams(Math.round(22 * dp), Math.round(22 * dp));
+            var params = new LayoutParams(Math.round(22 * dp), Math.round(22 * dp));
             params.setMarginEnd(Math.round(14 * dp));
             addView(leadingIcon, 0, params);
         }
@@ -133,7 +133,7 @@ public class UpRow extends LinearLayout {
     public void setAction(int iconRes, CharSequence description, OnClickListener listener) {
         if (action == null) {
             action = new UpIconButton(getContext());
-            LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            var params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
             params.setMarginStart(Math.round(4 * getResources().getDisplayMetrics().density));
             addView(action, params);
         }
@@ -155,7 +155,7 @@ public class UpRow extends LinearLayout {
     }
 
     private static TextView text(Context context, float sp, int colorRes) {
-        TextView view = new TextView(context);
+        var view = new TextView(context);
         view.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
         view.setTextColor(ContextCompat.getColor(context, colorRes));
         return view;

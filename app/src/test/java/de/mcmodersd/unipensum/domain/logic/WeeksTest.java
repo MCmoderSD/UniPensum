@@ -16,8 +16,8 @@ public class WeeksTest {
 
     @Test
     public void mondayOfAndPositionOf_areInverse() {
-        for (int position : new int[]{0, 1, 300, 1559}) {
-            LocalDate monday = Weeks.mondayOf(position);
+        for (var position : new int[]{0, 1, 300, 1559}) {
+            var monday = Weeks.mondayOf(position);
             assertEquals(DayOfWeek.MONDAY, monday.getDayOfWeek());
             assertEquals(position, Weeks.positionOf(monday));
             assertEquals(position, Weeks.positionOf(monday.plusDays(6)));
@@ -32,14 +32,14 @@ public class WeeksTest {
 
     @Test
     public void initialPosition_onAWeekday_isTheCurrentWeek() {
-        LocalDate wednesday = LocalDate.of(2026, 10, 7);
+        var wednesday = LocalDate.of(2026, 10, 7);
         assertEquals(Weeks.positionOf(wednesday), Weeks.initialPosition(wednesday));
     }
 
     @Test
     public void initialPosition_onTheWeekend_isTheComingWeek() {
-        LocalDate sunday = LocalDate.of(2026, 10, 4);
-        LocalDate nextMonday = LocalDate.of(2026, 10, 5);
+        var sunday = LocalDate.of(2026, 10, 4);
+        var nextMonday = LocalDate.of(2026, 10, 5);
         assertEquals(Weeks.positionOf(nextMonday), Weeks.initialPosition(sunday));
         assertEquals(Weeks.positionOf(nextMonday), Weeks.initialPosition(LocalDate.of(2026, 10, 3)));
     }

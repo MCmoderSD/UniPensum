@@ -31,7 +31,7 @@ public final class SeriesDao {
 
     /** @return {@code null} if there is no such series */
     public static Series get(SQLiteDatabase db, long id) {
-        try (Cursor cursor = db.query("series", null, "id = ?", new String[]{String.valueOf(id)},
+        try (var cursor = db.query("series", null, "id = ?", new String[]{String.valueOf(id)},
                 null, null, null)) {
             return cursor.moveToFirst() ? read(cursor) : null;
         }
@@ -39,8 +39,8 @@ public final class SeriesDao {
 
     /** Ordered by weekday, then start time. */
     public static List<Series> listByCourse(SQLiteDatabase db, long courseId) {
-        List<Series> result = new ArrayList<>();
-        try (Cursor cursor = db.query("series", null, "course_id = ?", new String[]{String.valueOf(courseId)},
+        var result = new ArrayList<Series>();
+        try (var cursor = db.query("series", null, "course_id = ?", new String[]{String.valueOf(courseId)},
                 null, null, "weekday, start_min, id")) {
             while (cursor.moveToNext()) result.add(read(cursor));
         }
@@ -48,17 +48,17 @@ public final class SeriesDao {
     }
 
     public static List<Series> listBySemester(SQLiteDatabase db, long semesterId) {
-        List<Series> result = new ArrayList<>();
-        String sql = "SELECT r.* FROM series r JOIN course c ON r.course_id = c.id "
+        var result = new ArrayList<Series>();
+        var sql = "SELECT r.* FROM series r JOIN course c ON r.course_id = c.id "
                 + "WHERE c.semester_id = ? ORDER BY r.id";
-        try (Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(semesterId)})) {
+        try (var cursor = db.rawQuery(sql, new String[]{String.valueOf(semesterId)})) {
             while (cursor.moveToNext()) result.add(read(cursor));
         }
         return result;
     }
 
     private static ContentValues values(Series series) {
-        ContentValues values = new ContentValues();
+        var values = new ContentValues();
         values.put("course_id", series.courseId());
         values.put("weekday", series.schedule().weekday().getValue());
         values.put("first_day", series.schedule().first().toEpochDay());
@@ -69,7 +69,7 @@ public final class SeriesDao {
     }
 
     private static Series read(Cursor cursor) {
-        Schedule schedule = new Schedule(
+        var schedule = new Schedule(
                 DayOfWeek.of(Rows.integer(cursor, "weekday")),
                 LocalDate.ofEpochDay(Rows.longValue(cursor, "first_day")),
                 LocalDate.ofEpochDay(Rows.longValue(cursor, "last_day")),

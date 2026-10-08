@@ -28,7 +28,7 @@ public enum CourseColor {
     }
 
     public static CourseColor fromKey(String key) {
-        for (CourseColor value : values()) {
+        for (var value : values()) {
             if (value.key.equals(key)) return value;
         }
         throw new IllegalArgumentException("Unknown course color: " + key);

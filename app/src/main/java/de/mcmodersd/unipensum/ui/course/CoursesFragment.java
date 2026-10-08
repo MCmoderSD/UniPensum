@@ -32,9 +32,9 @@ public class CoursesFragment extends Fragment {
     private static final String ARG_SEMESTER_ID = "semester_id";
 
     public static CoursesFragment forSemester(long semesterId) {
-        Bundle args = new Bundle();
+        var args = new Bundle();
         args.putLong(ARG_SEMESTER_ID, semesterId);
-        CoursesFragment fragment = new CoursesFragment();
+        var fragment = new CoursesFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,7 +63,7 @@ public class CoursesFragment extends Fragment {
         title.setText(R.string.courses_title);
         view.findViewById(R.id.back).setOnClickListener(v -> Navigator.of(this).pop());
 
-        long semesterId = requireArguments().getLong(ARG_SEMESTER_ID);
+        var semesterId = requireArguments().getLong(ARG_SEMESTER_ID);
         repository.loadSemester(semesterId, new Database.Callback<Semester>() {
             @Override
             public void onSuccess(Semester loaded) {
@@ -85,7 +85,7 @@ public class CoursesFragment extends Fragment {
         });
         // With the calendar beside this page, its semester can be deleted while the page is open.
         repository.semesters().observe(getViewLifecycleOwner(), semesters -> {
-            for (Semester existing : semesters) {
+            for (var existing : semesters) {
                 if (existing.id() == semesterId) return;
             }
             Navigator.of(this).pop();
@@ -93,14 +93,14 @@ public class CoursesFragment extends Fragment {
         repository.courses(semesterId).observe(getViewLifecycleOwner(), courses -> {
             list.removeAllViews();
             emptyView.setVisibility(courses.isEmpty() ? View.VISIBLE : View.GONE);
-            for (CourseWithSeries entry : courses) list.addView(row(entry));
+            for (var entry : courses) list.addView(row(entry));
         });
     }
 
     private View row(CourseWithSeries entry) {
-        Context context = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
-        UpRow row = new UpRow(context);
+        var context = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
+        var row = new UpRow(context);
         row.setTitle(entry.course().name());
         row.setSubtitle(getResources().getQuantityString(R.plurals.event_count,
                 entry.series().size(), entry.series().size()));
@@ -119,7 +119,7 @@ public class CoursesFragment extends Fragment {
                 if (isAdded()) Haptics.reject(v);
             }
         }));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.bottomMargin = Math.round(8 * dp);
         row.setLayoutParams(params);

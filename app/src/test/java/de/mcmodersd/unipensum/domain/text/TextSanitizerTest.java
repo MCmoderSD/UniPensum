@@ -51,8 +51,8 @@ public class TextSanitizerTest {
     @Test
     public void line_cutsAtTheLimitWithoutSplittingACharacter() {
         assertEquals(100, TextSanitizer.line("a".repeat(500), 100).length());
-        String emoji = "😀".repeat(60);
-        String cut = TextSanitizer.line(emoji, 50);
+        var emoji = "😀".repeat(60);
+        var cut = TextSanitizer.line(emoji, 50);
         assertEquals(50, cut.codePointCount(0, cut.length()));
         assertEquals("a", TextSanitizer.line("a b", 2));          // the cut would leave a trailing space
     }
@@ -219,16 +219,16 @@ public class TextSanitizerTest {
 
     @Test
     public void everyMethodIsIdempotent() {
-        String messy = "  ‮Anna ​\t Weber\r\n\r\n\r\nroom B2  ";
-        String line = TextSanitizer.line(messy, 100);
+        var messy = "  ‮Anna ​\t Weber\r\n\r\n\r\nroom B2  ";
+        var line = TextSanitizer.line(messy, 100);
         assertEquals(line, TextSanitizer.line(line, 100));
-        String text = TextSanitizer.text(messy, 100);
+        var text = TextSanitizer.text(messy, 100);
         assertEquals(text, TextSanitizer.text(text, 100));
-        String phone = TextSanitizer.phone(" +49  30 12 ");
+        var phone = TextSanitizer.phone(" +49  30 12 ");
         assertEquals(phone, TextSanitizer.phone(phone));
-        String email = TextSanitizer.email(" a@b.example ");
+        var email = TextSanitizer.email(" a@b.example ");
         assertEquals(email, TextSanitizer.email(email));
-        String link = TextSanitizer.webLink("HTTPS://Meet.example/a b");
+        var link = TextSanitizer.webLink("HTTPS://Meet.example/a b");
         assertEquals(link, TextSanitizer.webLink(link));
     }
 }

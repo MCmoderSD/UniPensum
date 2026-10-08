@@ -21,8 +21,8 @@ public class NowIndicatorTest {
 
     @Test
     public void duringTheShownWeek_isTheColumnOfToday() {
-        for (int day = 0; day < 5; day++) {
-            NowIndicator.Position position = at(MONDAY.plusDays(day).atTime(10, 30)).orElseThrow();
+        for (var day = 0; day < 5; day++) {
+            var position = at(MONDAY.plusDays(day).atTime(10, 30)).orElseThrow();
             assertEquals(day, position.dayIndex());
             assertEquals(10 * 60 + 30, position.minutes());
         }
@@ -57,7 +57,7 @@ public class NowIndicatorTest {
 
     @Test
     public void followsTheVisibleHours() {
-        LocalDateTime evening = MONDAY.atTime(20, 15);
+        var evening = MONDAY.atTime(20, 15);
         assertTrue(NowIndicator.at(MONDAY, evening, 7, 22).isPresent());
         assertFalse(NowIndicator.at(MONDAY, evening, 7, 18).isPresent());
         assertTrue(NowIndicator.at(MONDAY, evening, 18, 24).isPresent());

@@ -19,7 +19,7 @@ public final class ReminderReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (!isKnown(intent.getAction())) return;
         // The database read and the notification take a moment; the system waits for them.
-        PendingResult result = goAsync();
+        var result = goAsync();
         ReminderScheduler.update(context, true, result::finish);
     }
 

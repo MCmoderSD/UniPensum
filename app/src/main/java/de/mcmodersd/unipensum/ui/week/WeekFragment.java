@@ -83,7 +83,7 @@ public class WeekFragment extends Fragment {
         zoomIndicator = view.findViewById(R.id.zoom_indicator);
 
         viewModel = new ViewModelProvider(this).get(WeekViewModel.class);
-        WeekPagerAdapter adapter = new WeekPagerAdapter();
+        var adapter = new WeekPagerAdapter();
         adapter.setZoom(viewModel.zoom());
         adapter.setOnZoomChangedListener(zoom -> {
             viewModel.setZoom(zoom);
@@ -131,7 +131,7 @@ public class WeekFragment extends Fragment {
             timetable = loaded;
             adapter.setTimetable(loaded);
             askForNotificationsOnce(loaded);
-            boolean noSemesters = loaded.semesters().isEmpty();
+            var noSemesters = loaded.semesters().isEmpty();
             empty.setVisibility(noSemesters ? View.VISIBLE : View.GONE);
             pager.setVisibility(noSemesters ? View.INVISIBLE : View.VISIBLE);
             addCourse.setVisibility(noSemesters ? View.GONE : View.VISIBLE);
@@ -146,7 +146,7 @@ public class WeekFragment extends Fragment {
      * zoomed, so a tap can reset the zoom, and fades out a moment after the zoom is back at 100 %.
      */
     private void showZoom(float zoom) {
-        String percent = NumberFormat.getPercentInstance().format(zoom);
+        var percent = NumberFormat.getPercentInstance().format(zoom);
         zoomIndicator.setText(percent);
         zoomIndicator.setContentDescription(getString(R.string.zoom_reset_description, percent));
         zoomIndicator.removeCallbacks(hideZoom);
@@ -158,8 +158,8 @@ public class WeekFragment extends Fragment {
 
     /** Resets the zoom of the week that is shown; the others follow once it has settled. */
     private void resetZoom() {
-        RecyclerView weeks = (RecyclerView) pager.getChildAt(0);
-        RecyclerView.ViewHolder holder = weeks.findViewHolderForAdapterPosition(pager.getCurrentItem());
+        var weeks = (RecyclerView) pager.getChildAt(0);
+        var holder = weeks.findViewHolderForAdapterPosition(pager.getCurrentItem());
         if (holder instanceof WeekPagerAdapter.PageHolder) ((WeekPagerAdapter.PageHolder) holder).page.resetZoom();
     }
 
@@ -174,7 +174,7 @@ public class WeekFragment extends Fragment {
      * in the settings, not by asking again.
      */
     private void askForNotificationsOnce(Timetable loaded) {
-        AppSettings settings = UniPensumApp.from(requireContext()).settings();
+        var settings = UniPensumApp.from(requireContext()).settings();
         if (!settings.remindersEnabled() || settings.notificationsAsked()
                 || NotificationAccess.allowed(requireContext())
                 || !loaded.hasReminderFrom(LocalDate.now())) {
@@ -199,30 +199,30 @@ public class WeekFragment extends Fragment {
     @Nullable
     private Semester currentSemester() {
         if (timetable == null || timetable.semesters().isEmpty()) return null;
-        Semester semester = semesterOfWeek(Weeks.mondayOf(pager.getCurrentItem()));
+        var semester = semesterOfWeek(Weeks.mondayOf(pager.getCurrentItem()));
         if (semester != null) return semester;
-        List<Semester> all = timetable.semesters();
+        var all = timetable.semesters();
         return all.get(all.size() - 1);
     }
 
     private void openNewCourse() {
-        Semester semester = currentSemester();
+        var semester = currentSemester();
         if (semester == null) return;
         new ViewModelProvider(requireActivity()).get(CourseDraftViewModel.class).startNew(semester);
         Navigator.of(this).open(new CourseEditorFragment());
     }
 
     private void openCourses() {
-        Semester semester = currentSemester();
+        var semester = currentSemester();
         if (semester == null) return;
         Navigator.of(this).toggle(CoursesFragment.forSemester(semester.id()));
     }
 
     private void updateHeader(int position) {
-        LocalDate monday = Weeks.mondayOf(position);
-        LocalDate friday = monday.plusDays(4);
+        var monday = Weeks.mondayOf(position);
+        var friday = monday.plusDays(4);
 
-        Semester semester = semesterOfWeek(monday);
+        var semester = semesterOfWeek(monday);
         if (semester != null) {
             title.setText(SemesterNames.display(requireContext(), semester));
         } else {
@@ -239,8 +239,8 @@ public class WeekFragment extends Fragment {
     @Nullable
     private Semester semesterOfWeek(LocalDate monday) {
         if (timetable == null) return null;
-        for (int i = 0; i < 5; i++) {
-            Semester semester = timetable.semesterAt(monday.plusDays(i));
+        for (var i = 0; i < 5; i++) {
+            var semester = timetable.semesterAt(monday.plusDays(i));
             if (semester != null) return semester;
         }
         return null;

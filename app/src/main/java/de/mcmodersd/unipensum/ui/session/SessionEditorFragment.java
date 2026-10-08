@@ -87,18 +87,18 @@ public class SessionEditorFragment extends Fragment {
 
     /** @param index position in the course draft, or -1 for a new event */
     public static SessionEditorFragment forSeries(int index) {
-        Bundle args = new Bundle();
+        var args = new Bundle();
         args.putInt(ARG_SERIES_INDEX, index);
-        SessionEditorFragment fragment = new SessionEditorFragment();
+        var fragment = new SessionEditorFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
     public static SessionEditorFragment forSession(long sessionId, EditScope scope) {
-        Bundle args = new Bundle();
+        var args = new Bundle();
         args.putLong(ARG_SESSION_ID, sessionId);
         args.putString(ARG_SCOPE, scope.name());
-        SessionEditorFragment fragment = new SessionEditorFragment();
+        var fragment = new SessionEditorFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -179,7 +179,7 @@ public class SessionEditorFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Bundle args = requireArguments();
+        var args = requireArguments();
         seriesMode = !args.containsKey(ARG_SESSION_ID);
         seriesIndex = args.getInt(ARG_SERIES_INDEX, -1);
         sessionId = args.getLong(ARG_SESSION_ID);
@@ -224,8 +224,8 @@ public class SessionEditorFragment extends Fragment {
     // --- building the form ---
 
     private Form buildSeriesForm() {
-        Form result = new Form();
-        Semester semester = draft.semester();
+        var result = new Form();
+        var semester = draft.semester();
         result.semester = semester;
         Series source = seriesIndex >= 0 ? draft.series().get(seriesIndex) : null;
         result.source = source;
@@ -247,10 +247,10 @@ public class SessionEditorFragment extends Fragment {
     }
 
     private Form buildSessionForm(SessionContext context) {
-        Form result = new Form();
+        var result = new Form();
         result.semester = context.semester();
         fill(result, context.session().details());
-        Schedule series = context.series().schedule();
+        var series = context.series().schedule();
         result.weekday = series.weekday();
         result.interval = series.intervalWeeks();
         result.last = series.last();
@@ -262,7 +262,7 @@ public class SessionEditorFragment extends Fragment {
 
     /** The end of a 16-week run from {@code first}, cut off at the end of the semester. */
     private static LocalDate lectureEnd(Semester semester, LocalDate first) {
-        LocalDate end = SemesterDefaults.lectureEnd(first);
+        var end = SemesterDefaults.lectureEnd(first);
         return end.isAfter(semester.end()) ? semester.end() : end;
     }
 
@@ -318,8 +318,8 @@ public class SessionEditorFragment extends Fragment {
 
     /** Fills the views from the form and wires the listeners; runs once the form exists. */
     private void bind() {
-        View root = requireView();
-        FragmentManager manager = getParentFragmentManager();
+        var root = requireView();
+        var manager = getParentFragmentManager();
 
         TextView scopeNote = root.findViewById(R.id.scope_note);
         if (seriesMode) {
@@ -338,8 +338,8 @@ public class SessionEditorFragment extends Fragment {
         typeControl.setSelectedIndex(form.type.ordinal());
         typeControl.setOnSelectionChangedListener(index -> form.type = SessionType.values()[index]);
 
-        CharSequence[] weekdays = new CharSequence[5];
-        for (int i = 0; i < 5; i++) weekdays[i] = SeriesFormat.weekdayShort(requireContext(), DayOfWeek.of(i + 1));
+        var weekdays = new CharSequence[5];
+        for (var i = 0; i < 5; i++) weekdays[i] = SeriesFormat.weekdayShort(requireContext(), DayOfWeek.of(i + 1));
         weekdayControl.setOptions(weekdays);
         weekdayControl.setSelectedIndex(form.weekday.getValue() - 1);
         weekdayControl.setOnSelectionChangedListener(index -> {
@@ -350,7 +350,7 @@ public class SessionEditorFragment extends Fragment {
         modeControl.setOptions(getString(R.string.mode_in_person), getString(R.string.mode_online));
         modeControl.setSelectedIndex(form.mode.ordinal());
         modeControl.setOnSelectionChangedListener(index -> {
-            Mode previous = form.mode;
+            var previous = form.mode;
             form.mode = Mode.values()[index];
             // A reminder that is still the standard time of the old format becomes that of the new one.
             form.reminderMin = Reminders.afterModeChange(form.reminderMin, previous, form.mode);
@@ -380,13 +380,13 @@ public class SessionEditorFragment extends Fragment {
         });
         UniPensumApp.from(requireContext()).repository().lecturers().observe(getViewLifecycleOwner(), list -> {
             lecturers = new HashMap<>();
-            for (Lecturer lecturer : list) lecturers.put(lecturer.id(), lecturer);
+            for (var lecturer : list) lecturers.put(lecturer.id(), lecturer);
             renderLecturer();
         });
         reminderStepper.setRange(0, SessionDetails.MAX_REMINDER_MIN);
         reminderStepper.setStep(Reminders.STEP_MIN);
         reminderStepper.setFormatter(minutes -> ReminderFormat.text(requireContext(), minutes));
-        boolean reminderOn = form.reminderMin != SessionDetails.NO_REMINDER;
+        var reminderOn = form.reminderMin != SessionDetails.NO_REMINDER;
         reminderStepper.setValue(reminderOn ? form.reminderMin : Reminders.defaultFor(form.mode));
         reminderSwitch.setChecked(reminderOn);
         reminderSwitch.setOnCheckedChangeListener(checked -> {
@@ -429,7 +429,7 @@ public class SessionEditorFragment extends Fragment {
                 form.last, form.semester.start(), form.semester.end(), false));
 
         manager.setFragmentResultListener(KEY_START, getViewLifecycleOwner(), (key, result) -> {
-            int duration = form.endMin > form.startMin ? form.endMin - form.startMin : DEFAULT_DURATION_MIN;
+            var duration = form.endMin > form.startMin ? form.endMin - form.startMin : DEFAULT_DURATION_MIN;
             form.startMin = result.getInt(TimePickerSheet.RESULT_MINUTES);
             // Moving the start keeps the length, which is what one usually means.
             form.endMin = Math.min(SessionDetails.MINUTES_PER_DAY - 5, form.startMin + duration);
@@ -472,7 +472,7 @@ public class SessionEditorFragment extends Fragment {
 
     /** The time is only there while the reminder is on, and so is the hint that notifications are off. */
     private void updateReminderVisibility() {
-        boolean on = form.reminderMin != SessionDetails.NO_REMINDER;
+        var on = form.reminderMin != SessionDetails.NO_REMINDER;
         reminderStepper.setVisibility(on ? View.VISIBLE : View.GONE);
         notificationsOffRow.setVisibility(on && !NotificationAccess.allowed(requireContext())
                 ? View.VISIBLE : View.GONE);
@@ -496,7 +496,7 @@ public class SessionEditorFragment extends Fragment {
     /** Shows the chosen lecturer's full name, "None" if there is none or it has been deleted meanwhile. */
     private void renderLecturer() {
         if (lecturers == null) return;
-        Lecturer lecturer = lecturers.get(form.lecturerId);
+        var lecturer = lecturers.get(form.lecturerId);
         lecturerRow.setValue(lecturer == null ? getString(R.string.lecturer_none) : lecturer.name(NameStyle.FULL_NAME));
     }
 
@@ -513,7 +513,7 @@ public class SessionEditorFragment extends Fragment {
     }
 
     private void updateModeVisibility() {
-        boolean inPerson = form.mode == Mode.IN_PERSON;
+        var inPerson = form.mode == Mode.IN_PERSON;
         hybridRow.setVisibility(inPerson ? View.VISIBLE : View.GONE);
         roomField.setVisibility(inPerson ? View.VISIBLE : View.GONE);
         linkField.setVisibility(!inPerson || form.hybrid ? View.VISIBLE : View.GONE);
@@ -525,7 +525,7 @@ public class SessionEditorFragment extends Fragment {
 
     /** Warns that regenerated sessions lose their individual edits. */
     private void updateScheduleNote() {
-        boolean changed = !seriesMode && !thisOnly() && form.originalSchedule != null
+        var changed = !seriesMode && !thisOnly() && form.originalSchedule != null
                 && !form.originalSchedule.equals(currentSchedule());
         scheduleNote.setVisibility(changed ? View.VISIBLE : View.GONE);
     }
@@ -539,7 +539,7 @@ public class SessionEditorFragment extends Fragment {
     private void save() {
         timeError.setVisibility(View.GONE);
         scheduleError.setVisibility(View.GONE);
-        boolean valid = true;
+        var valid = true;
 
         if (form.endMin <= form.startMin) {
             timeError.setText(R.string.error_time);
@@ -547,7 +547,7 @@ public class SessionEditorFragment extends Fragment {
             valid = false;
         }
         // The link only counts for online and hybrid events; the field is hidden otherwise.
-        boolean linkUsed = form.mode == Mode.ONLINE || form.hybrid;
+        var linkUsed = form.mode == Mode.ONLINE || form.hybrid;
         if (linkUsed && !TextSanitizer.isValidWebLink(form.link)) {
             linkField.setError(getString(R.string.error_link));
             valid = false;
@@ -555,7 +555,7 @@ public class SessionEditorFragment extends Fragment {
         Schedule schedule = null;
         if (!thisOnly()) {
             schedule = currentSchedule();
-            String problem = scheduleProblem(schedule);
+            var problem = scheduleProblem(schedule);
             if (problem != null) {
                 scheduleError.setText(problem);
                 scheduleError.setVisibility(View.VISIBLE);
@@ -567,14 +567,14 @@ public class SessionEditorFragment extends Fragment {
             return;
         }
 
-        SessionDetails details = new SessionDetails(form.type, form.startMin, form.endMin, form.mode, form.hybrid,
+        var details = new SessionDetails(form.type, form.startMin, form.endMin, form.mode, form.hybrid,
                 form.room, form.link, form.lecturerId, form.note, form.reminderMin).normalized();
 
         if (seriesMode) {
-            Series source = form.source;
-            Series result = new Series(source == null ? 0 : source.id(), source == null ? 0 : source.courseId(),
+            var source = form.source;
+            var result = new Series(source == null ? 0 : source.id(), source == null ? 0 : source.courseId(),
                     details, schedule);
-            List<Series> list = draft.series();
+            var list = draft.series();
             if (seriesIndex >= 0) list.set(seriesIndex, result);
             else list.add(result);
             Haptics.confirm(saveButton);
@@ -606,7 +606,7 @@ public class SessionEditorFragment extends Fragment {
     /** @return a message if the schedule cannot be saved, otherwise {@code null} */
     @Nullable
     private String scheduleProblem(Schedule schedule) {
-        Semester semester = form.semester;
+        var semester = form.semester;
         switch (SemesterRules.checkSchedule(semester, schedule)) {
             case EMPTY_RANGE:
                 return getString(R.string.error_period_empty);

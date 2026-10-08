@@ -54,17 +54,17 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.sheet_base, container, false);
+        var root = inflater.inflate(R.layout.sheet_base, container, false);
 
         TextView title = root.findViewById(R.id.sheet_title);
-        CharSequence text = title(requireContext());
+        var text = title(requireContext());
         title.setText(text);
         title.setVisibility(text == null ? View.GONE : View.VISIBLE);
 
         ViewGroup content = root.findViewById(R.id.sheet_content);
         content.addView(createContent(inflater, content, savedInstanceState));
 
-        float fraction = minHeightFraction();
+        var fraction = minHeightFraction();
         if (fraction > 0f) {
             root.setMinimumHeight(Math.round(fraction * getResources().getDisplayMetrics().heightPixels));
         }
@@ -72,7 +72,7 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
         // Keeps the content above the navigation bar and, while typing, above the keyboard, and a tall
         // sheet below the status bar, so that it keeps its rounded top corners.
         ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
-            Insets bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+            var bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
             view.setPadding(0, 0, 0, bottom.bottom);
             limitHeight(insets.getInsets(WindowInsetsCompat.Type.systemBars()).top);
             return insets;
@@ -82,8 +82,8 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
 
     private void limitHeight(int statusBarTop) {
         if (!(getDialog() instanceof BottomSheetDialog)) return;
-        float dp = getResources().getDisplayMetrics().density;
-        int screen = getResources().getDisplayMetrics().heightPixels;
+        var dp = getResources().getDisplayMetrics().density;
+        var screen = getResources().getDisplayMetrics().heightPixels;
         ((BottomSheetDialog) getDialog()).getBehavior().setMaxHeight(screen - statusBarTop - Math.round(TOP_GAP_DP * dp));
     }
 
@@ -100,7 +100,7 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
 
     /** For sheets whose title is only known after their data has loaded. */
     protected final void setSheetTitle(@Nullable CharSequence text) {
-        View root = getView();
+        var root = getView();
         if (root == null) return;
         TextView title = root.findViewById(R.id.sheet_title);
         title.setText(text);
@@ -136,10 +136,10 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
     }
 
     private boolean isOnHeader(float rawX, float rawY) {
-        View root = getView();
+        var root = getView();
         if (root == null) return false;
         View header = root.findViewById(R.id.sheet_header);
-        int[] location = new int[2];
+        var location = new int[2];
         header.getLocationOnScreen(location);
         return rawX >= location[0] && rawX < location[0] + header.getWidth()
                 && rawY >= location[1] && rawY < location[1] + header.getHeight();
@@ -148,7 +148,7 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-        BottomSheetDialog dialog = (BottomSheetDialog) requireDialog();
+        var dialog = (BottomSheetDialog) requireDialog();
         BottomSheetBehavior<?> behavior = dialog.getBehavior();
         behavior.setSkipCollapsed(true);
         behavior.setState(BottomSheetBehavior.STATE_EXPANDED);

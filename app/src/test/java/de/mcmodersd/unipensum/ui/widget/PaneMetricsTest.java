@@ -49,16 +49,16 @@ public class PaneMetricsTest {
 
     @Test
     public void everySplitWindow_leavesAtLeastTheMinimumForTheCalendar() {
-        for (int width = SPLIT_MIN; width <= 3000; width++) {
+        for (var width = SPLIT_MIN; width <= 3000; width++) {
             assertTrue("width " + width, width - side(width) >= SIDE_MIN);
         }
     }
 
     @Test
     public void sideWidth_growsWithTheWindow() {
-        int previous = 0;
-        for (int width = SPLIT_MIN; width <= 3000; width++) {
-            int current = side(width);
+        var previous = 0;
+        for (var width = SPLIT_MIN; width <= 3000; width++) {
+            var current = side(width);
             assertTrue("width " + width, current >= previous);
             previous = current;
         }

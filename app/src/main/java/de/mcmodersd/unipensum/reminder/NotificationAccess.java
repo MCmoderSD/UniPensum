@@ -19,7 +19,7 @@ public final class NotificationAccess {
 
     /** Opens the notification settings of the app. */
     public static void openSettings(Context context) {
-        Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+        var intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                 .putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName())
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);

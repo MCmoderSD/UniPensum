@@ -53,10 +53,10 @@ public final class SemesterSheet extends UpSheet {
     @Override
     protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
                                  @Nullable Bundle savedInstanceState) {
-        Context context = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
+        var context = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
 
-        LinearLayout column = new LinearLayout(context);
+        var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
 
         list = new LinearLayout(context);
@@ -64,12 +64,12 @@ public final class SemesterSheet extends UpSheet {
         column.addView(list, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        UpButton create = new UpButton(context);
+        var create = new UpButton(context);
         create.setText(R.string.semester_new);
         create.setOnClickListener(v -> {
             SemesterEditorSheet.show(getParentFragmentManager(), null, current);
         });
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.topMargin = Math.round(12 * dp);
         column.addView(create, params);
@@ -85,12 +85,12 @@ public final class SemesterSheet extends UpSheet {
 
     private void render(List<Semester> semesters) {
         current = semesters;
-        Context context = requireContext();
-        float dp = getResources().getDisplayMetrics().density;
+        var context = requireContext();
+        var dp = getResources().getDisplayMetrics().density;
         list.removeAllViews();
 
         if (semesters.isEmpty()) {
-            TextView empty = new TextView(context);
+            var empty = new TextView(context);
             empty.setText(R.string.semesters_empty);
             empty.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
             empty.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
@@ -99,22 +99,22 @@ public final class SemesterSheet extends UpSheet {
             return;
         }
 
-        List<Semester> newestFirst = new ArrayList<>(semesters);
+        var newestFirst = new ArrayList<Semester>(semesters);
         Collections.sort(newestFirst, Comparator.comparing(Semester::start).reversed());
-        for (Semester semester : newestFirst) {
-            UpRow row = new UpRow(context);
+        for (var semester : newestFirst) {
+            var row = new UpRow(context);
             row.setTitle(SemesterNames.display(context, semester));
             row.setSubtitle(TimeFormat.dateMedium(context, semester.start()) + " – "
                     + TimeFormat.dateMedium(context, semester.end()));
             row.setAction(R.drawable.ic_edit, getString(R.string.action_edit), v ->
                     SemesterEditorSheet.show(getParentFragmentManager(), semester, semesters));
             row.setOnClickListener(v -> {
-                Bundle result = new Bundle();
+                var result = new Bundle();
                 result.putLong(RESULT_EPOCH_DAY, semester.start().toEpochDay());
                 getParentFragmentManager().setFragmentResult(REQUEST_JUMP, result);
                 dismiss();
             });
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+            var params = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.bottomMargin = Math.round(8 * dp);
             list.addView(row, params);

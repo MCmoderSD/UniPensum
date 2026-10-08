@@ -69,14 +69,14 @@ public class UpSwitch extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        float radius = getHeight() / 2f;
+        var radius = getHeight() / 2f;
         track.set(0, 0, getWidth(), getHeight());
         trackPaint.setColor(ColorUtils.blendARGB(trackOff, trackOn, progress));
         canvas.drawRoundRect(track, radius, radius, trackPaint);
 
-        float thumbRadius = radius - 3 * dp;
-        float startX = radius;
-        float endX = getWidth() - radius;
+        var thumbRadius = radius - 3 * dp;
+        var startX = radius;
+        var endX = getWidth() - radius;
         thumbPaint.setColor(ColorUtils.blendARGB(thumbOff, thumbOn, progress));
         canvas.drawCircle(startX + (endX - startX) * progress, radius, thumbRadius, thumbPaint);
     }
@@ -85,7 +85,7 @@ public class UpSwitch extends View {
     public boolean performClick() {
         checked = !checked;
         Haptics.toggle(this, checked);
-        ValueAnimator animator = ValueAnimator.ofFloat(progress, checked ? 1f : 0f);
+        var animator = ValueAnimator.ofFloat(progress, checked ? 1f : 0f);
         animator.setDuration(160);
         animator.addUpdateListener(a -> {
             progress = (float) a.getAnimatedValue();

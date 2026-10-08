@@ -50,10 +50,10 @@ public final class ReminderScheduler {
      * @param done    called when the run is over, also if it failed; may be {@code null}
      */
     public static void update(Context context, boolean showDue, @Nullable Runnable done) {
-        Context app = context.getApplicationContext();
-        ZoneId zone = ZoneId.systemDefault();
-        long nowMillis = System.currentTimeMillis();
-        LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(nowMillis), zone);
+        var app = context.getApplicationContext();
+        var zone = ZoneId.systemDefault();
+        var nowMillis = System.currentTimeMillis();
+        var now = LocalDateTime.ofInstant(Instant.ofEpochMilli(nowMillis), zone);
 
         // Yesterday as well: a reminder for an early session falls on the day before it.
         UniPensumApp.from(app).database().read(
@@ -78,20 +78,20 @@ public final class ReminderScheduler {
 
     private static void plan(Context context, List<ReminderView> views, boolean showDue, long nowMillis,
                              LocalDateTime now, ZoneId zone) {
-        SharedPreferences state = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        long lastRun = state.getLong(KEY_LAST_RUN, 0);
+        var state = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        var lastRun = state.getLong(KEY_LAST_RUN, 0);
         // The first run has no past: nothing that was due before the app was installed is shown.
-        LocalDateTime after = lastRun == 0 ? now : LocalDateTime.ofInstant(Instant.ofEpochMilli(lastRun), zone);
-        boolean enabled = UniPensumApp.from(context).settings().remindersEnabled();
+        var after = lastRun == 0 ? now : LocalDateTime.ofInstant(Instant.ofEpochMilli(lastRun), zone);
+        var enabled = UniPensumApp.from(context).settings().remindersEnabled();
 
-        List<Session> sessions = new ArrayList<>();
-        Map<Long, ReminderView> byId = new HashMap<>();
-        for (ReminderView view : views) {
+        var sessions = new ArrayList<Session>();
+        var byId = new HashMap<Long, ReminderView>();
+        for (var view : views) {
             sessions.add(view.session());
             byId.put(view.session().id(), view);
         }
         if (enabled && showDue) {
-            for (Reminders.Due due : Reminders.due(sessions, after, now)) {
+            for (var due : Reminders.due(sessions, after, now)) {
                 ReminderNotifier.show(context, byId.get(due.session().id()), due);
             }
         }
@@ -104,7 +104,7 @@ public final class ReminderScheduler {
     /** @param triggerMillis when the alarm goes off, {@code null} to have none */
     private static void setAlarm(Context context, @Nullable Long triggerMillis) {
         AlarmManager alarms = context.getSystemService(AlarmManager.class);
-        PendingIntent pending = alarmIntent(context);
+        var pending = alarmIntent(context);
         if (triggerMillis == null) {
             alarms.cancel(pending);
         } else if (alarms.canScheduleExactAlarms()) {
@@ -116,7 +116,7 @@ public final class ReminderScheduler {
     }
 
     private static PendingIntent alarmIntent(Context context) {
-        Intent intent = new Intent(context, ReminderReceiver.class).setAction(ReminderReceiver.ACTION_ALARM);
+        var intent = new Intent(context, ReminderReceiver.class).setAction(ReminderReceiver.ACTION_ALARM);
         return PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
