@@ -1,5 +1,6 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -231,6 +232,8 @@ public class MonthCalendarView extends LinearLayout {
             }
         }
 
+        // The click is made by performClick, which this method calls itself.
+        @SuppressLint("ClickableViewAccessibility")
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             switch (event.getAction()) {
@@ -247,11 +250,6 @@ public class MonthCalendarView extends LinearLayout {
                 default:
                     return true;
             }
-        }
-
-        @Override
-        public boolean performClick() {
-            return super.performClick();
         }
 
         @Override
@@ -321,13 +319,16 @@ public class MonthCalendarView extends LinearLayout {
                 var context = getContext();
                 var bounds = new Rect();
                 cellBounds(day, bounds);
-                node.setBoundsInParent(bounds);
+                setBoundsInScreenFromBoundsInParent(node, bounds);
                 node.setContentDescription(
                         day.getDayOfWeek().getDisplayName(TextStyle.FULL, TimeFormat.locale(context))
                                 + ", " + TimeFormat.dateMedium(context, day)
                 );
                 node.setCheckable(true);
-                node.setChecked(day.equals(selected));
+                node.setChecked(
+                        day.equals(selected)
+                                ? AccessibilityNodeInfoCompat.CHECKED_STATE_TRUE : AccessibilityNodeInfoCompat.CHECKED_STATE_FALSE
+                );
                 node.setEnabled(isSelectable(day));
                 node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
             }

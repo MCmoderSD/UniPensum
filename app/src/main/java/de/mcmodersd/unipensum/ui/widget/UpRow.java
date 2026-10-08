@@ -3,6 +3,7 @@ package de.mcmodersd.unipensum.ui.widget;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.GradientDrawable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -68,12 +69,12 @@ public class UpRow extends LinearLayout {
         addView(chevron, new LayoutParams(Math.round(20 * dp), Math.round(20 * dp)));
 
         if (attrs != null) {
-            var array = context.obtainStyledAttributes(attrs, R.styleable.UpRow);
-            setTitle(array.getText(R.styleable.UpRow_upTitle));
-            setSubtitle(array.getText(R.styleable.UpRow_upSubtitle));
-            setValue(array.getText(R.styleable.UpRow_upValue));
-            setChevronVisible(array.getBoolean(R.styleable.UpRow_upChevron, false));
-            array.recycle();
+            try (var array = context.obtainStyledAttributes(attrs, R.styleable.UpRow)) {
+                setTitle(array.getText(R.styleable.UpRow_upTitle));
+                setSubtitle(array.getText(R.styleable.UpRow_upSubtitle));
+                setValue(array.getText(R.styleable.UpRow_upValue));
+                setChevronVisible(array.getBoolean(R.styleable.UpRow_upChevron, false));
+            }
         }
     }
 
@@ -83,12 +84,12 @@ public class UpRow extends LinearLayout {
 
     public void setSubtitle(CharSequence text) {
         subtitle.setText(text);
-        subtitle.setVisibility(text == null || text.length() == 0 ? GONE : VISIBLE);
+        subtitle.setVisibility(TextUtils.isEmpty(text) ? GONE : VISIBLE);
     }
 
     public void setValue(CharSequence text) {
         value.setText(text);
-        value.setVisibility(text == null || text.length() == 0 ? GONE : VISIBLE);
+        value.setVisibility(TextUtils.isEmpty(text) ? GONE : VISIBLE);
     }
 
     public void setChevronVisible(boolean visible) {

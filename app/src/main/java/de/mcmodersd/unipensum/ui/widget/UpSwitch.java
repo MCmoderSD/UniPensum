@@ -11,6 +11,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
 import de.mcmodersd.unipensum.R;
 
@@ -100,6 +101,9 @@ public class UpSwitch extends View {
         super.onInitializeAccessibilityNodeInfo(info);
         info.setClassName("android.widget.Switch");
         info.setCheckable(true);
-        info.setChecked(checked);
+        AccessibilityNodeInfoCompat.wrap(info).setChecked(
+                checked
+                        ? AccessibilityNodeInfoCompat.CHECKED_STATE_TRUE : AccessibilityNodeInfoCompat.CHECKED_STATE_FALSE
+        );
     }
 }

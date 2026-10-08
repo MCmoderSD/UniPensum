@@ -5,6 +5,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -66,17 +67,17 @@ public class UpTextField extends LinearLayout {
         addView(error);
 
         if (attrs != null) {
-            var array = context.obtainStyledAttributes(attrs, R.styleable.UpTextField);
-            label.setText(array.getText(R.styleable.UpTextField_upLabel));
-            input.setHint(array.getText(R.styleable.UpTextField_upHint));
-            array.recycle();
+            try (var array = context.obtainStyledAttributes(attrs, R.styleable.UpTextField)) {
+                label.setText(array.getText(R.styleable.UpTextField_upLabel));
+                input.setHint(array.getText(R.styleable.UpTextField_upHint));
+            }
         }
         label.setVisibility(label.length() == 0 ? GONE : VISIBLE);
     }
 
     public void setLabel(CharSequence text) {
         label.setText(text);
-        label.setVisibility(text == null || text.length() == 0 ? GONE : VISIBLE);
+        label.setVisibility(TextUtils.isEmpty(text) ? GONE : VISIBLE);
     }
 
     public void setHint(CharSequence hint) {

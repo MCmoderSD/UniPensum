@@ -1,5 +1,6 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -86,13 +87,16 @@ public class ColorSwatchPicker extends View {
         var radius = Math.min(cellWidth, cellHeight) * 0.34f;
         for (var i = 0; i < colors.length; i++) {
             var cx = cellWidth * (i % COLUMNS + 0.5f);
-            var cy = cellHeight * (i / COLUMNS + 0.5f);
+            var row = i / COLUMNS;
+            var cy = cellHeight * (row + 0.5f);
             fill.setColor(CourseColors.resolve(getContext(), colors[i]));
             canvas.drawCircle(cx, cy, radius, fill);
             if (colors[i] == selected) canvas.drawCircle(cx, cy, radius + 5 * dp, ring);
         }
     }
 
+    // The click is made by performClick, which this method calls itself.
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
@@ -109,11 +113,6 @@ public class ColorSwatchPicker extends View {
             default:
                 return true;
         }
-    }
-
-    @Override
-    public boolean performClick() {
-        return super.performClick();
     }
 
     private int indexAt(float x, float y) {
@@ -133,7 +132,8 @@ public class ColorSwatchPicker extends View {
     private void cellBounds(int index, Rect out) {
         var cellWidth = getWidth() / (float) COLUMNS;
         var left = Math.round(cellWidth * (index % COLUMNS));
-        var top = Math.round(cellHeight * (index / COLUMNS));
+        var row = index / COLUMNS;
+        var top = Math.round(cellHeight * row);
         out.set(left, top, Math.round(left + cellWidth), Math.round(top + cellHeight));
     }
 
@@ -176,10 +176,13 @@ public class ColorSwatchPicker extends View {
         protected void onPopulateNodeForVirtualView(int id, @NonNull AccessibilityNodeInfoCompat node) {
             var bounds = new Rect();
             cellBounds(id, bounds);
-            node.setBoundsInParent(bounds);
+            setBoundsInScreenFromBoundsInParent(node, bounds);
             node.setContentDescription(colorName(colors[id]));
             node.setCheckable(true);
-            node.setChecked(colors[id] == selected);
+            node.setChecked(
+                    colors[id] == selected
+                            ? AccessibilityNodeInfoCompat.CHECKED_STATE_TRUE : AccessibilityNodeInfoCompat.CHECKED_STATE_FALSE
+            );
             node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
         }
 

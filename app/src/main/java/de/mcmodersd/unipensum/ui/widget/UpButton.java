@@ -36,9 +36,9 @@ public class UpButton extends AppCompatTextView {
 
         var variant = Variant.PRIMARY;
         if (attrs != null) {
-            var array = context.obtainStyledAttributes(attrs, R.styleable.UpButton);
-            variant = Variant.values()[array.getInt(R.styleable.UpButton_upVariant, 0)];
-            array.recycle();
+            try (var array = context.obtainStyledAttributes(attrs, R.styleable.UpButton)) {
+                variant = Variant.values()[array.getInt(R.styleable.UpButton_upVariant, 0)];
+            }
         }
         setVariant(variant);
     }
