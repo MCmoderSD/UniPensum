@@ -10,7 +10,6 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -74,8 +73,7 @@ public final class TimePickerSheet extends UpSheet {
     }
 
     @Override
-    protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
-                                 @Nullable Bundle savedInstanceState) {
+    protected View createContent(@Nullable Bundle savedInstanceState) {
         var context = requireContext();
         var dp = getResources().getDisplayMetrics().density;
         var initial = savedInstanceState != null

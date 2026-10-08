@@ -2,7 +2,6 @@ package de.mcmodersd.unipensum.ui.session;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -67,8 +66,7 @@ public final class SessionDetailSheet extends UpSheet {
     }
 
     @Override
-    protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
-                                 @Nullable Bundle savedInstanceState) {
+    protected View createContent(@Nullable Bundle savedInstanceState) {
         column = new LinearLayout(requireContext());
         column.setOrientation(LinearLayout.VERTICAL);
         return column;
@@ -195,7 +193,7 @@ public final class SessionDetailSheet extends UpSheet {
                         ), weighted(dp, links.getChildCount() > 0)
                 );
             }
-            actions.addView(links, rowParams(dp, 0, 8));
+            actions.addView(links, rowParams(dp, 8));
         }
 
         var manage = new LinearLayout(app);
@@ -220,7 +218,7 @@ public final class SessionDetailSheet extends UpSheet {
                         )
                 ), weighted(dp, true)
         );
-        actions.addView(manage, rowParams(dp, 0, 0));
+        actions.addView(manage, rowParams(dp, 0));
         return actions;
     }
 
@@ -261,7 +259,7 @@ public final class SessionDetailSheet extends UpSheet {
         var row = new UpRow(context);
         row.setTitle(title);
         row.setSubtitle(subtitle);
-        row.setLayoutParams(rowParams(dp, 0, 8));
+        row.setLayoutParams(rowParams(dp, 8));
         return row;
     }
 
@@ -283,11 +281,10 @@ public final class SessionDetailSheet extends UpSheet {
         return params;
     }
 
-    private static LinearLayout.LayoutParams rowParams(float dp, int topDp, int bottomDp) {
+    private static LinearLayout.LayoutParams rowParams(float dp, int bottomDp) {
         var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;
     }

@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -50,7 +49,6 @@ public final class BackupExportSheet extends UpSheet {
 
     private View form;
     private UpSwitch protect;
-    private View passwordBlock;
     private UpTextField password;
     private UpTextField repeat;
     private UpButton exportButton;
@@ -71,8 +69,7 @@ public final class BackupExportSheet extends UpSheet {
     }
 
     @Override
-    protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
-                                 @Nullable Bundle savedInstanceState) {
+    protected View createContent(@Nullable Bundle savedInstanceState) {
         var context = requireContext();
         var dp = getResources().getDisplayMetrics().density;
 
@@ -103,7 +100,6 @@ public final class BackupExportSheet extends UpSheet {
         var block = new LinearLayout(context);
         block.setOrientation(LinearLayout.VERTICAL);
         block.setVisibility(View.GONE);
-        passwordBlock = block;
         password = passwordField(context, R.string.backup_password);
         block.addView(password, spaced(dp, 0, 12));
         repeat = passwordField(context, R.string.backup_password_repeat);

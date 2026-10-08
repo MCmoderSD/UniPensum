@@ -35,8 +35,7 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
     @Nullable
     protected abstract CharSequence title(@NonNull Context context);
 
-    protected abstract View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
-                                          @Nullable Bundle savedInstanceState);
+    protected abstract View createContent(@Nullable Bundle savedInstanceState);
 
     /**
      * How much of the screen height the sheet takes at least, from 0 to 1. The default is 0: as tall as
@@ -61,7 +60,7 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
         title.setVisibility(text == null ? View.GONE : View.VISIBLE);
 
         ViewGroup content = root.findViewById(R.id.sheet_content);
-        content.addView(createContent(inflater, content, savedInstanceState));
+        content.addView(createContent(savedInstanceState));
 
         var fraction = minHeightFraction();
         if (fraction > 0f) {

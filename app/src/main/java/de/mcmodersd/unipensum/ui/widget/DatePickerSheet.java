@@ -2,9 +2,7 @@ package de.mcmodersd.unipensum.ui.widget;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -51,8 +49,7 @@ public final class DatePickerSheet extends UpSheet {
     }
 
     @Override
-    protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
-                                 @Nullable Bundle savedInstanceState) {
+    protected View createContent(@Nullable Bundle savedInstanceState) {
         var args = requireArguments();
         var calendar = new MonthCalendarView(requireContext());
         calendar.setWeekdaysOnly(args.getBoolean(ARG_WEEKDAYS_ONLY));

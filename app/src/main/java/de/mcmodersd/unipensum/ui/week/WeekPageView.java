@@ -87,7 +87,7 @@ final class WeekPageView extends LinearLayout {
 
             @Override
             public boolean onScale(@NonNull ScaleGestureDetector detector) {
-                zoomTo(grid.zoom() * detector.getScaleFactor(), detector.getFocusY(), false);
+                zoomTo(grid.zoom() * detector.getScaleFactor(), detector.getFocusY());
                 return true;
             }
 
@@ -217,9 +217,10 @@ final class WeekPageView extends LinearLayout {
     }
 
     /**
-     * Sets the zoom and keeps the time at {@code focusY} (measured in this page) where it is.
+     * Sets the zoom and keeps the time at {@code focusY} (measured in this page) where it is. The zoom is still
+     * changing then, so it is reported as not settled.
      */
-    private void zoomTo(float requested, float focusY, boolean settled) {
+    private void zoomTo(float requested, float focusY) {
         var old = grid.zoom();
         var next = ZoomMetrics.clamp(requested);
         if (next != old) {
@@ -229,7 +230,7 @@ final class WeekPageView extends LinearLayout {
             grid.setZoom(next);
             scrollAfterLayout(Math.round(target));
         }
-        reportZoom(settled);
+        reportZoom(false);
     }
 
     private void reportZoom(boolean settled) {
@@ -242,7 +243,7 @@ final class WeekPageView extends LinearLayout {
         var animator = ValueAnimator.ofFloat(grid.zoom(), ZoomMetrics.MIN);
         animator.setDuration(RESET_DURATION_MS);
         animator.setInterpolator(new DecelerateInterpolator());
-        animator.addUpdateListener(a -> zoomTo((float) a.getAnimatedValue(), focusY, false));
+        animator.addUpdateListener(a -> zoomTo((float) a.getAnimatedValue(), focusY));
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {

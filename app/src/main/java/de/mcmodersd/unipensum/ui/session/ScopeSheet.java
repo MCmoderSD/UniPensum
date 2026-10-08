@@ -2,7 +2,6 @@ package de.mcmodersd.unipensum.ui.session;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -50,8 +49,7 @@ public final class ScopeSheet extends UpSheet {
     }
 
     @Override
-    protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
-                                 @Nullable Bundle savedInstanceState) {
+    protected View createContent(@Nullable Bundle savedInstanceState) {
         var context = requireContext();
         var dp = getResources().getDisplayMetrics().density;
         var day = LocalDate.ofEpochDay(requireArguments().getLong(ARG_DAY));

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -55,8 +54,7 @@ public final class BackupImportSheet extends UpSheet {
     }
 
     @Override
-    protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
-                                 @Nullable Bundle savedInstanceState) {
+    protected View createContent(@Nullable Bundle savedInstanceState) {
         column = new LinearLayout(requireContext());
         column.setOrientation(LinearLayout.VERTICAL);
         return column;
@@ -112,7 +110,7 @@ public final class BackupImportSheet extends UpSheet {
         password.setPassword();
         if (model.wrongPassword()) password.setError(getString(R.string.backup_error_wrong_password));
         password.addTextWatcher(ignored -> password.setError(null));
-        column.addView(password, params(dp, 0, 12));
+        column.addView(password, params(dp, 12));
 
         var next = new UpButton(context);
         next.setText(R.string.action_continue);
@@ -124,8 +122,8 @@ public final class BackupImportSheet extends UpSheet {
             }
             model.submitPassword(chars);
         });
-        column.addView(next, params(dp, 0, 8));
-        column.addView(cancelButton(), params(dp, 0, 0));
+        column.addView(next, params(dp, 8));
+        column.addView(cancelButton(), params(dp, 0));
     }
 
     private void review() {
@@ -168,10 +166,10 @@ public final class BackupImportSheet extends UpSheet {
         }
 
         column.addView(text(R.string.backup_contents, 13, R.color.text_secondary, 0, 6));
-        column.addView(countRow(R.string.semesters_title, report.semesters()), params(dp, 0, 8));
-        column.addView(countRow(R.string.courses_title, report.courses()), params(dp, 0, 8));
-        column.addView(countRow(R.string.backup_sessions, report.sessions()), params(dp, 0, 8));
-        column.addView(countRow(R.string.lecturers_title, report.lecturers()), params(dp, 0, 8));
+        column.addView(countRow(R.string.semesters_title, report.semesters()), params(dp, 8));
+        column.addView(countRow(R.string.courses_title, report.courses()), params(dp, 8));
+        column.addView(countRow(R.string.backup_sessions, report.sessions()), params(dp, 8));
+        column.addView(countRow(R.string.lecturers_title, report.lecturers()), params(dp, 8));
 
         if (report.skipped() > 0) {
             column.addView(
@@ -199,8 +197,8 @@ public final class BackupImportSheet extends UpSheet {
         replace.setText(R.string.backup_action_replace);
         replace.setVariant(UpButton.Variant.DESTRUCTIVE);
         replace.setOnClickListener(v -> model.confirm());
-        column.addView(replace, params(dp, 0, 8));
-        column.addView(cancelButton(), params(dp, 0, 0));
+        column.addView(replace, params(dp, 8));
+        column.addView(cancelButton(), params(dp, 0));
     }
 
     private void finished(@StringRes int message, boolean error) {
@@ -209,7 +207,7 @@ public final class BackupImportSheet extends UpSheet {
         var done = new UpButton(requireContext());
         done.setText(error ? R.string.action_close : R.string.action_done);
         done.setOnClickListener(v -> dismiss());
-        column.addView(done, params(dp, 0, 0));
+        column.addView(done, params(dp, 0));
         if (isAdded()) {
             if (error) Haptics.reject(done);
             else Haptics.confirm(done);
@@ -247,11 +245,10 @@ public final class BackupImportSheet extends UpSheet {
         return view;
     }
 
-    private static LinearLayout.LayoutParams params(float dp, int topDp, int bottomDp) {
+    private static LinearLayout.LayoutParams params(float dp, int bottomDp) {
         var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;
     }

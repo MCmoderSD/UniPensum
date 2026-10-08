@@ -13,8 +13,8 @@ public final class SessionDao {
 
     private SessionDao() { }
 
-    public static long insert(SQLiteDatabase db, Session session) {
-        return db.insertOrThrow("session", null, values(session));
+    public static void insert(SQLiteDatabase db, Session session) {
+        db.insertOrThrow("session", null, values(session));
     }
 
     /** Also rewrites {@code series_id}, which is how a session moves into a split-off series. */

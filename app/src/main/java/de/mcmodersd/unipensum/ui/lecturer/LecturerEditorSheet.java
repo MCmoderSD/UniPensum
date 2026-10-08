@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Patterns;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -73,8 +72,7 @@ public final class LecturerEditorSheet extends UpSheet {
     }
 
     @Override
-    protected View createContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container,
-                                 @Nullable Bundle savedInstanceState) {
+    protected View createContent(@Nullable Bundle savedInstanceState) {
         var context = requireContext();
         var dp = getResources().getDisplayMetrics().density;
         repository = UniPensumApp.from(context).repository();
