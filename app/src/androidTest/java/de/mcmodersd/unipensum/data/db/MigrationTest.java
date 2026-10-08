@@ -64,6 +64,8 @@ public class MigrationTest {
     };
 
     private Context context;
+    /** The helper of the test that is running, closed after it together with its database. */
+    private DbHelper helper;
 
     @Before
     public void createVersion1Database() {
@@ -94,6 +96,7 @@ public class MigrationTest {
 
     @After
     public void deleteDatabase() {
+        if (helper != null) helper.close();
         context.deleteDatabase(NAME);
     }
 
@@ -115,7 +118,8 @@ public class MigrationTest {
     }
 
     private SQLiteDatabase migrate() {
-        return new DbHelper(context, NAME).getWritableDatabase();
+        helper = new DbHelper(context, NAME);
+        return helper.getWritableDatabase();
     }
 
     @Test
