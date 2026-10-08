@@ -84,6 +84,10 @@ android {
         // The language the texts fall back to is named in src/main/res/resources.properties.
         generateLocaleConfig = true
     }
+    lint {
+        // A language may lag behind a new text: what is missing falls back to English, so it is no reason to fail.
+        warning += "MissingTranslation"
+    }
     bundle {
         // The language of the app is set in the Android settings and can differ from the language of the device,
         // so Google Play has to deliver every language, not only the one of the device.
