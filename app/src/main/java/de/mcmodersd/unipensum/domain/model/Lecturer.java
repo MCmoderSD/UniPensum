@@ -13,7 +13,13 @@ import de.mcmodersd.unipensum.domain.text.TextSanitizer;
  * @param email     {@code null} if unknown
  * @param phone     {@code null} if unknown
  */
-public record Lecturer(long id, String firstName, String lastName, String email, String phone) {
+public record Lecturer(
+        long id,
+        String firstName,
+        String lastName,
+        String email,
+        String phone
+) {
 
     public Lecturer {
         Objects.requireNonNull(firstName, "firstName");

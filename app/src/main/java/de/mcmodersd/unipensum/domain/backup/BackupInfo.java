@@ -4,7 +4,13 @@ import static de.mcmodersd.unipensum.domain.backup.BackupInfo.Compatibility.*;
 
 import java.time.Instant;
 
-public record BackupInfo(int format, int schema, int appVersionCode, String appVersion, Instant exportedAt) {
+public record BackupInfo(
+        int format,
+        int schema,
+        int appVersionCode,
+        String appVersion,
+        Instant exportedAt
+) {
 
     public enum Compatibility {
         SAME, OLDER, NEWER

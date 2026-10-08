@@ -25,7 +25,8 @@ public record SessionDetails(
         String link,
         long lecturerId,
         String note,
-        int reminderMin) {
+        int reminderMin
+) {
 
     public static final int MINUTES_PER_DAY = 24 * 60;
     public static final long NO_LECTURER = 0;
