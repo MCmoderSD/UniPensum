@@ -1,4 +1,4 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+// Top-level build file where you can add configuration options common to all subprojects/modules.
 
 // The Android Gradle Plugin brings its own libraries, some in versions with known security issues. These
 // constraints require fixed versions on the build classpath. A constraint only raises a version, so it does

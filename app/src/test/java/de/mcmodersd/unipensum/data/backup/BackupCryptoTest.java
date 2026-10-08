@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 import javax.crypto.AEADBadTagException;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class BackupCryptoTest {
 
     /** Far fewer than the real ones, which would only make the tests slow. */

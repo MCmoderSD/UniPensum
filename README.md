@@ -65,7 +65,7 @@ Database tests (including the migration from older database versions) run on a d
 ./gradlew connectedDebugAndroidTest
 ```
 > [!WARNING]
-> `connectedDebugAndroidTest` runs on every connected device and uninstalls the app afterwards, which deletes its data.
+> `connectedDebugAndroidTest` runs on every connected device and uninstalls the app afterward, which deletes its data.
 > Disconnect your own phone and use an emulator, or install the two APKs on the emulator yourself:
 > ```bash
 > ./gradlew assembleDebug assembleDebugAndroidTest
@@ -154,7 +154,7 @@ Build provenance attestations are added to the release files as soon as the repo
 
 > [!NOTE]
 > An app signed with another key cannot be updated in place. Installing a release over a debug build needs the debug
-> build removed first, which deletes its data: export a backup (Settings → Data) beforehand and import it afterwards.
+> build removed first, which deletes its data: export a backup (Settings → Data) beforehand and import it afterward.
 
 ## Reminders
 Every event reminds you before it starts: 30 minutes by default, 5 minutes for an event that is only online. The time is

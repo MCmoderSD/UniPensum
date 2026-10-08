@@ -213,7 +213,7 @@ public class MigrationTest {
     public void fromVersion1_everyEventAndSessionGetsTheDefaultReminder() {
         var db = migrate();
 
-        // All of the version 1 rows are in person.
+        // All the version 1 rows are in person.
         assertEquals(0, DatabaseUtils.queryNumEntries(db, "series", "reminder_min IS NULL OR reminder_min <> 30"));
         assertEquals(0, DatabaseUtils.queryNumEntries(db, "session", "reminder_min IS NULL OR reminder_min <> 30"));
         var reminders = TimetableStore.loadReminders(db, MONDAY);

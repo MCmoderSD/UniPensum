@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class TextSanitizerTest {
 
     private static final String FAMILY = "👨‍👩‍👧";

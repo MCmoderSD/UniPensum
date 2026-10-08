@@ -31,6 +31,7 @@ import de.mcmodersd.unipensum.domain.model.SessionType;
  * With {@code --ei unipensum.debug.reminder_in 4} one more session is added today that begins in 4 minutes and
  * reminds 2 minutes before, with a meeting link and a Moodle link, to try a reminder without waiting for one.
  */
+@SuppressWarnings("SpellCheckingInspection")
 public final class DebugSeeder {
 
     public static final String EXTRA_SEED = "unipensum.debug.seed";

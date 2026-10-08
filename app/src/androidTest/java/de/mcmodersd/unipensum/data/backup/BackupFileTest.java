@@ -49,6 +49,7 @@ import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
 import de.mcmodersd.unipensum.domain.model.SessionType;
 
+@SuppressWarnings("SpellCheckingInspection")
 @RunWith(AndroidJUnit4.class)
 public class BackupFileTest {
 

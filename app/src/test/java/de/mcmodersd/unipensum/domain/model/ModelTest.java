@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.time.DayOfWeek;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class ModelTest {
 
     private static SessionDetails details(Mode mode, boolean hybrid, String room, String link) {

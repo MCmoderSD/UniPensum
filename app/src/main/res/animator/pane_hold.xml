@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Changes nothing, it only keeps a page on screen while the pane around it slides out, so the page
+    Changes nothing, it only keeps a page on screen while the surrounding pane slides out, so the page
     does not vanish before the pane has closed. Matches the closing time of PaneLayout.
 -->
 <objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"

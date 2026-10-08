@@ -133,7 +133,7 @@ public class UpSegmentedControl extends LinearLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         if (segments.isEmpty()) return;
-        // Interpolate between the two neighbouring segments, which also keeps right-to-left layouts correct.
+        // Interpolate between the two neighboring segments, which also keeps right-to-left layouts correct.
         var from = Math.max(0, Math.min(segments.size() - 1, (int) Math.floor(position)));
         var to = Math.min(segments.size() - 1, from + 1);
         var fraction = position - from;
