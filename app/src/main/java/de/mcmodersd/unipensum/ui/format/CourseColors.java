@@ -33,7 +33,6 @@ public final class CourseColors {
             case GRAPHITE -> R.color.course_graphite;
             case GRAY -> R.color.course_gray;
             case SILVER -> R.color.course_silver;
-            default -> throw new IllegalArgumentException("Unknown color: " + color);
         };
     }
 }

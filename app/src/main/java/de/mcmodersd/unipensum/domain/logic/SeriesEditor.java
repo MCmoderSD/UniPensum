@@ -46,7 +46,6 @@ public final class SeriesEditor {
                 yield editAll(semester, series, sessions, target.details(), details, schedule);
             }
             case ALL -> editAll(semester, series, sessions, target.details(), details, schedule);
-            default -> throw new IllegalArgumentException("Unknown scope: " + scope);
         };
     }
 
@@ -64,10 +63,8 @@ public final class SeriesEditor {
         var target = find(sessions, sessionId);
         var changes = new ChangeSet();
         switch (scope) {
-            case THIS_ONLY:
-                changes.deletedSessionIds.add(target.id());
-                break;
-            case THIS_AND_FOLLOWING:
+            case THIS_ONLY -> changes.deletedSessionIds.add(target.id());
+            case THIS_AND_FOLLOWING -> {
                 if (isFirst(sessions, target)) {
                     changes.deletedSeriesIds.add(series.id());
                 } else {
@@ -76,12 +73,8 @@ public final class SeriesEditor {
                     }
                     changes.updatedSeries.add(series.withSchedule(endBefore(series.schedule(), target)));
                 }
-                break;
-            case ALL:
-                changes.deletedSeriesIds.add(series.id());
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown scope: " + scope);
+            }
+            case ALL -> changes.deletedSeriesIds.add(series.id());
         }
         return changes;
     }

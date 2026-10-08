@@ -59,7 +59,6 @@ public final class TimeFormat {
             case EXERCISE -> context.getString(R.string.type_exercise);
             case LAB -> context.getString(R.string.type_lab);
             case TUTORIAL -> context.getString(R.string.type_tutorial);
-            default -> throw new IllegalArgumentException("Unknown type: " + type);
         };
     }
 }
