@@ -20,8 +20,7 @@ public final class Fixtures {
     public static final Semester SEMESTER =
             new Semester(1, LocalDate.of(2026, 10, 5), LocalDate.of(2027, 2, 12), null);
 
-    private Fixtures() {
-    }
+    private Fixtures() { }
 
     public static LocalDate date(int month, int day) {
         var year = month >= 9 ? 2026 : 2027;

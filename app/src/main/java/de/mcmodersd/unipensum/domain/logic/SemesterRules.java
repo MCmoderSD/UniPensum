@@ -27,8 +27,7 @@ public final class SemesterRules {
         OUTSIDE_SEMESTER
     }
 
-    private SemesterRules() {
-    }
+    private SemesterRules() { }
 
     /** @param others all other semesters; one with the same id as the candidate is ignored */
     public static SemesterCheck check(Semester candidate, List<Semester> others) {

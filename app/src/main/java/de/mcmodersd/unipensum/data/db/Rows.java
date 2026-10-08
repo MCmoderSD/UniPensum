@@ -10,8 +10,7 @@ import de.mcmodersd.unipensum.domain.model.SessionType;
 /** Column mapping shared by the series and session tables, which store the same detail fields. */
 final class Rows {
 
-    private Rows() {
-    }
+    private Rows() { }
 
     static void putDetails(ContentValues values, SessionDetails details) {
         values.put("type", details.type().key());

@@ -6,8 +6,7 @@ package de.mcmodersd.unipensum.ui.widget;
  */
 public final class PaneMetrics {
 
-    private PaneMetrics() {
-    }
+    private PaneMetrics() { }
 
     /** Whether a window this wide shows the calendar and the pane next to each other. */
     public static boolean isSplit(int windowWidth, int splitMinWidth) {

@@ -26,8 +26,7 @@ public final class SeriesEditor {
     private static final Comparator<Session> BY_DAY_THEN_ID =
             Comparator.comparing(Session::day).thenComparingLong(Session::id);
 
-    private SeriesEditor() {
-    }
+    private SeriesEditor() { }
 
     /**
      * @param sessions all sessions of {@code series}

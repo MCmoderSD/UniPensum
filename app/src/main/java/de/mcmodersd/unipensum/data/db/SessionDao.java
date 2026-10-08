@@ -12,8 +12,7 @@ import de.mcmodersd.unipensum.domain.model.Session;
 
 public final class SessionDao {
 
-    private SessionDao() {
-    }
+    private SessionDao() { }
 
     public static long insert(SQLiteDatabase db, Session session) {
         return db.insertOrThrow("session", null, values(session));

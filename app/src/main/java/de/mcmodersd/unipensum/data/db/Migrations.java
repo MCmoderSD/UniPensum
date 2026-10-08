@@ -22,8 +22,7 @@ final class Migrations {
             Migrations::reminders
     };
 
-    private Migrations() {
-    }
+    private Migrations() { }
 
     static void upgrade(SQLiteDatabase db, int from, int to) {
         for (var version = from; version < to; version++) {

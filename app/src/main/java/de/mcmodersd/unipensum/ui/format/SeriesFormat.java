@@ -17,8 +17,7 @@ import de.mcmodersd.unipensum.domain.model.SessionDetails;
 /** One-line descriptions of series and sessions for lists and the sheets. */
 public final class SeriesFormat {
 
-    private SeriesFormat() {
-    }
+    private SeriesFormat() { }
 
     public static String weekdayShort(Context context, DayOfWeek weekday) {
         return weekday.getDisplayName(TextStyle.SHORT, TimeFormat.locale(context));

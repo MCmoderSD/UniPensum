@@ -12,8 +12,7 @@ import de.mcmodersd.unipensum.domain.model.CourseColor;
 /** Resolves the preset keys to the light or dark color of the current configuration. */
 public final class CourseColors {
 
-    private CourseColors() {
-    }
+    private CourseColors() { }
 
     @ColorInt
     public static int resolve(Context context, CourseColor color) {

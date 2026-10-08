@@ -33,8 +33,7 @@ public final class ReminderNotifier {
     static final String CHANNEL_ID = "reminders";
     private static final String TAG = "reminder";
 
-    private ReminderNotifier() {
-    }
+    private ReminderNotifier() { }
 
     /** Idempotent. The user can change sound and priority of the channel in the system settings. */
     public static void createChannel(Context context) {

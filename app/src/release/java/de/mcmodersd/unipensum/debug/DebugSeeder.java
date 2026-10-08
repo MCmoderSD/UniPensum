@@ -8,8 +8,7 @@ public final class DebugSeeder {
 
     public static final String EXTRA_SEED = "unipensum.debug.seed";
 
-    private DebugSeeder() {
-    }
+    private DebugSeeder() { }
 
     public static void seed(Context context, Intent intent) {
     }

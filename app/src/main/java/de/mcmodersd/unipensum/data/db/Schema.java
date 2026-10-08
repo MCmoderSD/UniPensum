@@ -76,6 +76,5 @@ public final class Schema {
             "CREATE INDEX session_lecturer ON session(lecturer_id)"
     };
 
-    private Schema() {
-    }
+    private Schema() { }
 }

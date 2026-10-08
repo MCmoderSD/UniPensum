@@ -11,8 +11,7 @@ import de.mcmodersd.unipensum.domain.model.Lecturer;
 
 public final class LecturerDao {
 
-    private LecturerDao() {
-    }
+    private LecturerDao() { }
 
     public static long insert(SQLiteDatabase db, Lecturer lecturer) {
         return db.insertOrThrow("lecturer", null, values(lecturer));

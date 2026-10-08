@@ -36,8 +36,7 @@ final class BackupCrypto {
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private BackupCrypto() {
-    }
+    private BackupCrypto() { }
 
     /** The values that, together with the password, make the key; stored in the manifest. */
     record Params(int iterations, byte[] salt, byte[] iv) {

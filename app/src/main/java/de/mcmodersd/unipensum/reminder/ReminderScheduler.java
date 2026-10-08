@@ -38,8 +38,7 @@ public final class ReminderScheduler {
     /** When the last run looked at the data, in epoch milliseconds. */
     private static final String KEY_LAST_RUN = "last_run";
 
-    private ReminderScheduler() {
-    }
+    private ReminderScheduler() { }
 
     /**
      * Runs on the database thread and finishes on the main thread.

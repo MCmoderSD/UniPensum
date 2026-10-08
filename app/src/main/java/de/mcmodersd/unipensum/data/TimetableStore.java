@@ -40,8 +40,7 @@ import de.mcmodersd.unipensum.domain.text.TextSanitizer;
  */
 public final class TimetableStore {
 
-    private TimetableStore() {
-    }
+    private TimetableStore() { }
 
     // --- reads ---
 

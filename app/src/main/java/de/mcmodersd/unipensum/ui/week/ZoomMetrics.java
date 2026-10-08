@@ -7,8 +7,7 @@ final class ZoomMetrics {
     static final float MIN = 1f;
     static final float MAX = 4f;
 
-    private ZoomMetrics() {
-    }
+    private ZoomMetrics() { }
 
     static float clamp(float zoom) {
         return Math.max(MIN, Math.min(MAX, zoom));

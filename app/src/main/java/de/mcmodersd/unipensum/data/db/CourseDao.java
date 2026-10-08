@@ -12,8 +12,7 @@ import de.mcmodersd.unipensum.domain.model.CourseColor;
 
 public final class CourseDao {
 
-    private CourseDao() {
-    }
+    private CourseDao() { }
 
     public static long insert(SQLiteDatabase db, Course course) {
         return db.insertOrThrow("course", null, values(course));

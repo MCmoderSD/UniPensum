@@ -12,8 +12,7 @@ import java.util.Optional;
  */
 public final class NowIndicator {
 
-    private NowIndicator() {
-    }
+    private NowIndicator() { }
 
     /**
      * @param dayIndex 0 for Monday to 4 for Friday

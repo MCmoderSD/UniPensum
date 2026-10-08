@@ -12,8 +12,7 @@ import de.mcmodersd.unipensum.domain.model.Semester;
 
 public final class SemesterDao {
 
-    private SemesterDao() {
-    }
+    private SemesterDao() { }
 
     public static long insert(SQLiteDatabase db, Semester semester) {
         return db.insertOrThrow("semester", null, values(semester));

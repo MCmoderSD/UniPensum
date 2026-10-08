@@ -14,8 +14,7 @@ import de.mcmodersd.unipensum.domain.model.Series;
 
 public final class SeriesDao {
 
-    private SeriesDao() {
-    }
+    private SeriesDao() { }
 
     public static long insert(SQLiteDatabase db, Series series) {
         return db.insertOrThrow("series", null, values(series));

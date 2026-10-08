@@ -14,8 +14,7 @@ public final class Weeks {
     /** Roughly 30 years, until the end of 2049. */
     public static final int PAGE_COUNT = 52 * 30;
 
-    private Weeks() {
-    }
+    private Weeks() { }
 
     public static LocalDate mondayOf(int position) {
         return ANCHOR.plusWeeks(position);

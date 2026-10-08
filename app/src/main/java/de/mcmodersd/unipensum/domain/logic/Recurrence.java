@@ -10,8 +10,7 @@ import de.mcmodersd.unipensum.domain.model.Schedule;
 
 public final class Recurrence {
 
-    private Recurrence() {
-    }
+    private Recurrence() { }
 
     /**
      * All dates of the schedule in ascending order. The first one is the first matching weekday

@@ -8,8 +8,7 @@ import de.mcmodersd.unipensum.domain.model.Semester;
 
 public final class SemesterNames {
 
-    private SemesterNames() {
-    }
+    private SemesterNames() { }
 
     /** The custom name if there is one, otherwise "WiSe 26/27" or "SoSe 27" in the app language. */
     public static String display(Context context, Semester semester) {

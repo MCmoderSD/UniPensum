@@ -49,8 +49,7 @@ final class BackupJson {
     record Parsed(BackupData data, int skipped, int adjusted) {
     }
 
-    private BackupJson() {
-    }
+    private BackupJson() { }
 
     // --- writing ---
 

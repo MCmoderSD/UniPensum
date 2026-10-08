@@ -17,8 +17,7 @@ public final class SemesterNamer {
     public record Label(Season season, int year) {
     }
 
-    private SemesterNamer() {
-    }
+    private SemesterNamer() { }
 
     public static Label label(LocalDate start) {
         var month = start.getMonthValue();

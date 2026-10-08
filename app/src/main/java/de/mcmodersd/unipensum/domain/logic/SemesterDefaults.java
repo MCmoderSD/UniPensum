@@ -18,8 +18,7 @@ public final class SemesterDefaults {
     public record Period(LocalDate start, LocalDate end) {
     }
 
-    private SemesterDefaults() {
-    }
+    private SemesterDefaults() { }
 
     /**
      * The last day of a lecture period that begins on {@code start}: 16 weeks later, less a day, so a

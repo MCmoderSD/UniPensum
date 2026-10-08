@@ -21,8 +21,7 @@ public final class WeekLayout {
     public record Placement(long id, int column, int columns, boolean overlapping) {
     }
 
-    private WeekLayout() {
-    }
+    private WeekLayout() { }
 
     /** Result is ordered by start time, then end time, then id. */
     public static List<Placement> layout(List<Block> blocks) {

@@ -10,8 +10,7 @@ import android.view.View;
  */
 public final class Haptics {
 
-    private Haptics() {
-    }
+    private Haptics() { }
 
     /** A plain press of a button, a row or an icon: a firm click. */
     public static void tap(View view) {

@@ -38,8 +38,7 @@ public final class DebugSeeder {
     private static final int TEST_REMINDER_MIN = 2;
     private static final int TEST_LENGTH_MIN = 60;
 
-    private DebugSeeder() {
-    }
+    private DebugSeeder() { }
 
     public static void seed(Context context, Intent intent) {
         var reminderIn = intent.getIntExtra(EXTRA_REMINDER_IN, -1);

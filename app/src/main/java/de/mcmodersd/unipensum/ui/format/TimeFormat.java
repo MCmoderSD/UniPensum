@@ -16,8 +16,7 @@ import de.mcmodersd.unipensum.domain.model.SessionType;
 /** Locale- and 12/24h-aware formatting of times, dates and labels. */
 public final class TimeFormat {
 
-    private TimeFormat() {
-    }
+    private TimeFormat() { }
 
     public static Locale locale(Context context) {
         return context.getResources().getConfiguration().getLocales().get(0);

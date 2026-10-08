@@ -9,8 +9,7 @@ import androidx.core.app.NotificationManagerCompat;
 /** Whether the app may show notifications, and the way to the system settings where that is changed. */
 public final class NotificationAccess {
 
-    private NotificationAccess() {
-    }
+    private NotificationAccess() { }
 
     /** False if the user turned the notifications of the app off, or denied them when asked (Android 13 and newer). */
     public static boolean allowed(Context context) {

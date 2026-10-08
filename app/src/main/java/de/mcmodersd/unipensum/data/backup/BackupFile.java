@@ -62,8 +62,7 @@ public final class BackupFile {
     private static final String DATA_ENC = "data.enc";
     private static final int MAX_ENTRIES = 16;
 
-    private BackupFile() {
-    }
+    private BackupFile() { }
 
     /** What the file says about the app that wrote it. */
     public record Meta(int schema, int appVersionCode, String appVersion, Instant exportedAt) {

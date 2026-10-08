@@ -36,8 +36,7 @@ public final class Reminders {
     private static final Comparator<Due> BY_TIME =
             Comparator.comparing(Due::remindAt).thenComparing(due -> due.session().id());
 
-    private Reminders() {
-    }
+    private Reminders() { }
 
     public static int defaultFor(Mode mode) {
         return mode == Mode.ONLINE ? ONLINE_DEFAULT_MIN : IN_PERSON_DEFAULT_MIN;
