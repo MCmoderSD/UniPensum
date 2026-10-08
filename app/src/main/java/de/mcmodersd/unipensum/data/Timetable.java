@@ -11,8 +11,6 @@ import de.mcmodersd.unipensum.domain.model.Semester;
 /** Immutable snapshot of all semesters and sessions, indexed by day for the week grid. */
 public final class Timetable {
 
-    public static final Timetable EMPTY = new Timetable(List.of(), List.of());
-
     private final List<Semester> semesters;
     private final HashMap<LocalDate, ArrayList<SessionView>> byDay = new HashMap<>();
 

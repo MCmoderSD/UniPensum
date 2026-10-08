@@ -38,7 +38,6 @@ final class SessionBlockView extends LinearLayout {
     /** Lets the time range break after the dash when it does not fit on one line. */
     private static final String BREAKABLE_DASH = "–​";
 
-    private final SessionView session;
     private final TextView title;
     private final TextView time;
     private final TextView place;
@@ -55,7 +54,6 @@ final class SessionBlockView extends LinearLayout {
     SessionBlockView(Context context, GridMetrics metrics, SessionView session, NameStyle nameStyle,
                      boolean overlapping) {
         super(context);
-        this.session = session;
         this.barWidth = metrics.accentBar;
         this.radius = getResources().getDimension(R.dimen.radius_block);
         this.dp = getResources().getDisplayMetrics().density;
@@ -98,10 +96,6 @@ final class SessionBlockView extends LinearLayout {
                         TimeFormat.time(context, details.endMin())
                 )
         );
-    }
-
-    SessionView session() {
-        return session;
     }
 
     /**

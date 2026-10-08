@@ -92,13 +92,6 @@ public final class TimetableRepository {
         database.write(db -> TimetableStore.createCourse(db, course, series), callback);
     }
 
-    public void updateCourse(Course course, Callback<Void> callback) {
-        database.write(db -> {
-            TimetableStore.updateCourse(db, course);
-            return null;
-        }, callback);
-    }
-
     public void saveCourse(Course course, ArrayList<Series> series, Callback<Void> callback) {
         database.write(db -> {
             TimetableStore.saveCourse(db, course, series);
@@ -109,17 +102,6 @@ public final class TimetableRepository {
     public void deleteCourse(long id, Callback<Void> callback) {
         database.write(db -> {
             TimetableStore.deleteCourse(db, id);
-            return null;
-        }, callback);
-    }
-
-    public void addSeries(long courseId, Series series, Callback<Long> callback) {
-        database.write(db -> TimetableStore.addSeries(db, courseId, series), callback);
-    }
-
-    public void deleteSeries(long id, Callback<Void> callback) {
-        database.write(db -> {
-            TimetableStore.deleteSeries(db, id);
             return null;
         }, callback);
     }

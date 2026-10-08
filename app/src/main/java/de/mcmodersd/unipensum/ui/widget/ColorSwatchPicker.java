@@ -60,10 +60,6 @@ public class ColorSwatchPicker extends View {
         return accessibility.dispatchHoverEvent(event) || super.dispatchHoverEvent(event);
     }
 
-    public CourseColor getSelectedColor() {
-        return selected;
-    }
-
     public void setSelectedColor(CourseColor color) {
         selected = color;
         invalidate();

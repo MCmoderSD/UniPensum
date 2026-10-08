@@ -291,15 +291,6 @@ public final class TimetableStore {
         });
     }
 
-    public static void updateCourse(SQLiteDatabase db, Course course) {
-        CourseDao.update(
-                db, new Course(
-                        course.id(), course.semesterId(), requireName(course.name()),
-                        course.color(), cleanLink(course.moodleLink())
-                )
-        );
-    }
-
     /**
      * Saves an edited course together with its series as one transaction. Series of the stored course
      * that are missing from {@code drafts} are deleted, drafts with id 0 are added, and drafts with a
@@ -357,10 +348,6 @@ public final class TimetableStore {
             Semester semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
             return insertSeries(db, semester, courseId, series);
         });
-    }
-
-    public static void deleteSeries(SQLiteDatabase db, long id) {
-        SeriesDao.delete(db, id);
     }
 
     // --- sessions ---

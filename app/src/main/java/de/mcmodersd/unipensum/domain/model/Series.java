@@ -10,10 +10,6 @@ public record Series(long id, long courseId, SessionDetails details, Schedule sc
         Objects.requireNonNull(schedule, "schedule");
     }
 
-    public Series withDetails(SessionDetails newDetails) {
-        return new Series(id, courseId, newDetails, schedule);
-    }
-
     public Series withSchedule(Schedule newSchedule) {
         return new Series(id, courseId, details, newSchedule);
     }

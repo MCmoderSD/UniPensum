@@ -29,10 +29,6 @@ import de.mcmodersd.unipensum.R;
 @SuppressLint("NotifyDataSetChanged")
 public class WheelPicker extends RecyclerView {
 
-    public interface OnSelectedListener {
-        void onSelected(int index);
-    }
-
     private static final int VISIBLE_ITEMS = 5;
 
     private final int itemHeight;
@@ -43,7 +39,6 @@ public class WheelPicker extends RecyclerView {
     private int selected;
     /** The value in the center row the last time the wheel moved, to notice when the next one arrives. */
     private int centered = RecyclerView.NO_POSITION;
-    private OnSelectedListener listener;
 
     public WheelPicker(Context context) {
         this(context, null);
@@ -87,15 +82,11 @@ public class WheelPicker extends RecyclerView {
         return selected;
     }
 
-    /** Jumps to the value without notifying the listener. */
+    /** Jumps to the value. */
     public void setSelectedIndex(int index) {
         selected = Math.max(0, Math.min(labels.length - 1, index));
         layoutManager.scrollToPositionWithOffset(selected, 0);
         post(this::updateAlphas);
-    }
-
-    public void setOnSelectedListener(OnSelectedListener listener) {
-        this.listener = listener;
     }
 
     @Override
@@ -150,7 +141,6 @@ public class WheelPicker extends RecyclerView {
         var index = getChildAdapterPosition(snapView);
         if (index != RecyclerView.NO_POSITION && index != selected) {
             selected = index;
-            if (listener != null) listener.onSelected(index);
         }
     }
 

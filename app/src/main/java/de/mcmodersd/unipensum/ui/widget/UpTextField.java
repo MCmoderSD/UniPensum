@@ -155,10 +155,6 @@ public class UpTextField extends LinearLayout {
         input.setInputType(inputType);
     }
 
-    public AppCompatEditText editText() {
-        return input;
-    }
-
     private void updateStroke(boolean focused) {
         var hasError = error.getVisibility() == VISIBLE;
         if (hasError) {
