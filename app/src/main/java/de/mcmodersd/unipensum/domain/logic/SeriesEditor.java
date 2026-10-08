@@ -3,7 +3,6 @@ package de.mcmodersd.unipensum.domain.logic;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 import de.mcmodersd.unipensum.domain.model.EditScope;
@@ -35,7 +34,7 @@ public final class SeriesEditor {
      *                 {@link EditScope#THIS_AND_FOLLOWING} its first day is raised to the edited session's date.
      * @throws IllegalArgumentException if the date or schedule violates the semester rules
      */
-    public static ChangeSet edit(Semester semester, Series series, List<Session> sessions, long sessionId,
+    public static ChangeSet edit(Semester semester, Series series, ArrayList<Session> sessions, long sessionId,
                                  EditScope scope, SessionDetails details, LocalDate day, Schedule schedule) {
         var target = find(sessions, sessionId);
         switch (scope) {
@@ -58,12 +57,12 @@ public final class SeriesEditor {
      * The series template is the baseline: fields that differ from it are carried over to every session,
      * fields that stay as they are keep each session's individual value.
      */
-    public static ChangeSet editSeries(Semester semester, Series series, List<Session> sessions,
+    public static ChangeSet editSeries(Semester semester, Series series, ArrayList<Session> sessions,
                                        SessionDetails details, Schedule schedule) {
         return editAll(semester, series, sessions, series.details(), details, schedule);
     }
 
-    public static ChangeSet delete(Series series, List<Session> sessions, long sessionId, EditScope scope) {
+    public static ChangeSet delete(Series series, ArrayList<Session> sessions, long sessionId, EditScope scope) {
         var target = find(sessions, sessionId);
         var changes = new ChangeSet();
         switch (scope) {
@@ -102,7 +101,7 @@ public final class SeriesEditor {
     }
 
     /** @param before the details the edit started from, the baseline for "which fields changed" */
-    private static ChangeSet editAll(Semester semester, Series series, List<Session> sessions, SessionDetails before,
+    private static ChangeSet editAll(Semester semester, Series series, ArrayList<Session> sessions, SessionDetails before,
                                      SessionDetails details, Schedule schedule) {
         requireValidSchedule(semester, schedule);
         var template = carryOver(before, details, series.details());
@@ -125,7 +124,7 @@ public final class SeriesEditor {
         return changes;
     }
 
-    private static ChangeSet editFollowing(Semester semester, Series series, List<Session> sessions, Session target,
+    private static ChangeSet editFollowing(Semester semester, Series series, ArrayList<Session> sessions, Session target,
                                            SessionDetails details, Schedule schedule) {
         requireValidSchedule(semester, schedule);
         var old = series.schedule();
@@ -182,21 +181,21 @@ public final class SeriesEditor {
         return schedule.withLast(target.day().minusDays(1));
     }
 
-    private static Session find(List<Session> sessions, long sessionId) {
+    private static Session find(ArrayList<Session> sessions, long sessionId) {
         for (var session : sessions) {
             if (session.id() == sessionId) return session;
         }
         throw new IllegalArgumentException("Session " + sessionId + " is not part of the series");
     }
 
-    private static boolean isFirst(List<Session> sessions, Session target) {
+    private static boolean isFirst(ArrayList<Session> sessions, Session target) {
         for (var session : sessions) {
             if (BY_DAY_THEN_ID.compare(session, target) < 0) return false;
         }
         return true;
     }
 
-    private static List<Session> followingOf(List<Session> sessions, Session target) {
+    private static ArrayList<Session> followingOf(ArrayList<Session> sessions, Session target) {
         var result = new ArrayList<Session>();
         for (var session : sessions) {
             if (BY_DAY_THEN_ID.compare(session, target) >= 0) result.add(session);

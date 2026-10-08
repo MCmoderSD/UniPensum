@@ -63,7 +63,7 @@ public final class Reminders {
      * The reminders that were due after {@code after} (exclusive) up to {@code now} (inclusive) and are still of
      * use, which is until their session is over. Earliest first.
      */
-    public static List<Due> due(List<Session> sessions, LocalDateTime after, LocalDateTime now) {
+    public static ArrayList<Due> due(List<Session> sessions, LocalDateTime after, LocalDateTime now) {
         var result = new ArrayList<Due>();
         for (var session : sessions) {
             of(session).ifPresent(due -> {

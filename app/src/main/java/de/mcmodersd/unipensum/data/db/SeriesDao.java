@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.mcmodersd.unipensum.domain.model.Schedule;
 import de.mcmodersd.unipensum.domain.model.Series;
@@ -39,7 +38,7 @@ public final class SeriesDao {
     }
 
     /** Ordered by weekday, then start time. */
-    public static List<Series> listByCourse(SQLiteDatabase db, long courseId) {
+    public static ArrayList<Series> listByCourse(SQLiteDatabase db, long courseId) {
         var result = new ArrayList<Series>();
         try (var cursor = db.query(
                 "series", null, "course_id = ?", new String[]{String.valueOf(courseId)},
@@ -50,7 +49,7 @@ public final class SeriesDao {
         return result;
     }
 
-    public static List<Series> listBySemester(SQLiteDatabase db, long semesterId) {
+    public static ArrayList<Series> listBySemester(SQLiteDatabase db, long semesterId) {
         var result = new ArrayList<Series>();
         var sql = "SELECT r.* FROM series r JOIN course c ON r.course_id = c.id "
                 + "WHERE c.semester_id = ? ORDER BY r.id";

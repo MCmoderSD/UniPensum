@@ -54,7 +54,7 @@ public final class SemesterEditorSheet extends UpSheet {
     private static final String KEY_SHORTEN = "semester_shorten";
     private static final String KEY_DELETE = "semester_delete";
 
-    private final List<Semester> others = new ArrayList<>();
+    private final ArrayList<Semester> others = new ArrayList<>();
     private TimetableRepository repository;
     private long id;
     private Semester original;

@@ -17,7 +17,6 @@ import androidx.fragment.app.FragmentManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
@@ -38,7 +37,7 @@ public final class SemesterSheet extends UpSheet {
     public static final String RESULT_EPOCH_DAY = "epochDay";
 
     private LinearLayout list;
-    private List<Semester> current = new ArrayList<>();
+    private ArrayList<Semester> current = new ArrayList<>();
 
     public static void show(FragmentManager manager) {
         new SemesterSheet().show(manager, "semesters");
@@ -87,7 +86,7 @@ public final class SemesterSheet extends UpSheet {
                 .observe(getViewLifecycleOwner(), this::render);
     }
 
-    private void render(List<Semester> semesters) {
+    private void render(ArrayList<Semester> semesters) {
         current = semesters;
         var context = requireContext();
         var dp = getResources().getDisplayMetrics().density;

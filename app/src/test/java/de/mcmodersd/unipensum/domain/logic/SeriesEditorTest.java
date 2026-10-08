@@ -34,7 +34,7 @@ import de.mcmodersd.unipensum.domain.model.SessionDetails;
 public class SeriesEditorTest {
 
     private final Series series = series(10, weekly(DayOfWeek.MONDAY, date(10, 5), date(11, 2)));
-    private final List<Session> sessions = sessionsOf(series, 101);
+    private final ArrayList<Session> sessions = sessionsOf(series, 101);
 
     private ChangeSet edit(long sessionId, EditScope scope, SessionDetails details, Schedule schedule) {
         return SeriesEditor.edit(

@@ -24,7 +24,7 @@ public final class WeekLayout {
     private WeekLayout() { }
 
     /** Result is ordered by start time, then end time, then id. */
-    public static List<Placement> layout(List<Block> blocks) {
+    public static ArrayList<Placement> layout(List<Block> blocks) {
         var sorted = new ArrayList<Block>(blocks);
         sorted.sort(
                 Comparator.comparingInt(Block::startMin)
@@ -68,7 +68,7 @@ public final class WeekLayout {
         return result;
     }
 
-    private static void flush(List<Block> group, List<Integer> columns, int columnCount, List<Placement> out) {
+    private static void flush(ArrayList<Block> group, ArrayList<Integer> columns, int columnCount, ArrayList<Placement> out) {
         var overlapping = group.size() > 1;
         for (var i = 0; i < group.size(); i++) {
             out.add(new Placement(group.get(i).id(), columns.get(i), columnCount, overlapping));

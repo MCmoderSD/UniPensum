@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import de.mcmodersd.unipensum.UniPensumApp;
@@ -57,9 +55,9 @@ public final class ReminderScheduler {
         // Yesterday as well: a reminder for an early session falls on the day before it.
         UniPensumApp.from(app).database().read(
                 db -> TimetableStore.loadReminders(db, now.toLocalDate().minusDays(1)),
-                new Database.Callback<List<ReminderView>>() {
+                new Database.Callback<ArrayList<ReminderView>>() {
                     @Override
-                    public void onSuccess(List<ReminderView> views) {
+                    public void onSuccess(ArrayList<ReminderView> views) {
                         try {
                             plan(app, views, showDue, nowMillis, now, zone);
                         } finally {
@@ -76,7 +74,7 @@ public final class ReminderScheduler {
         );
     }
 
-    private static void plan(Context context, List<ReminderView> views, boolean showDue, long nowMillis,
+    private static void plan(Context context, ArrayList<ReminderView> views, boolean showDue, long nowMillis,
                              LocalDateTime now, ZoneId zone) {
         var state = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         var lastRun = state.getLong(KEY_LAST_RUN, 0);

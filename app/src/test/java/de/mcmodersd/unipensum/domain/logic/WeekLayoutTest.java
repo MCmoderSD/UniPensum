@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.mcmodersd.unipensum.domain.logic.WeekLayout.Block;
@@ -17,7 +18,7 @@ public class WeekLayoutTest {
         return new Block(id, startHour * 60, endHour * 60);
     }
 
-    private static Placement placement(List<Placement> all, long id) {
+    private static Placement placement(ArrayList<Placement> all, long id) {
         for (var p : all) {
             if (p.id() == id) return p;
         }

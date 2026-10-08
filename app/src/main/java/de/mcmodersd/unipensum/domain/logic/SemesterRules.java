@@ -2,9 +2,9 @@ package de.mcmodersd.unipensum.domain.logic;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import de.mcmodersd.unipensum.domain.model.Schedule;
 import de.mcmodersd.unipensum.domain.model.Semester;
@@ -67,7 +67,7 @@ public final class SemesterRules {
      * @param series   all series of the semester's courses
      * @param sessions all sessions of those series
      */
-    public static ChangeSet resize(Semester old, Semester updated, List<Series> series, List<Session> sessions) {
+    public static ChangeSet resize(Semester old, Semester updated, List<Series> series, ArrayList<Session> sessions) {
         var changes = new ChangeSet();
         var deletedSeries = new HashSet<Long>();
 

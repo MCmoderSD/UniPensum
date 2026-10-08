@@ -3,7 +3,7 @@ package de.mcmodersd.unipensum.data;
 import androidx.lifecycle.LiveData;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.ArrayList;
 
 import de.mcmodersd.unipensum.data.db.Database;
 import de.mcmodersd.unipensum.data.db.Database.Callback;
@@ -33,15 +33,15 @@ public final class TimetableRepository {
         return database.observe(TimetableStore::loadTimetable);
     }
 
-    public LiveData<List<Semester>> semesters() {
+    public LiveData<ArrayList<Semester>> semesters() {
         return database.observe(TimetableStore::listSemesters);
     }
 
-    public LiveData<List<CourseWithSeries>> courses(long semesterId) {
+    public LiveData<ArrayList<CourseWithSeries>> courses(long semesterId) {
         return database.observe(db -> TimetableStore.listCourses(db, semesterId));
     }
 
-    public LiveData<List<Lecturer>> lecturers() {
+    public LiveData<ArrayList<Lecturer>> lecturers() {
         return database.observe(TimetableStore::listLecturers);
     }
 
@@ -88,7 +88,7 @@ public final class TimetableRepository {
         }, callback);
     }
 
-    public void createCourse(Course course, List<Series> series, Callback<Long> callback) {
+    public void createCourse(Course course, ArrayList<Series> series, Callback<Long> callback) {
         database.write(db -> TimetableStore.createCourse(db, course, series), callback);
     }
 
@@ -99,7 +99,7 @@ public final class TimetableRepository {
         }, callback);
     }
 
-    public void saveCourse(Course course, List<Series> series, Callback<Void> callback) {
+    public void saveCourse(Course course, ArrayList<Series> series, Callback<Void> callback) {
         database.write(db -> {
             TimetableStore.saveCourse(db, course, series);
             return null;

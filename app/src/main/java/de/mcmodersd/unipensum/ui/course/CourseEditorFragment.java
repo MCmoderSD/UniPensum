@@ -15,8 +15,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
@@ -48,7 +46,7 @@ public class CourseEditorFragment extends Fragment {
 
     private CourseDraftViewModel draft;
     private TimetableRepository repository;
-    private final Map<Long, Lecturer> lecturers = new HashMap<>();
+    private final HashMap<Long, Lecturer> lecturers = new HashMap<>();
     private NameStyle nameStyle = NameStyle.LAST_NAME;
     private UpTextField nameField;
     private UpTextField moodleField;

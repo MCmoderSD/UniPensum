@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.mcmodersd.unipensum.domain.model.Lecturer;
 
@@ -41,7 +40,7 @@ public final class LecturerDao {
     }
 
     /** Ordered by last name, then first name, case-insensitive. */
-    public static List<Lecturer> list(SQLiteDatabase db) {
+    public static ArrayList<Lecturer> list(SQLiteDatabase db) {
         var result = new ArrayList<Lecturer>();
         try (var cursor = db.query(
                 "lecturer", null, null, null, null, null,

@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import de.mcmodersd.unipensum.data.db.CourseDao;
@@ -44,11 +42,11 @@ public final class TimetableStore {
 
     // --- reads ---
 
-    public static List<Semester> listSemesters(SQLiteDatabase db) {
+    public static ArrayList<Semester> listSemesters(SQLiteDatabase db) {
         return SemesterDao.list(db);
     }
 
-    public static List<Lecturer> listLecturers(SQLiteDatabase db) {
+    public static ArrayList<Lecturer> listLecturers(SQLiteDatabase db) {
         return LecturerDao.list(db);
     }
 
@@ -86,7 +84,7 @@ public final class TimetableStore {
      * The sessions that have a reminder and take place on {@code from} or later, with the name and the Moodle
      * link of their course, which is what a reminder shows. Earliest first.
      */
-    public static List<ReminderView> loadReminders(SQLiteDatabase db, LocalDate from) {
+    public static ArrayList<ReminderView> loadReminders(SQLiteDatabase db, LocalDate from) {
         var sql = "SELECT s.*, c.name AS course_name, c.moodle_link AS moodle_link "
                 + "FROM session s JOIN series r ON s.series_id = r.id JOIN course c ON r.course_id = c.id "
                 + "WHERE s.day >= ? AND s.reminder_min IS NOT NULL ORDER BY s.day, s.start_min, s.id";
@@ -106,7 +104,7 @@ public final class TimetableStore {
         return views;
     }
 
-    public static List<CourseWithSeries> listCourses(SQLiteDatabase db, long semesterId) {
+    public static ArrayList<CourseWithSeries> listCourses(SQLiteDatabase db, long semesterId) {
         var result = new ArrayList<CourseWithSeries>();
         for (var course : CourseDao.listBySemester(db, semesterId)) {
             result.add(new CourseWithSeries(course, SeriesDao.listByCourse(db, course.id())));
@@ -200,14 +198,14 @@ public final class TimetableStore {
         });
     }
 
-    private static long mapped(Map<Long, Long> ids, long oldId, String what) {
+    private static long mapped(HashMap<Long, Long> ids, long oldId, String what) {
         var id = ids.get(oldId);
         if (id == null) throw new IllegalArgumentException("The backup refers to a " + what + " it does not hold: " + oldId);
         return id;
     }
 
     /** The details with the lecturer id of the data replaced by the one the lecturer got in the database. */
-    private static SessionDetails withLecturer(SessionDetails d, Map<Long, Long> lecturerIds) {
+    private static SessionDetails withLecturer(SessionDetails d, HashMap<Long, Long> lecturerIds) {
         var lecturer = d.lecturerId() == SessionDetails.NO_LECTURER
                 ? SessionDetails.NO_LECTURER : mapped(lecturerIds, d.lecturerId(), "lecturer");
         return d.withLecturer(lecturer);

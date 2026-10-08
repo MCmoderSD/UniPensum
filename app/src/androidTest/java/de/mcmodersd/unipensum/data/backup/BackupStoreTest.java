@@ -22,7 +22,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.mcmodersd.unipensum.data.SessionView;
 import de.mcmodersd.unipensum.data.Timetable;
@@ -101,7 +100,7 @@ public class BackupStoreTest {
      * Everything in the database as text, without any id, with the lecturers by name: two databases with
      * the same signature hold the same timetable even though their ids differ.
      */
-    private static List<String> signature(SQLiteDatabase db) {
+    private static ArrayList<String> signature(SQLiteDatabase db) {
         var lines = new ArrayList<String>();
         var lecturerNames = new HashMap<Long, String>();
         for (var l : TimetableStore.listLecturers(db)) {

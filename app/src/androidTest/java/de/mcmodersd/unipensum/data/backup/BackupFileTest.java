@@ -28,7 +28,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -544,14 +543,14 @@ public class BackupFileTest {
 
     // --- helpers ---
 
-    private static Map<String, byte[]> sampleFile(String manifest, String data) {
+    private static LinkedHashMap<String, byte[]> sampleFile(String manifest, String data) {
         var entries = new LinkedHashMap<String, byte[]>();
         entries.put("manifest.json", manifest.getBytes(StandardCharsets.UTF_8));
         entries.put("data.json", data.getBytes(StandardCharsets.UTF_8));
         return entries;
     }
 
-    private static byte[] zip(Map<String, byte[]> entries) throws IOException {
+    private static byte[] zip(LinkedHashMap<String, byte[]> entries) throws IOException {
         var bytes = new ByteArrayOutputStream();
         try (var zip = new ZipOutputStream(bytes)) {
             for (var entry : entries.entrySet()) {
@@ -563,7 +562,7 @@ public class BackupFileTest {
         return bytes.toByteArray();
     }
 
-    private static Map<String, byte[]> unzip(byte[] file) throws IOException {
+    private static LinkedHashMap<String, byte[]> unzip(byte[] file) throws IOException {
         var entries = new LinkedHashMap<String, byte[]>();
         try (var zip = new ZipInputStream(new ByteArrayInputStream(file))) {
             ZipEntry entry;

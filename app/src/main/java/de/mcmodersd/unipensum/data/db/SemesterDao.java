@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.mcmodersd.unipensum.domain.model.Semester;
 
@@ -42,7 +41,7 @@ public final class SemesterDao {
     }
 
     /** Ordered by start date. */
-    public static List<Semester> list(SQLiteDatabase db) {
+    public static ArrayList<Semester> list(SQLiteDatabase db) {
         var result = new ArrayList<Semester>();
         try (var cursor = db.query("semester", null, null, null, null, null, "start_day, id")) {
             while (cursor.moveToNext()) result.add(read(cursor));

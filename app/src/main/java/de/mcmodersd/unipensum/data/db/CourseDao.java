@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.mcmodersd.unipensum.domain.model.Course;
 import de.mcmodersd.unipensum.domain.model.CourseColor;
@@ -37,7 +36,7 @@ public final class CourseDao {
     }
 
     /** Ordered by name, case-insensitive. */
-    public static List<Course> listBySemester(SQLiteDatabase db, long semesterId) {
+    public static ArrayList<Course> listBySemester(SQLiteDatabase db, long semesterId) {
         var result = new ArrayList<Course>();
         try (var cursor = db.query(
                 "course", null, "semester_id = ?", new String[]{String.valueOf(semesterId)},

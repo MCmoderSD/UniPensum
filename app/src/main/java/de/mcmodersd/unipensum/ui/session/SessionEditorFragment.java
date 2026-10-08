@@ -17,8 +17,6 @@ import androidx.lifecycle.ViewModelProvider;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
@@ -143,7 +141,7 @@ public class SessionEditorFragment extends Fragment {
     private int seriesIndex;
     private CourseDraftViewModel draft;
     /** All lecturers by id, to put a name on the chosen one; {@code null} until they have loaded. */
-    private Map<Long, Lecturer> lecturers;
+    private HashMap<Long, Lecturer> lecturers;
 
     private View formScroll;
     private UpSegmentedControl typeControl;

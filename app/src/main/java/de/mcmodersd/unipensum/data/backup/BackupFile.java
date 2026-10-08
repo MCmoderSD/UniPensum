@@ -17,7 +17,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -227,7 +226,7 @@ public final class BackupFile {
         return new Opened(parsed.info, parsed.crypto, manifest, data);
     }
 
-    private static Map<String, byte[]> unzip(byte[] bytes) throws BackupException {
+    private static HashMap<String, byte[]> unzip(byte[] bytes) throws BackupException {
         var entries = new HashMap<String, byte[]>();
         var budget = MAX_UNPACKED_BYTES;
         try (var zip = new ZipInputStream(new ByteArrayInputStream(bytes))) {

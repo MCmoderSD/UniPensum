@@ -1,7 +1,6 @@
 package de.mcmodersd.unipensum.domain.logic;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.model.Session;
@@ -20,16 +19,16 @@ public final class ChangeSet {
      * @param sessions new sessions to insert into it (their {@code seriesId} is ignored)
      * @param adopted  existing sessions that move into it; their {@code seriesId} is overwritten
      */
-    public record NewSeries(Series series, List<Session> sessions, List<Session> adopted) {
+    public record NewSeries(Series series, ArrayList<Session> sessions, ArrayList<Session> adopted) {
     }
 
-    public final List<NewSeries> newSeries = new ArrayList<>();
-    public final List<Series> updatedSeries = new ArrayList<>();
-    public final List<Long> deletedSeriesIds = new ArrayList<>();
+    public final ArrayList<NewSeries> newSeries = new ArrayList<>();
+    public final ArrayList<Series> updatedSeries = new ArrayList<>();
+    public final ArrayList<Long> deletedSeriesIds = new ArrayList<>();
     /** Sessions inserted into already existing series. */
-    public final List<Session> newSessions = new ArrayList<>();
-    public final List<Session> updatedSessions = new ArrayList<>();
-    public final List<Long> deletedSessionIds = new ArrayList<>();
+    public final ArrayList<Session> newSessions = new ArrayList<>();
+    public final ArrayList<Session> updatedSessions = new ArrayList<>();
+    public final ArrayList<Long> deletedSessionIds = new ArrayList<>();
 
     public boolean isEmpty() {
         return newSeries.isEmpty()

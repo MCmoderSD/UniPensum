@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import de.mcmodersd.unipensum.domain.logic.SemesterRules;
@@ -52,7 +51,7 @@ public final class BackupCleaner {
         );
     }
 
-    private Map<Long, Lecturer> cleanLecturers(List<Lecturer> raw) {
+    private LinkedHashMap<Long, Lecturer> cleanLecturers(List<Lecturer> raw) {
         var kept = new LinkedHashMap<Long, Lecturer>();
         for (var lecturer : raw) {
             var clean = lecturer.normalized();
@@ -65,7 +64,7 @@ public final class BackupCleaner {
         return kept;
     }
 
-    private Map<Long, Semester> cleanSemesters(List<Semester> raw) {
+    private LinkedHashMap<Long, Semester> cleanSemesters(List<Semester> raw) {
         var seen = new HashSet<Long>();
         var candidates = new ArrayList<Semester>();
         for (var semester : raw) {
@@ -94,7 +93,7 @@ public final class BackupCleaner {
         return byId;
     }
 
-    private Map<Long, Course> cleanCourses(List<Course> raw, Map<Long, Semester> semesters) {
+    private LinkedHashMap<Long, Course> cleanCourses(List<Course> raw, LinkedHashMap<Long, Semester> semesters) {
         var kept = new LinkedHashMap<Long, Course>();
         for (var course : raw) {
             var name = TextSanitizer.line(course.name(), TextSanitizer.MAX_NAME);
@@ -113,7 +112,7 @@ public final class BackupCleaner {
         return kept;
     }
 
-    private Map<Long, Series> cleanSeries(List<Series> raw, Map<Long, Course> courses, Map<Long, Semester> semesters, Set<Long> lecturerIds) {
+    private LinkedHashMap<Long, Series> cleanSeries(List<Series> raw, LinkedHashMap<Long, Course> courses, LinkedHashMap<Long, Semester> semesters, Set<Long> lecturerIds) {
         var kept = new LinkedHashMap<Long, Series>();
         for (var series : raw) {
             var course = courses.get(series.courseId());
@@ -131,8 +130,8 @@ public final class BackupCleaner {
         return kept;
     }
 
-    private List<Session> cleanSessions(List<Session> raw, Map<Long, Series> series, Map<Long, Course> courses,
-                                        Map<Long, Semester> semesters, Set<Long> lecturerIds) {
+    private ArrayList<Session> cleanSessions(List<Session> raw, LinkedHashMap<Long, Series> series, LinkedHashMap<Long, Course> courses,
+                                             LinkedHashMap<Long, Semester> semesters, Set<Long> lecturerIds) {
         var seen = new HashSet<Long>();
         var kept = new ArrayList<Session>();
         for (var session : raw) {

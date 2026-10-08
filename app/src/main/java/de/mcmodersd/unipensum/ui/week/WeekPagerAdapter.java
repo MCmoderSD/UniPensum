@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.function.IntSupplier;
 
 import de.mcmodersd.unipensum.data.AppSettings.TimeWindow;
@@ -29,7 +28,7 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
         }
     }
 
-    private final List<WeekPageView> attached = new ArrayList<>();
+    private final ArrayList<WeekPageView> attached = new ArrayList<>();
     private Timetable timetable;
     private TimeWindow window = TimeWindow.DEFAULT;
     private NameStyle nameStyle = NameStyle.LAST_NAME;

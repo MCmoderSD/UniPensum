@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
@@ -119,7 +119,7 @@ public final class LecturerSheet extends UpSheet {
                 .observe(getViewLifecycleOwner(), this::render);
     }
 
-    private void render(List<Lecturer> lecturers) {
+    private void render(ArrayList<Lecturer> lecturers) {
         var context = requireContext();
         var dp = getResources().getDisplayMetrics().density;
         var selected = picking() ? requireArguments().getLong(ARG_SELECTED) : SessionDetails.NO_LECTURER;

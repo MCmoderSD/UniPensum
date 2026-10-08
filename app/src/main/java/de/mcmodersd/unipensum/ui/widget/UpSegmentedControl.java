@@ -19,7 +19,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.mcmodersd.unipensum.R;
 
@@ -35,7 +34,7 @@ public class UpSegmentedControl extends LinearLayout {
 
     private static final long SLIDE_MILLIS = 260;
 
-    private final List<TextView> segments = new ArrayList<>();
+    private final ArrayList<TextView> segments = new ArrayList<>();
     private final Paint pillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF pillRect = new RectF();
     private final float dp = getResources().getDisplayMetrics().density;

@@ -101,7 +101,7 @@ public class SemesterRulesTest {
 
     private static final Semester OLD = semester(1, date(10, 5), date(11, 13));      // Mon to Fri
 
-    private static List<Session> allSessions(Series... series) {
+    private static ArrayList<Session> allSessions(Series... series) {
         var result = new ArrayList<Session>();
         long next = 100;
         for (var s : series) {

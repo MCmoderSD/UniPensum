@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.mcmodersd.unipensum.domain.model.Session;
 
@@ -38,7 +37,7 @@ public final class SessionDao {
     }
 
     /** Ordered by date. */
-    public static List<Session> listBySeries(SQLiteDatabase db, long seriesId) {
+    public static ArrayList<Session> listBySeries(SQLiteDatabase db, long seriesId) {
         var result = new ArrayList<Session>();
         try (var cursor = db.query(
                 "session", null, "series_id = ?", new String[]{String.valueOf(seriesId)},
@@ -49,7 +48,7 @@ public final class SessionDao {
         return result;
     }
 
-    public static List<Session> listBySemester(SQLiteDatabase db, long semesterId) {
+    public static ArrayList<Session> listBySemester(SQLiteDatabase db, long semesterId) {
         var result = new ArrayList<Session>();
         var sql = "SELECT s.* FROM session s JOIN series r ON s.series_id = r.id "
                 + "JOIN course c ON r.course_id = c.id WHERE c.semester_id = ? ORDER BY s.day, s.id";

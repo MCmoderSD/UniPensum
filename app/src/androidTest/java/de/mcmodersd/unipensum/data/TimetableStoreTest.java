@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -651,9 +652,9 @@ public class TimetableStoreTest {
     @Test
     public void observe_reRunsTheQueryAfterAWrite() throws Exception {
         var database = Database.inMemory(context);
-        LiveData<List<Semester>> live = database.observe(TimetableStore::listSemesters);
+        LiveData<ArrayList<Semester>> live = database.observe(TimetableStore::listSemesters);
         var sawSemester = new CountDownLatch(1);
-        Observer<List<Semester>> observer = semesters -> {
+        Observer<ArrayList<Semester>> observer = semesters -> {
             if (semesters.size() == 1) sawSemester.countDown();
         };
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> live.observeForever(observer));

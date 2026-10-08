@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.mcmodersd.unipensum.domain.model.Semester;
 
@@ -15,7 +14,7 @@ public final class Timetable {
     public static final Timetable EMPTY = new Timetable(List.of(), List.of());
 
     private final List<Semester> semesters;
-    private final Map<LocalDate, List<SessionView>> byDay = new HashMap<>();
+    private final HashMap<LocalDate, ArrayList<SessionView>> byDay = new HashMap<>();
 
     /** @param sessions expected in display order; that order is kept within each day */
     public Timetable(List<Semester> semesters, List<SessionView> sessions) {

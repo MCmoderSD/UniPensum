@@ -68,7 +68,7 @@ final class WeekGridView extends ViewGroup {
     private final Paint nowLabelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint nowLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint nowFaintPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final List<Placed> placed = new ArrayList<>();
+    private final ArrayList<Placed> placed = new ArrayList<>();
     private final Runnable tick = () -> {
         updateNow();
         scheduleTick();
@@ -111,7 +111,7 @@ final class WeekGridView extends ViewGroup {
      * @param monday the Monday of the week shown, which tells whether the current time belongs to it
      * @param perDay exactly five lists, Monday to Friday, each ordered by start time
      */
-    void bind(LocalDate monday, TimeWindow window, NameStyle nameStyle, List<List<SessionView>> perDay,
+    void bind(LocalDate monday, TimeWindow window, NameStyle nameStyle, ArrayList<List<SessionView>> perDay,
               OnSessionClickListener listener) {
         this.monday = monday;
         this.window = window;

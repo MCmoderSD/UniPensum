@@ -15,8 +15,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import de.mcmodersd.unipensum.domain.backup.BackupData;
@@ -152,11 +150,11 @@ final class BackupJson {
         private int adjusted;
 
         Parsed read(JsonReader json) throws IOException {
-            List<Lecturer> lecturers = new ArrayList<>();
-            List<Semester> semesters = new ArrayList<>();
-            List<Course> courses = new ArrayList<>();
-            List<Series> series = new ArrayList<>();
-            List<Session> sessions = new ArrayList<>();
+            ArrayList<Lecturer> lecturers = new ArrayList<>();
+            ArrayList<Semester> semesters = new ArrayList<>();
+            ArrayList<Course> courses = new ArrayList<>();
+            ArrayList<Series> series = new ArrayList<>();
+            ArrayList<Session> sessions = new ArrayList<>();
 
             json.beginObject();
             while (json.hasNext()) {
@@ -186,7 +184,7 @@ final class BackupJson {
         }
 
         /** Reads a list of objects; one that cannot be turned into a record is skipped and counted. */
-        private <T> List<T> array(JsonReader json, Function<Map<String, Object>, T> parse) throws IOException {
+        private <T> ArrayList<T> array(JsonReader json, Function<HashMap<String, Object>, T> parse) throws IOException {
             var result = new ArrayList<T>();
             if (json.peek() != JsonToken.BEGIN_ARRAY) {
                 json.skipValue();
@@ -212,7 +210,7 @@ final class BackupJson {
         }
 
         /** Reads one object into a map of its plain values; nested values are skipped. */
-        private static Map<String, Object> object(JsonReader json) throws IOException {
+        private static HashMap<String, Object> object(JsonReader json) throws IOException {
             var fields = new HashMap<String, Object>();
             json.beginObject();
             while (json.hasNext()) {
@@ -237,21 +235,21 @@ final class BackupJson {
             return fields;
         }
 
-        private Lecturer lecturer(Map<String, Object> f) {
+        private Lecturer lecturer(HashMap<String, Object> f) {
             return new Lecturer(
                     requiredLong(f, "id"), orEmpty(text(f, "firstName")),
                     requiredText(f, "lastName"), text(f, "email"), text(f, "phone")
             );
         }
 
-        private Semester semester(Map<String, Object> f) {
+        private Semester semester(HashMap<String, Object> f) {
             return new Semester(
                     requiredLong(f, "id"), LocalDate.parse(requiredText(f, "start")),
                     LocalDate.parse(requiredText(f, "end")), text(f, "name")
             );
         }
 
-        private Course course(Map<String, Object> f) {
+        private Course course(HashMap<String, Object> f) {
             // The required fields first: a default only counts as an adjustment if the entry is kept.
             var id = requiredLong(f, "id");
             var semester = requiredLong(f, "semester");
@@ -266,7 +264,7 @@ final class BackupJson {
             return new Course(id, semester, name, color, text(f, "moodle"));
         }
 
-        private Series series(Map<String, Object> f) {
+        private Series series(HashMap<String, Object> f) {
             var schedule = new Schedule(
                     DayOfWeek.of((int) requiredLong(f, "weekday")),
                     LocalDate.parse(requiredText(f, "first")), LocalDate.parse(requiredText(f, "last")),
@@ -275,14 +273,14 @@ final class BackupJson {
             return new Series(requiredLong(f, "id"), requiredLong(f, "course"), details(f), schedule);
         }
 
-        private Session session(Map<String, Object> f) {
+        private Session session(HashMap<String, Object> f) {
             return new Session(
                     requiredLong(f, "id"), requiredLong(f, "series"),
                     LocalDate.parse(requiredText(f, "day")), details(f)
             );
         }
 
-        private SessionDetails details(Map<String, Object> f) {
+        private SessionDetails details(HashMap<String, Object> f) {
             var startMin = (int) requiredLong(f, "startMin");
             var endMin = (int) requiredLong(f, "endMin");
             var lecturer = f.containsKey("lecturer") ? requiredLong(f, "lecturer") : SessionDetails.NO_LECTURER;
@@ -307,7 +305,7 @@ final class BackupJson {
         }
 
         /** A file from before the reminders has no field and gets the default; so does a value that is no number. */
-        private int reminder(Map<String, Object> f, Mode mode) {
+        private int reminder(HashMap<String, Object> f, Mode mode) {
             if (!f.containsKey("reminder")) return Reminders.defaultFor(mode);
             try {
                 return (int) Math.max(
@@ -320,7 +318,7 @@ final class BackupJson {
             }
         }
 
-        private static String text(Map<String, Object> f, String key) {
+        private static String text(HashMap<String, Object> f, String key) {
             var value = f.get(key);
             return value instanceof String ? (String) value : null;
         }
@@ -329,13 +327,13 @@ final class BackupJson {
             return value == null ? "" : value;
         }
 
-        private static String requiredText(Map<String, Object> f, String key) {
+        private static String requiredText(HashMap<String, Object> f, String key) {
             var value = text(f, key);
             if (value == null) throw new IllegalArgumentException("Missing " + key);
             return value;
         }
 
-        private static long requiredLong(Map<String, Object> f, String key) {
+        private static long requiredLong(HashMap<String, Object> f, String key) {
             return Long.parseLong(requiredText(f, key));
         }
     }

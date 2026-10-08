@@ -3,7 +3,6 @@ package de.mcmodersd.unipensum.domain;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.mcmodersd.unipensum.domain.logic.Recurrence;
 import de.mcmodersd.unipensum.domain.model.Mode;
@@ -68,7 +67,7 @@ public final class Fixtures {
     }
 
     /** One session per occurrence, ids counting up from {@code firstSessionId}. */
-    public static List<Session> sessionsOf(Series series, long firstSessionId) {
+    public static ArrayList<Session> sessionsOf(Series series, long firstSessionId) {
         var result = new ArrayList<Session>();
         var id = firstSessionId;
         for (var day : Recurrence.occurrences(series.schedule())) {
@@ -77,7 +76,7 @@ public final class Fixtures {
         return result;
     }
 
-    public static Session byId(List<Session> sessions, long id) {
+    public static Session byId(ArrayList<Session> sessions, long id) {
         for (var session : sessions) {
             if (session.id() == id) return session;
         }

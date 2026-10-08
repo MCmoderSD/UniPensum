@@ -27,7 +27,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import de.mcmodersd.unipensum.R;
@@ -47,7 +46,7 @@ public final class TimePickerSheet extends UpSheet {
     private static final String STATE_MINUTES = "state_minutes";
     private static final String STATE_TYPING = "state_typing";
 
-    private final List<Integer> minuteValues = new ArrayList<>();
+    private final ArrayList<Integer> minuteValues = new ArrayList<>();
     private WheelPicker hourWheel;
     private WheelPicker minuteWheel;
     private View wheelsLayer;
