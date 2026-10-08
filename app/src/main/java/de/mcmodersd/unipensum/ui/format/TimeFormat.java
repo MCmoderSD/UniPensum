@@ -5,6 +5,7 @@ import android.text.format.DateFormat;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
@@ -36,9 +37,16 @@ public final class TimeFormat {
         return DateTimeFormatter.ofPattern(pattern, locale(context)).format(time);
     }
 
-    /** "Oct 5" or "5. Okt", depending on the app language. */
+    /** "Oct 5" or "5. Okt": the order and the punctuation of the app language, which needs no translated pattern. */
     public static String dateShort(Context context, LocalDate date) {
-        return DateTimeFormatter.ofPattern(context.getString(R.string.date_short_pattern), locale(context)).format(date);
+        Locale locale = locale(context);
+        return DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "MMMd"), locale).format(date);
+    }
+
+    /** "October 2026" for the title of a month, in the form of the app language. */
+    public static String monthYear(Context context, YearMonth month) {
+        Locale locale = locale(context);
+        return DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "yyyyLLLL"), locale).format(month);
     }
 
     /** "Oct 5, 2026" or "05.10.2026", depending on the app language. */

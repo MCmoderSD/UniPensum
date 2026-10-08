@@ -23,7 +23,6 @@ import androidx.customview.widget.ExploreByTouchHelper;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
@@ -118,8 +117,7 @@ public class MonthCalendarView extends LinearLayout {
     }
 
     private void refresh() {
-        Locale locale = TimeFormat.locale(getContext());
-        monthTitle.setText(DateTimeFormatter.ofPattern("LLLL yyyy", locale).format(month));
+        monthTitle.setText(TimeFormat.monthYear(getContext(), month));
         boolean hasPrevious = month.isAfter(YearMonth.from(min));
         boolean hasNext = month.isBefore(YearMonth.from(max));
         previous.setEnabled(hasPrevious);

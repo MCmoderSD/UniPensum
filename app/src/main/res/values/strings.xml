@@ -7,7 +7,6 @@
     <string name="no_semester">No semester</string>
 
     <!-- Week header -->
-    <string name="date_short_pattern">MMM d</string>
     <string name="week_subtitle">%1$s – %2$s · Week %3$d</string>
 
     <!-- Empty state -->
