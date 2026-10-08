@@ -341,12 +341,12 @@ public final class TimetableStore {
         CourseDao.delete(db, id);
     }
 
-    /** @return the series id */
-    public static long addSeries(SQLiteDatabase db, long courseId, Series series) {
-        return transact(db, () -> {
+    public static void addSeries(SQLiteDatabase db, long courseId, Series series) {
+        transact(db, () -> {
             Course course = require(CourseDao.get(db, courseId), "course", courseId);
             Semester semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
-            return insertSeries(db, semester, courseId, series);
+            insertSeries(db, semester, courseId, series);
+            return null;
         });
     }
 
@@ -384,7 +384,7 @@ public final class TimetableStore {
 
     // --- internals ---
 
-    private static long insertSeries(SQLiteDatabase db, Semester semester, long courseId, Series template) {
+    private static void insertSeries(SQLiteDatabase db, Semester semester, long courseId, Series template) {
         var details = requireValid(db, template.details());
         var schedule = template.schedule();
         if (SemesterRules.checkSchedule(semester, schedule) != SemesterRules.ScheduleCheck.OK) {
@@ -394,7 +394,6 @@ public final class TimetableStore {
         for (var day : Recurrence.occurrences(schedule)) {
             SessionDao.insert(db, new Session(0, seriesId, day, details));
         }
-        return seriesId;
     }
 
     private static void apply(SQLiteDatabase db, ChangeSet changes) {
