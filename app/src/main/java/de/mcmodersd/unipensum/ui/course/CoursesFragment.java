@@ -1,6 +1,5 @@
 package de.mcmodersd.unipensum.ui.course;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +63,7 @@ public class CoursesFragment extends Fragment {
         view.findViewById(R.id.back).setOnClickListener(v -> Navigator.of(this).pop());
 
         var semesterId = requireArguments().getLong(ARG_SEMESTER_ID);
-        repository.loadSemester(semesterId, new Database.Callback<Semester>() {
+        repository.loadSemester(semesterId, new Database.Callback<>() {
             @Override
             public void onSuccess(Semester loaded) {
                 if (getView() == null) return;
@@ -110,7 +109,7 @@ public class CoursesFragment extends Fragment {
         );
         row.setLeadingColor(CourseColors.resolve(context, entry.course().color()));
         row.setChevronVisible(true);
-        row.setOnClickListener(v -> repository.loadCourse(entry.course().id(), new Database.Callback<CourseContext>() {
+        row.setOnClickListener(v -> repository.loadCourse(entry.course().id(), new Database.Callback<>() {
             @Override
             public void onSuccess(CourseContext loaded) {
                 if (!isAdded()) return;

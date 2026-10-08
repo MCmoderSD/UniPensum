@@ -248,7 +248,7 @@ public final class SemesterEditorSheet extends UpSheet {
 
     private void save() {
         saveButton.setEnabled(false);
-        repository.saveSemester(candidate(), new Database.Callback<Long>() {
+        repository.saveSemester(candidate(), new Database.Callback<>() {
             @Override
             public void onSuccess(Long result) {
                 if (!isAdded()) return;
@@ -266,7 +266,7 @@ public final class SemesterEditorSheet extends UpSheet {
     }
 
     private void delete() {
-        repository.deleteSemester(id, new Database.Callback<Void>() {
+        repository.deleteSemester(id, new Database.Callback<>() {
             @Override
             public void onSuccess(Void result) {
                 if (isAdded()) dismiss();

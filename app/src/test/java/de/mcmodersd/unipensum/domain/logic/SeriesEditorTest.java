@@ -320,7 +320,7 @@ public class SeriesEditorTest {
     @Test
     public void editFollowing_afterAnIndividualMove_keepsThePhaseOfTheChain() {
         var biweekly = series(20, new Schedule(DayOfWeek.THURSDAY, date(10, 5), date(11, 19), 2));
-        var chain = new ArrayList<Session>(sessionsOf(biweekly, 201));       // Oct 8, 22, Nov 5, 19
+        var chain = new ArrayList<>(sessionsOf(biweekly, 201));       // Oct 8, 22, Nov 5, 19
         chain.set(2, chain.get(2).withDay(date(11, 6)));                         // Nov 5 moved to Friday
 
         var changes = SeriesEditor.edit(

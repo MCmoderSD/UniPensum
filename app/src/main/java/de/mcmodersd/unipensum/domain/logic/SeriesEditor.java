@@ -37,19 +37,17 @@ public final class SeriesEditor {
     public static ChangeSet edit(Semester semester, Series series, ArrayList<Session> sessions, long sessionId,
                                  EditScope scope, SessionDetails details, LocalDate day, Schedule schedule) {
         var target = find(sessions, sessionId);
-        switch (scope) {
-            case THIS_ONLY:
-                return editOne(semester, target, details, day);
-            case THIS_AND_FOLLOWING:
+        return switch (scope) {
+            case THIS_ONLY -> editOne(semester, target, details, day);
+            case THIS_AND_FOLLOWING -> {
                 if (!isFirst(sessions, target)) {
-                    return editFollowing(semester, series, sessions, target, details, schedule);
+                    yield editFollowing(semester, series, sessions, target, details, schedule);
                 }
-                return editAll(semester, series, sessions, target.details(), details, schedule);
-            case ALL:
-                return editAll(semester, series, sessions, target.details(), details, schedule);
-            default:
-                throw new IllegalArgumentException("Unknown scope: " + scope);
-        }
+                yield editAll(semester, series, sessions, target.details(), details, schedule);
+            }
+            case ALL -> editAll(semester, series, sessions, target.details(), details, schedule);
+            default -> throw new IllegalArgumentException("Unknown scope: " + scope);
+        };
     }
 
     /**

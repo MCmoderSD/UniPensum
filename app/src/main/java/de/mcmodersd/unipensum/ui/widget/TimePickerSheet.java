@@ -92,7 +92,7 @@ public final class TimePickerSheet extends UpSheet {
 
         var done = new UpButton(context);
         done.setText(R.string.action_done);
-        done.setOnClickListener(v -> finish(v));
+        done.setOnClickListener(this::finish);
 
         var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);

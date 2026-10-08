@@ -21,7 +21,6 @@ import androidx.core.graphics.ColorUtils;
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.data.SessionView;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
-import de.mcmodersd.unipensum.domain.model.SessionDetails;
 import de.mcmodersd.unipensum.ui.format.CourseColors;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;

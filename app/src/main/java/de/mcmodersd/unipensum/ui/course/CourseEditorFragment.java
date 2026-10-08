@@ -23,8 +23,6 @@ import de.mcmodersd.unipensum.data.db.Database;
 import de.mcmodersd.unipensum.domain.model.Course;
 import de.mcmodersd.unipensum.domain.model.Lecturer;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
-import de.mcmodersd.unipensum.domain.model.Semester;
-import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.text.TextSanitizer;
 import de.mcmodersd.unipensum.ui.Navigator;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
@@ -98,7 +96,7 @@ public class CourseEditorFragment extends Fragment {
 
         events = view.findViewById(R.id.events);
         eventsError = view.findViewById(R.id.events_error);
-        ((UpButton) view.findViewById(R.id.add_event)).setOnClickListener(v ->
+        view.findViewById(R.id.add_event).setOnClickListener(v ->
                 Navigator.of(this).push(SessionEditorFragment.forSeries(-1))
         );
         renderEvents();
@@ -198,16 +196,16 @@ public class CourseEditorFragment extends Fragment {
                 draft.moodleLink()
         );
         // The database thread gets its own copy, the draft stays editable while it works.
-        var snapshot = new ArrayList<Series>(draft.series());
+        var snapshot = new ArrayList<>(draft.series());
         if (draft.isNew()) {
-            repository.createCourse(course, snapshot, new Done<Long>());
+            repository.createCourse(course, snapshot, new Done<>());
         } else {
-            repository.saveCourse(course, snapshot, new Done<Void>());
+            repository.saveCourse(course, snapshot, new Done<>());
         }
     }
 
     private void deleteCourse() {
-        repository.deleteCourse(draft.courseId(), new Done<Void>());
+        repository.deleteCourse(draft.courseId(), new Done<>());
     }
 
     /** Leaves the screen on success, re-enables Save and says so on failure. */

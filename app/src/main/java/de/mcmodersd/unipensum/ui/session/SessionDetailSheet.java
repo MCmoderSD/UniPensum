@@ -14,13 +14,10 @@ import androidx.fragment.app.FragmentManager;
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
 import de.mcmodersd.unipensum.data.SessionContext;
-import de.mcmodersd.unipensum.data.TimetableRepository;
 import de.mcmodersd.unipensum.data.db.Database;
 import de.mcmodersd.unipensum.domain.model.EditScope;
-import de.mcmodersd.unipensum.domain.model.Lecturer;
 import de.mcmodersd.unipensum.domain.model.Mode;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
-import de.mcmodersd.unipensum.domain.model.SessionDetails;
 import de.mcmodersd.unipensum.ui.Links;
 import de.mcmodersd.unipensum.ui.Navigator;
 import de.mcmodersd.unipensum.ui.format.ReminderFormat;
@@ -93,7 +90,7 @@ public final class SessionDetailSheet extends UpSheet {
         );
 
         UniPensumApp.from(requireContext()).repository().loadSessionContext(
-                requireArguments().getLong(ARG_SESSION_ID), new Database.Callback<SessionContext>() {
+                requireArguments().getLong(ARG_SESSION_ID), new Database.Callback<>() {
                     @Override
                     public void onSuccess(SessionContext context) {
                         if (getView() == null) return;
@@ -233,7 +230,7 @@ public final class SessionDetailSheet extends UpSheet {
 
     private void delete(EditScope scope) {
         var repository = UniPensumApp.from(requireContext()).repository();
-        repository.deleteSession(requireArguments().getLong(ARG_SESSION_ID), scope, new Database.Callback<Void>() {
+        repository.deleteSession(requireArguments().getLong(ARG_SESSION_ID), scope, new Database.Callback<>() {
             @Override
             public void onSuccess(Void result) {
                 if (isAdded()) dismiss();

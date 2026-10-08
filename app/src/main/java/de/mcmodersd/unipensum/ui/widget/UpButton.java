@@ -1,7 +1,6 @@
 package de.mcmodersd.unipensum.ui.widget;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
@@ -46,22 +45,20 @@ public class UpButton extends AppCompatTextView {
 
     public void setVariant(Variant variant) {
         int fill;
-        int text;
-        switch (variant) {
-            case SECONDARY:
+        int text = switch (variant) {
+            case SECONDARY -> {
                 fill = R.color.surface;
-                text = R.color.text_primary;
-                break;
-            case DESTRUCTIVE:
+                yield R.color.text_primary;
+            }
+            case DESTRUCTIVE -> {
                 fill = R.color.surface;
-                text = R.color.danger;
-                break;
-            case PRIMARY:
-            default:
+                yield R.color.danger;
+            }
+            default -> {
                 fill = R.color.accent;
-                text = R.color.text_on_accent;
-                break;
-        }
+                yield R.color.text_on_accent;
+            }
+        };
         var background = new GradientDrawable();
         background.setCornerRadius(14 * getResources().getDisplayMetrics().density);
         background.setColor(ContextCompat.getColor(getContext(), fill));

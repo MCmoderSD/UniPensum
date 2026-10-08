@@ -21,31 +21,19 @@ public final class CourseColors {
 
     @ColorRes
     private static int resource(CourseColor color) {
-        switch (color) {
-            case RED:
-                return R.color.course_red;
-            case ORANGE:
-                return R.color.course_orange;
-            case YELLOW:
-                return R.color.course_yellow;
-            case GREEN:
-                return R.color.course_green;
-            case TEAL:
-                return R.color.course_teal;
-            case BLUE:
-                return R.color.course_blue;
-            case VIOLET:
-                return R.color.course_violet;
-            case PINK:
-                return R.color.course_pink;
-            case GRAPHITE:
-                return R.color.course_graphite;
-            case GRAY:
-                return R.color.course_gray;
-            case SILVER:
-                return R.color.course_silver;
-            default:
-                throw new IllegalArgumentException("Unknown color: " + color);
-        }
+        return switch (color) {
+            case RED -> R.color.course_red;
+            case ORANGE -> R.color.course_orange;
+            case YELLOW -> R.color.course_yellow;
+            case GREEN -> R.color.course_green;
+            case TEAL -> R.color.course_teal;
+            case BLUE -> R.color.course_blue;
+            case VIOLET -> R.color.course_violet;
+            case PINK -> R.color.course_pink;
+            case GRAPHITE -> R.color.course_graphite;
+            case GRAY -> R.color.course_gray;
+            case SILVER -> R.color.course_silver;
+            default -> throw new IllegalArgumentException("Unknown color: " + color);
+        };
     }
 }

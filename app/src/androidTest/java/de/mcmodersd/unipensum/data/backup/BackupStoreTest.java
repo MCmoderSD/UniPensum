@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import de.mcmodersd.unipensum.data.SessionView;
-import de.mcmodersd.unipensum.data.Timetable;
 import de.mcmodersd.unipensum.data.TimetableStore;
 import de.mcmodersd.unipensum.data.db.DbHelper;
 import de.mcmodersd.unipensum.domain.backup.BackupCleaner;
@@ -37,7 +35,6 @@ import de.mcmodersd.unipensum.domain.model.Mode;
 import de.mcmodersd.unipensum.domain.model.Schedule;
 import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.domain.model.Series;
-import de.mcmodersd.unipensum.domain.model.Session;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
 import de.mcmodersd.unipensum.domain.model.SessionType;
 
@@ -222,7 +219,7 @@ public class BackupStoreTest {
         fill(a, "Math");
         var good = TimetableStore.exportData(a);
         // The last series names a course that is not in the data, so the import fails after the early rows.
-        var series = new ArrayList<Series>(good.series());
+        var series = new ArrayList<>(good.series());
         var orphan = series.remove(series.size() - 1);
         series.add(new Series(orphan.id(), 424242, orphan.details(), orphan.schedule()));
         var broken = new BackupData(good.lecturers(), good.semesters(), good.courses(), series, good.sessions());

@@ -35,7 +35,6 @@ import java.util.zip.ZipOutputStream;
 import de.mcmodersd.unipensum.data.TimetableStore;
 import de.mcmodersd.unipensum.data.db.DbHelper;
 import de.mcmodersd.unipensum.data.db.Schema;
-import de.mcmodersd.unipensum.domain.backup.BackupCleaner;
 import de.mcmodersd.unipensum.domain.backup.BackupData;
 import de.mcmodersd.unipensum.domain.backup.BackupInfo;
 import de.mcmodersd.unipensum.domain.backup.BackupReport;
@@ -47,7 +46,6 @@ import de.mcmodersd.unipensum.domain.model.Mode;
 import de.mcmodersd.unipensum.domain.model.Schedule;
 import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.domain.model.Series;
-import de.mcmodersd.unipensum.domain.model.Session;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
 import de.mcmodersd.unipensum.domain.model.SessionType;
 

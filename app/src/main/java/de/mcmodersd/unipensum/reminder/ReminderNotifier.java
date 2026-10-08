@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.data.ReminderView;
 import de.mcmodersd.unipensum.domain.logic.Reminders;
-import de.mcmodersd.unipensum.domain.model.SessionDetails;
 import de.mcmodersd.unipensum.domain.text.TextSanitizer;
 import de.mcmodersd.unipensum.ui.MainActivity;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;

@@ -75,10 +75,9 @@ public class UpSwitch extends View {
         canvas.drawRoundRect(track, radius, radius, trackPaint);
 
         var thumbRadius = radius - 3 * dp;
-        var startX = radius;
         var endX = getWidth() - radius;
         thumbPaint.setColor(ColorUtils.blendARGB(thumbOff, thumbOn, progress));
-        canvas.drawCircle(startX + (endX - startX) * progress, radius, thumbRadius, thumbPaint);
+        canvas.drawCircle(radius + (endX - radius) * progress, radius, thumbRadius, thumbPaint);
     }
 
     @Override

@@ -10,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -206,7 +205,7 @@ public class SessionEditorFragment extends Fragment {
         } else {
             UniPensumApp.from(requireContext()).repository().loadSessionContext(
                     sessionId,
-                    new Database.Callback<SessionContext>() {
+                    new Database.Callback<>() {
                         @Override
                         public void onSuccess(SessionContext context) {
                             if (getView() == null) return;
@@ -500,14 +499,11 @@ public class SessionEditorFragment extends Fragment {
     }
 
     private String scopeText() {
-        switch (scope) {
-            case THIS_ONLY:
-                return getString(R.string.scope_this_only);
-            case THIS_AND_FOLLOWING:
-                return getString(R.string.scope_this_and_following);
-            default:
-                return getString(R.string.scope_all);
-        }
+        return switch (scope) {
+            case THIS_ONLY -> getString(R.string.scope_this_only);
+            case THIS_AND_FOLLOWING -> getString(R.string.scope_this_and_following);
+            default -> getString(R.string.scope_all);
+        };
     }
 
     /** Shows the chosen lecturer's full name, "None" if there is none or it has been deleted meanwhile. */
@@ -606,7 +602,7 @@ public class SessionEditorFragment extends Fragment {
         saveButton.setEnabled(false);
         UniPensumApp.from(requireContext()).repository().editSession(
                 sessionId, scope, details,
-                thisOnly() ? form.day : null, schedule, new Database.Callback<Void>() {
+                thisOnly() ? form.day : null, schedule, new Database.Callback<>() {
                     @Override
                     public void onSuccess(Void result) {
                         if (!isAdded()) return;
@@ -630,18 +626,15 @@ public class SessionEditorFragment extends Fragment {
     @Nullable
     private String scheduleProblem(Schedule schedule) {
         var semester = form.semester;
-        switch (SemesterRules.checkSchedule(semester, schedule)) {
-            case EMPTY_RANGE:
-                return getString(R.string.error_period_empty);
-            case OUTSIDE_SEMESTER:
-                return getString(
-                        R.string.error_period_outside,
-                        TimeFormat.dateMedium(requireContext(), semester.start()),
-                        TimeFormat.dateMedium(requireContext(), semester.end())
-                );
-            default:
-                break;
-        }
-        return Recurrence.occurrences(schedule).isEmpty() ? getString(R.string.error_period_no_dates) : null;
+        return switch (SemesterRules.checkSchedule(semester, schedule)) {
+            case EMPTY_RANGE -> getString(R.string.error_period_empty);
+            case OUTSIDE_SEMESTER -> getString(
+                    R.string.error_period_outside,
+                    TimeFormat.dateMedium(requireContext(), semester.start()),
+                    TimeFormat.dateMedium(requireContext(), semester.end())
+            );
+            default ->
+                    Recurrence.occurrences(schedule).isEmpty() ? getString(R.string.error_period_no_dates) : null;
+        };
     }
 }

@@ -4,7 +4,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -55,7 +54,7 @@ public final class ReminderScheduler {
         // Yesterday as well: a reminder for an early session falls on the day before it.
         UniPensumApp.from(app).database().read(
                 db -> TimetableStore.loadReminders(db, now.toLocalDate().minusDays(1)),
-                new Database.Callback<ArrayList<ReminderView>>() {
+                new Database.Callback<>() {
                     @Override
                     public void onSuccess(ArrayList<ReminderView> views) {
                         try {

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -99,7 +100,7 @@ public class BackupCryptoTest {
 
     @Test
     public void theRealIterationCountIsWithinTheBoundsAFileMayUse() {
-        assertEquals(true, BackupCrypto.ITERATIONS >= BackupCrypto.MIN_ITERATIONS);
-        assertEquals(true, BackupCrypto.ITERATIONS <= BackupCrypto.MAX_ITERATIONS);
+        assertTrue(BackupCrypto.ITERATIONS >= BackupCrypto.MIN_ITERATIONS);
+        assertTrue(BackupCrypto.ITERATIONS <= BackupCrypto.MAX_ITERATIONS);
     }
 }

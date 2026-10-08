@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
@@ -260,7 +261,7 @@ final class WeekGridView extends ViewGroup {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         var hourHeight = hourHeight(getHeight());
         var labelOffset = (labelPaint.descent() + labelPaint.ascent()) / 2f;
 
@@ -284,7 +285,7 @@ final class WeekGridView extends ViewGroup {
 
     /** Over the session blocks, so the current time stays readable inside a lecture. */
     @Override
-    protected void dispatchDraw(Canvas canvas) {
+    protected void dispatchDraw(@NonNull Canvas canvas) {
         super.dispatchDraw(canvas);
         if (now == null) return;
         var y = yOf(now.minutes(), hourHeight(getHeight()));

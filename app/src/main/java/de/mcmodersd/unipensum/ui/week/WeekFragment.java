@@ -22,7 +22,6 @@ import java.time.LocalDate;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
-import de.mcmodersd.unipensum.data.AppSettings;
 import de.mcmodersd.unipensum.data.Timetable;
 import de.mcmodersd.unipensum.domain.logic.Weeks;
 import de.mcmodersd.unipensum.domain.model.Semester;

@@ -1,7 +1,6 @@
 package de.mcmodersd.unipensum.data.backup;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Handler;
@@ -9,8 +8,6 @@ import android.os.Looper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
@@ -70,7 +67,7 @@ public final class BackupManager {
      * Writes all data to {@code target}, protected with {@code password} unless it is {@code null}.
      */
     public void export(Uri target, char[] password, Database.Callback<Void> callback) {
-        database.read(TimetableStore::exportData, new Database.Callback<BackupData>() {
+        database.read(TimetableStore::exportData, new Database.Callback<>() {
             @Override
             public void onSuccess(BackupData data) {
                 worker.execute(() -> {

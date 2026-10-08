@@ -54,17 +54,12 @@ public final class TimeFormat {
     }
 
     public static String typeName(Context context, SessionType type) {
-        switch (type) {
-            case LECTURE:
-                return context.getString(R.string.type_lecture);
-            case EXERCISE:
-                return context.getString(R.string.type_exercise);
-            case LAB:
-                return context.getString(R.string.type_lab);
-            case TUTORIAL:
-                return context.getString(R.string.type_tutorial);
-            default:
-                throw new IllegalArgumentException("Unknown type: " + type);
-        }
+        return switch (type) {
+            case LECTURE -> context.getString(R.string.type_lecture);
+            case EXERCISE -> context.getString(R.string.type_exercise);
+            case LAB -> context.getString(R.string.type_lab);
+            case TUTORIAL -> context.getString(R.string.type_tutorial);
+            default -> throw new IllegalArgumentException("Unknown type: " + type);
+        };
     }
 }

@@ -25,7 +25,6 @@ import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.model.Session;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
-import de.mcmodersd.unipensum.domain.model.SessionType;
 
 public class BackupCleanerTest {
 
@@ -237,7 +236,7 @@ public class BackupCleanerTest {
 
     @Test
     public void sessionOnAWeekend_orOutsideTheSemester_orWithoutAnEvent_isSkipped() {
-        var sessions = new ArrayList<Session>(sessionsOf(SERIES, 100));
+        var sessions = new ArrayList<>(sessionsOf(SERIES, 100));
         sessions.add(new Session(200, 10, date(10, 10), details()));                       // Saturday
         sessions.add(new Session(201, 10, LocalDate.of(2027, 3, 1), details()));           // after the semester
         sessions.add(new Session(202, 77, date(10, 12), details()));                       // no such event
@@ -251,7 +250,7 @@ public class BackupCleanerTest {
     @Test
     public void sessionWithImpossibleTimes_isSkipped() {
         var broken = new Session(200, 10, date(10, 12), withTimes(details(), 700, 700));
-        var sessions = new ArrayList<Session>(sessionsOf(SERIES, 100));
+        var sessions = new ArrayList<>(sessionsOf(SERIES, 100));
         sessions.add(broken);
 
         var result = clean(with(good(), null, null, null, null, sessions));
@@ -291,7 +290,7 @@ public class BackupCleanerTest {
     public void entriesWithAnIdUsedBefore_orBelowOne_areSkipped() {
         var duplicate = new Lecturer(LECTURER, "Other", "Person", null, null);
         var zero = new Lecturer(0, "Zero", "Id", null, null);
-        var sessions = new ArrayList<Session>(sessionsOf(SERIES, 100));
+        var sessions = new ArrayList<>(sessionsOf(SERIES, 100));
         sessions.add(new Session(100, 10, date(10, 12), details()));                       // id 100 again
 
         var data = new BackupData(

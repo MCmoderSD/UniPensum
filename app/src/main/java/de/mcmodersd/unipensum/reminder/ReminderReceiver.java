@@ -25,16 +25,11 @@ public final class ReminderReceiver extends BroadcastReceiver {
 
     private static boolean isKnown(String action) {
         if (action == null) return false;
-        switch (action) {
-            case ACTION_ALARM:
-            case Intent.ACTION_BOOT_COMPLETED:
-            case Intent.ACTION_TIME_CHANGED:
-            case Intent.ACTION_TIMEZONE_CHANGED:
-            case Intent.ACTION_MY_PACKAGE_REPLACED:
-            case AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED:
-                return true;
-            default:
-                return false;
-        }
+        return switch (action) {
+            case ACTION_ALARM, Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_TIME_CHANGED,
+                 Intent.ACTION_TIMEZONE_CHANGED, Intent.ACTION_MY_PACKAGE_REPLACED,
+                 AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> true;
+            default -> false;
+        };
     }
 }

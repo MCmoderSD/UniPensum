@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import de.mcmodersd.unipensum.domain.model.Mode;
 import de.mcmodersd.unipensum.domain.model.Session;
-import de.mcmodersd.unipensum.domain.model.SessionDetails;
 
 /**
  * The rules of the reminders, without anything of Android: how long before a session the app reminds, which
@@ -80,7 +79,7 @@ public final class Reminders {
         LocalDateTime next = null;
         for (var session : sessions) {
             var due = of(session);
-            if (!due.isPresent() || !due.get().remindAt().isAfter(now)) continue;
+            if (due.isEmpty() || !due.get().remindAt().isAfter(now)) continue;
             if (next == null || due.get().remindAt().isBefore(next)) next = due.get().remindAt();
         }
         return Optional.ofNullable(next);

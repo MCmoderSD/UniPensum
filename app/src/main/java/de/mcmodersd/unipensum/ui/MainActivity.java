@@ -11,13 +11,11 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.debug.DebugSeeder;
@@ -189,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         View view = page == null ? null : page.getView();
         ImageView back = view == null ? null : view.findViewById(R.id.back);
         if (back == null) return;
-        var closes = pane.isSplit() && page != null && FIRST_PAGE.equals(page.getTag());
+        var closes = pane.isSplit() && FIRST_PAGE.equals(page.getTag());
         back.setImageResource(closes ? R.drawable.ic_close : R.drawable.ic_chevron_left);
         back.setContentDescription(getString(closes ? R.string.action_close : R.string.action_back));
     }

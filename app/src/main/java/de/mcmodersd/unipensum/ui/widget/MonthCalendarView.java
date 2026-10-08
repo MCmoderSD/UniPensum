@@ -201,7 +201,7 @@ public class MonthCalendarView extends LinearLayout {
         }
 
         @Override
-        protected void onDraw(Canvas canvas) {
+        protected void onDraw(@NonNull Canvas canvas) {
             var locale = TimeFormat.locale(getContext());
             var cellWidth = getWidth() / (float) columns();
 

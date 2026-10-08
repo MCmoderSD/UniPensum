@@ -81,7 +81,7 @@ public class ColorSwatchPicker extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         var cellWidth = getWidth() / (float) COLUMNS;
         var radius = Math.min(cellWidth, cellHeight) * 0.34f;
         for (var i = 0; i < colors.length; i++) {
@@ -139,30 +139,19 @@ public class ColorSwatchPicker extends View {
 
     private String colorName(CourseColor color) {
         var context = getContext();
-        switch (color) {
-            case RED:
-                return context.getString(R.string.color_red);
-            case ORANGE:
-                return context.getString(R.string.color_orange);
-            case YELLOW:
-                return context.getString(R.string.color_yellow);
-            case GREEN:
-                return context.getString(R.string.color_green);
-            case TEAL:
-                return context.getString(R.string.color_teal);
-            case BLUE:
-                return context.getString(R.string.color_blue);
-            case VIOLET:
-                return context.getString(R.string.color_violet);
-            case PINK:
-                return context.getString(R.string.color_pink);
-            case GRAPHITE:
-                return context.getString(R.string.color_graphite);
-            case GRAY:
-                return context.getString(R.string.color_gray);
-            default:
-                return context.getString(R.string.color_silver);
-        }
+        return switch (color) {
+            case RED -> context.getString(R.string.color_red);
+            case ORANGE -> context.getString(R.string.color_orange);
+            case YELLOW -> context.getString(R.string.color_yellow);
+            case GREEN -> context.getString(R.string.color_green);
+            case TEAL -> context.getString(R.string.color_teal);
+            case BLUE -> context.getString(R.string.color_blue);
+            case VIOLET -> context.getString(R.string.color_violet);
+            case PINK -> context.getString(R.string.color_pink);
+            case GRAPHITE -> context.getString(R.string.color_graphite);
+            case GRAY -> context.getString(R.string.color_gray);
+            default -> context.getString(R.string.color_silver);
+        };
     }
 
     /** Exposes every swatch as its own focusable, named element for TalkBack. */

@@ -1,6 +1,7 @@
 package de.mcmodersd.unipensum.data;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -236,7 +237,7 @@ public class TimetableStoreTest {
         var stored = TimetableStore.listCourses(db, semesterId).get(0).series().get(0).details();
 
         assertNull(stored.room());
-        assertEquals(false, stored.hybrid());
+        assertFalse(stored.hybrid());
         assertEquals("https://meet.example/x", stored.link());
         assertEquals(SessionDetails.NO_LECTURER, stored.lecturerId());
         assertNull(stored.note());

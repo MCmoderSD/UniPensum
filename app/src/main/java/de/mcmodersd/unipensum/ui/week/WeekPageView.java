@@ -13,6 +13,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import androidx.annotation.NonNull;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,20 +79,20 @@ final class WeekPageView extends LinearLayout {
 
         pinch = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
             @Override
-            public boolean onScaleBegin(ScaleGestureDetector detector) {
+            public boolean onScaleBegin(@NonNull ScaleGestureDetector detector) {
                 stopReset();
                 swallowing = true;
                 return true;
             }
 
             @Override
-            public boolean onScale(ScaleGestureDetector detector) {
+            public boolean onScale(@NonNull ScaleGestureDetector detector) {
                 zoomTo(grid.zoom() * detector.getScaleFactor(), detector.getFocusY(), false);
                 return true;
             }
 
             @Override
-            public void onScaleEnd(ScaleGestureDetector detector) {
+            public void onScaleEnd(@NonNull ScaleGestureDetector detector) {
                 reportZoom(true);
             }
         });
@@ -100,7 +102,7 @@ final class WeekPageView extends LinearLayout {
 
         taps = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
-            public boolean onDoubleTap(MotionEvent event) {
+            public boolean onDoubleTap(@NonNull MotionEvent event) {
                 if (grid.zoom() > ZoomMetrics.MIN) {
                     Haptics.tap(WeekPageView.this);
                     resetZoom(event.getY());

@@ -20,9 +20,7 @@ import androidx.lifecycle.ViewModelProvider;
 import java.time.ZoneId;
 
 import de.mcmodersd.unipensum.R;
-import de.mcmodersd.unipensum.data.backup.BackupManager;
 import de.mcmodersd.unipensum.domain.backup.BackupInfo;
-import de.mcmodersd.unipensum.domain.backup.BackupReport;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
 import de.mcmodersd.unipensum.ui.widget.UpButton;

@@ -23,7 +23,7 @@ public final class WeekLayout {
 
     /** Result is ordered by start time, then end time, then id. */
     public static ArrayList<Placement> layout(List<Block> blocks) {
-        var sorted = new ArrayList<Block>(blocks);
+        var sorted = new ArrayList<>(blocks);
         sorted.sort(
                 Comparator.comparingInt(Block::startMin)
                         .thenComparingInt(Block::endMin)

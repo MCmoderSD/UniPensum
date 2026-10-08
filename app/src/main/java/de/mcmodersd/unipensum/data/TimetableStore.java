@@ -1,6 +1,5 @@
 package de.mcmodersd.unipensum.data;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.time.LocalDate;

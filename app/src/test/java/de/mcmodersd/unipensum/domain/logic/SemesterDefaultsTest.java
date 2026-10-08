@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-import de.mcmodersd.unipensum.domain.logic.SemesterDefaults.Period;
 import de.mcmodersd.unipensum.domain.model.Semester;
 
 public class SemesterDefaultsTest {

@@ -89,7 +89,7 @@ public class BackupImportViewModel extends AndroidViewModel {
         if (started) return;
         started = true;
         step.setValue(Step.READING);
-        backups.open(source, new Database.Callback<BackupFile.Opened>() {
+        backups.open(source, new Database.Callback<>() {
             @Override
             public void onSuccess(BackupFile.Opened result) {
                 opened = result;
@@ -112,7 +112,7 @@ public class BackupImportViewModel extends AndroidViewModel {
 
     private void load(@Nullable char[] password) {
         step.setValue(Step.LOADING);
-        backups.load(opened, password, new Database.Callback<BackupCleaner.Result>() {
+        backups.load(opened, password, new Database.Callback<>() {
             @Override
             public void onSuccess(BackupCleaner.Result result) {
                 loaded = result;
@@ -136,7 +136,7 @@ public class BackupImportViewModel extends AndroidViewModel {
     public void confirm() {
         if (loaded == null || step.getValue() != Step.REVIEW) return;
         step.setValue(Step.IMPORTING);
-        backups.replaceAll(loaded.data(), new Database.Callback<Void>() {
+        backups.replaceAll(loaded.data(), new Database.Callback<>() {
             @Override
             public void onSuccess(Void result) {
                 step.setValue(Step.DONE);

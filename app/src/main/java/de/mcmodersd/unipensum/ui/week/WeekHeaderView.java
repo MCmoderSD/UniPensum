@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import java.time.DayOfWeek;
@@ -68,7 +69,7 @@ final class WeekHeaderView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         var locale = TimeFormat.locale(getContext());
         var columnWidth = metrics.columnWidth(getWidth());
         var weekdayBaseline = getHeight() * 0.36f;

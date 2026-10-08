@@ -181,7 +181,7 @@ public final class LecturerEditorSheet extends UpSheet {
         }
 
         saveButton.setEnabled(false);
-        repository.saveLecturer(candidate, new Database.Callback<Long>() {
+        repository.saveLecturer(candidate, new Database.Callback<>() {
             @Override
             public void onSuccess(Long savedId) {
                 if (!isAdded()) return;
@@ -206,7 +206,7 @@ public final class LecturerEditorSheet extends UpSheet {
     }
 
     private void delete() {
-        repository.deleteLecturer(id, new Database.Callback<Void>() {
+        repository.deleteLecturer(id, new Database.Callback<>() {
             @Override
             public void onSuccess(Void result) {
                 if (isAdded()) dismiss();

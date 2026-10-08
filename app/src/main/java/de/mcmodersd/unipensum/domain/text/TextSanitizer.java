@@ -131,7 +131,7 @@ public final class TextSanitizer {
 
     private static String stripAll(String raw) {
         if (raw == null) return "";
-         var out = new StringBuilder(raw.length());
+        var out = new StringBuilder(raw.length());
         for (var i = 0; i < raw.length(); ) {
             var cp = raw.codePointAt(i);
             i += Character.charCount(cp);

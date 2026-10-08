@@ -206,7 +206,7 @@ public final class BackupExportSheet extends UpSheet {
         status.setText(R.string.backup_exporting);
         status.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary));
         status.setVisibility(View.VISIBLE);
-        UniPensumApp.from(requireContext()).backups().export(target, chars, new Database.Callback<Void>() {
+        UniPensumApp.from(requireContext()).backups().export(target, chars, new Database.Callback<>() {
             @Override
             public void onSuccess(Void result) {
                 if (getView() == null) return;

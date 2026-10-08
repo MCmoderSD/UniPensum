@@ -1,7 +1,6 @@
 package de.mcmodersd.unipensum.ui.widget;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
 import android.text.InputFilter;

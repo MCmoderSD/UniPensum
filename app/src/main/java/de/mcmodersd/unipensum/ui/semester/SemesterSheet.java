@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 import de.mcmodersd.unipensum.R;
@@ -68,9 +67,7 @@ public final class SemesterSheet extends UpSheet {
 
         var create = new UpButton(context);
         create.setText(R.string.semester_new);
-        create.setOnClickListener(v -> {
-            SemesterEditorSheet.show(getParentFragmentManager(), null, current);
-        });
+        create.setOnClickListener(v -> SemesterEditorSheet.show(getParentFragmentManager(), null, current));
         var params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         );
@@ -102,8 +99,8 @@ public final class SemesterSheet extends UpSheet {
             return;
         }
 
-        var newestFirst = new ArrayList<Semester>(semesters);
-        Collections.sort(newestFirst, Comparator.comparing(Semester::start).reversed());
+        var newestFirst = new ArrayList<>(semesters);
+        newestFirst.sort(Comparator.comparing(Semester::start).reversed());
         for (var semester : newestFirst) {
             var row = new UpRow(context);
             row.setTitle(SemesterNames.display(context, semester));

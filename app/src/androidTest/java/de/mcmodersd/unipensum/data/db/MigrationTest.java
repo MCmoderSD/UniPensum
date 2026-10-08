@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -21,9 +20,6 @@ import org.junit.runner.RunWith;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
-import de.mcmodersd.unipensum.data.ReminderView;
-import de.mcmodersd.unipensum.data.SessionView;
-import de.mcmodersd.unipensum.data.Timetable;
 import de.mcmodersd.unipensum.data.TimetableStore;
 import de.mcmodersd.unipensum.domain.model.Lecturer;
 import de.mcmodersd.unipensum.domain.model.Mode;

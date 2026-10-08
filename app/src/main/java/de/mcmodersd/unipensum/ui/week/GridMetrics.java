@@ -1,7 +1,6 @@
 package de.mcmodersd.unipensum.ui.week;
 
 import android.content.Context;
-import android.content.res.Resources;
 
 import de.mcmodersd.unipensum.R;
 
