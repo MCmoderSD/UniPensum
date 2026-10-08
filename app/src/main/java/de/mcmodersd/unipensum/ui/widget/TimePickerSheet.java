@@ -341,12 +341,7 @@ public final class TimePickerSheet extends UpSheet {
         void onChanged(String text);
     }
 
-    private static final class AfterChange implements TextWatcher {
-        private final TextChange action;
-
-        AfterChange(TextChange action) {
-            this.action = action;
-        }
+    private record AfterChange(TextChange action) implements TextWatcher {
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
