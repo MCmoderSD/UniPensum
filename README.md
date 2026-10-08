@@ -24,7 +24,7 @@ The app works completely offline and has no internet access. The only permission
 - [x] Move a single session to another day
 - [x] Overlapping sessions are marked
 - [x] Light and dark theme, following the system or set manually
-- [x] English and German
+- [x] English and German, set in the Android settings; [a new language is one new file](#translations)
 - [x] Export and import of all data as a `.unipensum` file, optionally protected with a password
 - [x] Reminders before every event: 30 minutes by default, 5 minutes for an event that is only online, set per event
 - [x] Reminders look and work like those of a calendar app, with buttons for the meeting and for Moodle
@@ -73,6 +73,26 @@ Database tests (including the migration from older database versions) run on a d
 > adb -s emulator-5554 install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 > adb -s emulator-5554 shell am instrument -w de.mcmodersd.unipensum.test/androidx.test.runner.AndroidJUnitRunner
 > ```
+
+## Translations
+UniPensum comes in English and German, and every other language is welcome. English is the default: a text that a
+language does not have yet is shown in English, so a translation can be sent in parts.
+
+The app has no language setting of its own. Android 13 and newer lets you pick a language per app (Settings → System →
+Languages → App languages, the path differs a little between phones). Android 12 has no such setting, so the app uses
+the language of the phone.
+
+### Add a language
+1. Copy `app/src/main/res/values/strings.xml` to `app/src/main/res/values-<code>/strings.xml`, with the language code
+   Android uses, for example `values-fr` for French or `values-pt-rBR` for Brazilian Portuguese.
+2. Translate the texts between the tags. Leave the names, the placeholders (`%1$s`, `%d`) and the entries marked
+   `translatable="false"` as they are. A plural needs every form that the language has (`one`, `few`, `many`, `other`).
+3. Send a pull request.
+
+Nothing else has to change: the list of languages for Android is made from the `values-<code>` folders when the app is
+built, and the names of the weekdays and months and the order of day and month are taken from the language by the
+system. `./gradlew lint` points out texts that are missing (a warning, because English is shown instead) and texts that
+exist in a language but not in English.
 
 ## Release
 Releases are built by a GitHub Actions workflow, [`android-build-release.yaml`](.github/workflows/android-build-release.yaml).
@@ -203,7 +223,7 @@ de.mcmodersd.unipensum
     ├── course          Course editor and course list
     ├── lecturer        Lecturer list, picker and editor
     ├── semester        Semester list and editor
-    ├── settings        Theme, language, visible hours and how lecturers are named
+    ├── settings        Theme, visible hours, reminders and how lecturers are named
     ├── backup          Export and import sheets
     ├── format          Formatting of dates, times and names
     └── widget          The app's own controls, sheets and pickers
