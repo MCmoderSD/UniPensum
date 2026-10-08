@@ -30,22 +30,6 @@ import de.mcmodersd.unipensum.domain.backup.BackupCleaner;
 import de.mcmodersd.unipensum.domain.backup.BackupData;
 import de.mcmodersd.unipensum.domain.backup.BackupInfo;
 
-/**
- * The {@code .unipensum} file: a zip archive, packed with the strongest deflate level, so any zip tool
- * can look inside.
- * <pre>
- * manifest.json   always readable: format, database version, app version, date, and, for a protected
- *                 backup, how the key is made (iterations, salt, nonce)
- * data.json       the data, see {@link BackupJson}
- * data.enc        instead of data.json for a protected backup: the same JSON, deflated, then encrypted
- * </pre>
- * Nothing is ever unpacked to a file: the archive is read from memory, entry by entry, with a cap on
- * what it may unpack to, so a file that is made to explode is refused rather than filling the memory.
- * <p>
- * When the schema or the format changes, this class and {@link BackupJson} must keep reading the old
- * files (a test holds a fixed sample of the current form), because a backup is exactly the thing people
- * keep for years.
- */
 public final class BackupFile {
 
     /** Layout of the file; raised only if the archive structure itself changes. */
@@ -172,13 +156,6 @@ public final class BackupFile {
             return crypto != null;
         }
 
-        /**
-         * Decrypts (slow, so not on the main thread), reads and cleans the data.
-         *
-         * @param password the password, ignored if the backup is not protected
-         * @throws BackupException {@code WRONG_PASSWORD} for a missing or wrong password or a file that was
-         *                         changed afterwards, {@code DAMAGED} or {@code TOO_LARGE} for a broken one
-         */
         public BackupCleaner.Result read(char[] password) throws BackupException {
             var json = data;
             if (crypto != null) {

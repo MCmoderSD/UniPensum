@@ -81,7 +81,6 @@ public class SemesterDefaultsTest {
 
     @Test
     public void lectureEnd_forAWeekendStart_movesBackToFriday() {
-        // Sunday, 4 October 2026 + 16 weeks - 1 day = Saturday, 23 January 2027 -> Friday, 22 January.
         assertEquals(LocalDate.of(2027, 1, 22), SemesterDefaults.lectureEnd(LocalDate.of(2026, 10, 4)));
     }
 }

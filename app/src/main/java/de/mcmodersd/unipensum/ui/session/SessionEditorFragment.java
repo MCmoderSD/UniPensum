@@ -506,7 +506,6 @@ public class SessionEditorFragment extends Fragment {
         };
     }
 
-    /** Shows the chosen lecturer's full name, "None" if there is none or it has been deleted meanwhile. */
     private void renderLecturer() {
         if (lecturers == null) return;
         var lecturer = lecturers.get(form.lecturerId);

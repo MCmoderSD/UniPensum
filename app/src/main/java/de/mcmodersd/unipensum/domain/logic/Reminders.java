@@ -22,13 +22,6 @@ public final class Reminders {
     /** The reminder is set in steps of this many minutes. */
     public static final int STEP_MIN = 5;
 
-    /**
-     * One reminder to come.
-     *
-     * @param remindAt when the reminder is shown
-     * @param start    when the session begins
-     * @param end      when the session is over, which is when the reminder is of no use any more
-     */
     public record Due(Session session, LocalDateTime remindAt, LocalDateTime start, LocalDateTime end) { }
 
     private static final Comparator<Due> BY_TIME =

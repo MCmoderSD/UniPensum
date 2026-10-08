@@ -9,11 +9,6 @@ public final class Schema {
     public static final String NAME = "unipensum.db";
     public static final int VERSION = 3;
 
-    /**
-     * The current layout, used for fresh installs. Databases upgraded from version 1 still carry the
-     * unused free-text {@code lecturer} column on {@code series} and {@code session}, see {@link Migrations}.
-     * {@code reminder_min} is the minutes before the start at which the app reminds, {@code NULL} for none.
-     */
     static final String[] CREATE_STATEMENTS = {
             "CREATE TABLE semester ("
                     + "id INTEGER PRIMARY KEY AUTOINCREMENT, "

@@ -5,11 +5,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-/**
- * Where the "now" marker of the week grid belongs: in which of the five day columns and at which minute of
- * the day. There is none if today is not a day of the shown week (another week, or the weekend, which the
- * grid has no column for) or if the time lies outside the visible hours.
- */
 public final class NowIndicator {
 
     private NowIndicator() { }

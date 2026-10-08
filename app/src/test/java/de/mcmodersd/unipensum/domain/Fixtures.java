@@ -13,7 +13,6 @@ import de.mcmodersd.unipensum.domain.model.Session;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
 import de.mcmodersd.unipensum.domain.model.SessionType;
 
-/** Shared test data. Dates: 2026-10-05 is a Monday, 2027-02-12 is a Friday. */
 public final class Fixtures {
 
     public static final Semester SEMESTER =

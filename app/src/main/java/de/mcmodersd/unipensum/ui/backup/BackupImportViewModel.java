@@ -104,7 +104,6 @@ public class BackupImportViewModel extends AndroidViewModel {
         });
     }
 
-    /** Takes over the password; the array is cleared afterwards. */
     public void submitPassword(char[] password) {
         wrongPassword = false;
         load(password);

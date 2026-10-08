@@ -67,7 +67,6 @@ public final class ReminderNotifier {
                 .setWhen(startMillis)
                 .setShowWhen(true)
                 .setAutoCancel(true)
-                // Over, it is no use any more: it goes away by itself.
                 .setTimeoutAfter(Math.max(1, endMillis - System.currentTimeMillis()))
                 .setContentIntent(openEvent(context, view.session().id(), id));
 
