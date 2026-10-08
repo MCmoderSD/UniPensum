@@ -55,9 +55,9 @@ public class BackupCleanerTest {
         return BackupCleaner.clean(data, 0, 0);
     }
 
-    private static SessionDetails withLink(SessionDetails d, Mode mode, String link) {
+    private static SessionDetails onlineWithLink(SessionDetails d, String link) {
         return new SessionDetails(
-                d.type(), d.startMin(), d.endMin(), mode, d.hybrid(), d.room(), link,
+                d.type(), d.startMin(), d.endMin(), Mode.ONLINE, d.hybrid(), d.room(), link,
                 d.lecturerId(), d.note(), d.reminderMin()
         );
     }
@@ -261,7 +261,7 @@ public class BackupCleanerTest {
 
     @Test
     public void aMeetingLinkThatIsNoWebLink_isDropped_theEventStays() {
-        var online = withLink(details(), Mode.ONLINE, "ftp://files.example/x");
+        var online = onlineWithLink(details(), "ftp://files.example/x");
         var series = new Series(10, 1, online, SERIES.schedule());
         var session = new Session(100, 10, date(10, 5), online);
 
@@ -275,7 +275,7 @@ public class BackupCleanerTest {
 
     @Test
     public void aMeetingLinkWithoutAScheme_getsHttps() {
-        var online = withLink(details(), Mode.ONLINE, "meet.example/abc");
+        var online = onlineWithLink(details(), "meet.example/abc");
         var series = new Series(10, 1, online, SERIES.schedule());
 
         var result = clean(with(good(), null, null, null, List.of(series), List.of()));
