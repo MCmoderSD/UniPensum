@@ -2,6 +2,7 @@ package de.mcmodersd.unipensum.data.backup;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -209,6 +210,7 @@ public class BackupFileTest {
     public void changedEncryptedData_makesAProtectedBackupFail() throws Exception {
         var entries = unzip(BackupFile.write(sample(), META, PASSWORD.clone(), ITERATIONS));
         var data = entries.get("data.enc");
+        assertNotNull(data);
         data[data.length / 2] ^= 0x01;
 
         var opened = open(zip(entries));

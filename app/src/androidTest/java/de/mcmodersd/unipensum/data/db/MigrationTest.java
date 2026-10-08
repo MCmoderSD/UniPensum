@@ -255,17 +255,18 @@ public class MigrationTest {
         );
         old.execSQL("INSERT INTO course (id, semester_id, name, color) VALUES (1, 1, 'Math', 'blue')");
         // Series 1 is in person, series 2 online, series 3 hybrid.
-        String[] modes = {"'in_person', 0", "'online', 0", "'in_person', 1"};
+        String[] modes = {"in_person", "online", "in_person"};
+        int[] hybrid = {0, 0, 1};
         for (var i = 0; i < 3; i++) {
             old.execSQL(
                     "INSERT INTO series (id, course_id, type, weekday, start_min, end_min, mode, hybrid, "
-                            + "first_day, last_day, interval_weeks) VALUES (" + (i + 1) + ", 1, 'lecture', " + (i + 1)
-                            + ", 480, 570, " + modes[i] + ", " + MONDAY.toEpochDay() + ", " + MONDAY.toEpochDay() + ", 1)"
+                            + "first_day, last_day, interval_weeks) VALUES (?, 1, 'lecture', ?, 480, 570, ?, ?, ?, ?, 1)",
+                    new Object[]{i + 1, i + 1, modes[i], hybrid[i], MONDAY.toEpochDay(), MONDAY.toEpochDay()}
             );
             old.execSQL(
-                    "INSERT INTO session (id, series_id, day, type, start_min, end_min, mode, hybrid) VALUES ("
-                            + (i + 1) + ", " + (i + 1) + ", " + MONDAY.plusDays(i).toEpochDay() + ", 'lecture', 480, 570, "
-                            + modes[i] + ")"
+                    "INSERT INTO session (id, series_id, day, type, start_min, end_min, mode, hybrid) "
+                            + "VALUES (?, ?, ?, 'lecture', 480, 570, ?, ?)",
+                    new Object[]{i + 1, i + 1, MONDAY.plusDays(i).toEpochDay(), modes[i], hybrid[i]}
             );
         }
         old.setVersion(2);
@@ -287,16 +288,17 @@ public class MigrationTest {
     public void aFreshDatabaseHasTheSameShape() {
         context.deleteDatabase(NAME);
 
-        var db = new DbHelper(context, NAME).getWritableDatabase();
-        var id = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Weber", null, null));
+        try (var helper = new DbHelper(context, NAME)) {
+            var db = helper.getWritableDatabase();
+            var id = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Weber", null, null));
 
-        assertEquals(Schema.VERSION, db.getVersion());
-        assertEquals(1, TimetableStore.listLecturers(db).size());
-        assertEquals("Weber", TimetableStore.listLecturers(db).get(0).lastName());
-        assertNotEquals(0, id);
-        try (var cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE '%lecturer'", null)) {
-            assertEquals(2, cursor.getCount());
+            assertEquals(Schema.VERSION, db.getVersion());
+            assertEquals(1, TimetableStore.listLecturers(db).size());
+            assertEquals("Weber", TimetableStore.listLecturers(db).get(0).lastName());
+            assertNotEquals(0, id);
+            try (var cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE '%lecturer'", null)) {
+                assertEquals(2, cursor.getCount());
+            }
         }
-        db.close();
     }
 }

@@ -99,6 +99,8 @@ public class BackupCryptoTest {
         );
     }
 
+    // A guard on constants: it fails as soon as one of them changes so that a file we write could not be read back.
+    @SuppressWarnings("ConstantValue")
     @Test
     public void theRealIterationCountIsWithinTheBoundsAFileMayUse() {
         assertTrue(BackupCrypto.ITERATIONS >= BackupCrypto.MIN_ITERATIONS);
