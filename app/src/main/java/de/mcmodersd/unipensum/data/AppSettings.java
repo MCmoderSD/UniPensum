@@ -12,8 +12,7 @@ import java.util.Objects;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
 
 /**
- * User preferences. The language is not stored here: AppCompat persists it itself
- * (including on Android 12 through its locale metadata service).
+ * User preferences. The language is not stored here: it is set in the Android settings.
  */
 public final class AppSettings {
 
