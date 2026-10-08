@@ -19,7 +19,6 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.util.List;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;

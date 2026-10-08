@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.data.ReminderView;

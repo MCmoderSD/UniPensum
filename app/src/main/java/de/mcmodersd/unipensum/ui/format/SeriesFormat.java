@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.domain.model.Mode;

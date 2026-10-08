@@ -20,7 +20,6 @@ import org.junit.runner.RunWith;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.List;
 
 import de.mcmodersd.unipensum.data.ReminderView;
 import de.mcmodersd.unipensum.data.SessionView;

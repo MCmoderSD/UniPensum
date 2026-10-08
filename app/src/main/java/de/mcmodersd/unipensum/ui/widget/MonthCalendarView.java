@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
