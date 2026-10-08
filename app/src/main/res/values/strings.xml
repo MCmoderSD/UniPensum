@@ -93,10 +93,6 @@
     <string name="theme_system">System</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
-    <string name="settings_language">Language</string>
-    <string name="language_system">System</string>
-    <string name="language_english">English</string>
-    <string name="language_german">Deutsch</string>
     <string name="settings_hours">Visible hours</string>
     <string name="hours_start">Day starts at</string>
     <string name="hours_end">Day ends at</string>

@@ -79,9 +79,14 @@ android {
             }
         }
     }
+    androidResources {
+        // The list of languages follows from the values-xx folders, so a new translation is one new strings.xml.
+        // The language the texts fall back to is named in src/main/res/resources.properties.
+        generateLocaleConfig = true
+    }
     bundle {
-        // The language is chosen in the app, not only by the device: a device in English must still be able to get
-        // the German texts, also those of a reminder, which come up without a screen of the app.
+        // The language of the app is set in the Android settings and can differ from the language of the device,
+        // so Google Play has to deliver every language, not only the one of the device.
         language {
             enableSplit = false
         }

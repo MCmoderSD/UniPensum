@@ -6,13 +6,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.LocaleList;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.os.LocaleListCompat;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -42,23 +38,22 @@ public final class ReminderNotifier {
 
     /** Idempotent. The user can change sound and priority of the channel in the system settings. */
     public static void createChannel(Context context) {
-        Context localized = localized(context);
         NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                localized.getString(R.string.reminder_channel_name), NotificationManager.IMPORTANCE_HIGH);
-        channel.setDescription(localized.getString(R.string.reminder_channel_description));
+                context.getString(R.string.reminder_channel_name), NotificationManager.IMPORTANCE_HIGH);
+        channel.setDescription(context.getString(R.string.reminder_channel_description));
         context.getSystemService(NotificationManager.class).createNotificationChannel(channel);
     }
 
     static void show(Context context, @Nullable ReminderView view, Reminders.Due due) {
         if (view == null) return;
-        Context text = localized(context);
         createChannel(context);
         SessionDetails details = view.session().details();
 
+        // The texts follow the language of the app, which Android also applies when only a receiver runs.
         List<String> parts = new ArrayList<>();
-        parts.add(TimeFormat.typeName(text, details.type()));
-        parts.add(SeriesFormat.timeRange(text, details));
-        String place = SeriesFormat.place(text, details);
+        parts.add(TimeFormat.typeName(context, details.type()));
+        parts.add(SeriesFormat.timeRange(context, details));
+        String place = SeriesFormat.place(context, details);
         if (!place.isEmpty()) parts.add(place);
 
         long startMillis = due.start().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
@@ -78,10 +73,10 @@ public final class ReminderNotifier {
                 .setContentIntent(openEvent(context, view.session().id(), id));
 
         if (details.link() != null) {
-            builder.addAction(action(context, id, 1, text.getString(R.string.action_open_meeting), details.link()));
+            builder.addAction(action(context, id, 1, context.getString(R.string.action_open_meeting), details.link()));
         }
         if (view.moodleLink() != null) {
-            builder.addAction(action(context, id, 2, text.getString(R.string.action_open_moodle), view.moodleLink()));
+            builder.addAction(action(context, id, 2, context.getString(R.string.action_open_moodle), view.moodleLink()));
         }
         context.getSystemService(NotificationManager.class).notify(TAG, id, builder.build());
     }
@@ -112,17 +107,5 @@ public final class ReminderNotifier {
         PendingIntent pending = PendingIntent.getActivity(context, id * 4 + slot, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         return new Notification.Action.Builder(null, title, pending).build();
-    }
-
-    /**
-     * The language chosen in the app. On Android 13 and newer the whole app process already follows it, before
-     * that only the screens do, so the text of a reminder is looked up in a context of that language.
-     */
-    private static Context localized(Context context) {
-        LocaleListCompat chosen = AppCompatDelegate.getApplicationLocales();
-        if (chosen.isEmpty()) return context;
-        Configuration configuration = new Configuration(context.getResources().getConfiguration());
-        configuration.setLocales(LocaleList.forLanguageTags(chosen.toLanguageTags()));
-        return context.createConfigurationContext(configuration);
     }
 }

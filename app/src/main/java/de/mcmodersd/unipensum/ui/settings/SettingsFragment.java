@@ -11,8 +11,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.os.LocaleListCompat;
 import androidx.fragment.app.Fragment;
 
 import java.util.Locale;
@@ -37,12 +35,9 @@ import de.mcmodersd.unipensum.ui.widget.UpSegmentedControl;
 import de.mcmodersd.unipensum.ui.widget.UpStepper;
 import de.mcmodersd.unipensum.ui.widget.UpSwitch;
 
-/** Theme, language, the visible hours of the grid and a way into the semester list. */
+/** Theme, the visible hours of the grid, reminders and a way into the lists and the backup. */
 public class SettingsFragment extends Fragment {
 
-    private static final int LANGUAGE_SYSTEM = 0;
-    private static final int LANGUAGE_ENGLISH = 1;
-    private static final int LANGUAGE_GERMAN = 2;
     /** A little longer than the segmented control's slide. */
     private static final long RECREATE_DELAY_MILLIS = 300;
 
@@ -70,7 +65,6 @@ public class SettingsFragment extends Fragment {
         view.findViewById(R.id.back).setOnClickListener(v -> Navigator.of(this).pop());
 
         bindTheme(view.findViewById(R.id.theme_control));
-        bindLanguage(view.findViewById(R.id.language_control));
         bindHours(view.findViewById(R.id.hours_start), view.findViewById(R.id.hours_end));
         bindLecturerNames(view.findViewById(R.id.lecturer_name_control));
         bindReminders(view.findViewById(R.id.reminders_switch), view.findViewById(R.id.notifications_row));
@@ -102,33 +96,13 @@ public class SettingsFragment extends Fragment {
     }
 
     /**
-     * Theme and language changes rebuild the whole screen at once. Waiting for the selection to finish
+     * A theme change rebuilds the whole screen at once. Waiting for the selection to finish
      * sliding keeps the switch visible instead of cutting it off.
      */
     private void afterSlide(View control, Runnable change) {
         control.postDelayed(() -> {
             if (isAdded()) change.run();
         }, RECREATE_DELAY_MILLIS);
-    }
-
-    private void bindLanguage(UpSegmentedControl control) {
-        control.setOptions(getString(R.string.language_system), getString(R.string.language_english),
-                getString(R.string.language_german));
-        control.setSelectedIndex(currentLanguage());
-        control.setOnSelectionChangedListener(index -> {
-            String tags = index == LANGUAGE_ENGLISH ? "en" : (index == LANGUAGE_GERMAN ? "de" : "");
-            afterSlide(control, () ->
-                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tags)));
-        });
-    }
-
-    private static int currentLanguage() {
-        LocaleListCompat locales = AppCompatDelegate.getApplicationLocales();
-        if (locales.isEmpty() || locales.get(0) == null) return LANGUAGE_SYSTEM;
-        String language = locales.get(0).getLanguage();
-        if ("en".equals(language)) return LANGUAGE_ENGLISH;
-        if ("de".equals(language)) return LANGUAGE_GERMAN;
-        return LANGUAGE_SYSTEM;
     }
 
     /** Nothing is rebuilt here: the grid and the sheets read the style from the settings when they draw. */
