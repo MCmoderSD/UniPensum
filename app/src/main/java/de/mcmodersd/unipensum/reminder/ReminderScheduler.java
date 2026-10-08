@@ -72,7 +72,8 @@ public final class ReminderScheduler {
                         Log.e(TAG, "Could not read the reminders", error);
                         if (done != null) done.run();
                     }
-                });
+                }
+        );
     }
 
     private static void plan(Context context, List<ReminderView> views, boolean showDue, long nowMillis,
@@ -116,7 +117,9 @@ public final class ReminderScheduler {
 
     private static PendingIntent alarmIntent(Context context) {
         var intent = new Intent(context, ReminderReceiver.class).setAction(ReminderReceiver.ACTION_ALARM);
-        return PendingIntent.getBroadcast(context, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        return PendingIntent.getBroadcast(
+                context, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
     }
 }

@@ -238,13 +238,17 @@ final class BackupJson {
         }
 
         private Lecturer lecturer(Map<String, Object> f) {
-            return new Lecturer(requiredLong(f, "id"), orEmpty(text(f, "firstName")),
-                    requiredText(f, "lastName"), text(f, "email"), text(f, "phone"));
+            return new Lecturer(
+                    requiredLong(f, "id"), orEmpty(text(f, "firstName")),
+                    requiredText(f, "lastName"), text(f, "email"), text(f, "phone")
+            );
         }
 
         private Semester semester(Map<String, Object> f) {
-            return new Semester(requiredLong(f, "id"), LocalDate.parse(requiredText(f, "start")),
-                    LocalDate.parse(requiredText(f, "end")), text(f, "name"));
+            return new Semester(
+                    requiredLong(f, "id"), LocalDate.parse(requiredText(f, "start")),
+                    LocalDate.parse(requiredText(f, "end")), text(f, "name")
+            );
         }
 
         private Course course(Map<String, Object> f) {
@@ -263,15 +267,19 @@ final class BackupJson {
         }
 
         private Series series(Map<String, Object> f) {
-            var schedule = new Schedule(DayOfWeek.of((int) requiredLong(f, "weekday")),
+            var schedule = new Schedule(
+                    DayOfWeek.of((int) requiredLong(f, "weekday")),
                     LocalDate.parse(requiredText(f, "first")), LocalDate.parse(requiredText(f, "last")),
-                    f.containsKey("interval") ? (int) requiredLong(f, "interval") : 1);
+                    f.containsKey("interval") ? (int) requiredLong(f, "interval") : 1
+            );
             return new Series(requiredLong(f, "id"), requiredLong(f, "course"), details(f), schedule);
         }
 
         private Session session(Map<String, Object> f) {
-            return new Session(requiredLong(f, "id"), requiredLong(f, "series"),
-                    LocalDate.parse(requiredText(f, "day")), details(f));
+            return new Session(
+                    requiredLong(f, "id"), requiredLong(f, "series"),
+                    LocalDate.parse(requiredText(f, "day")), details(f)
+            );
         }
 
         private SessionDetails details(Map<String, Object> f) {
@@ -292,16 +300,20 @@ final class BackupJson {
                 mode = Mode.IN_PERSON;
                 adjusted++;
             }
-            return new SessionDetails(type, startMin, endMin, mode, Boolean.TRUE.equals(f.get("hybrid")),
-                    text(f, "room"), text(f, "link"), lecturer, text(f, "note"), reminder(f, mode));
+            return new SessionDetails(
+                    type, startMin, endMin, mode, Boolean.TRUE.equals(f.get("hybrid")),
+                    text(f, "room"), text(f, "link"), lecturer, text(f, "note"), reminder(f, mode)
+            );
         }
 
         /** A file from before the reminders has no field and gets the default; so does a value that is no number. */
         private int reminder(Map<String, Object> f, Mode mode) {
             if (!f.containsKey("reminder")) return Reminders.defaultFor(mode);
             try {
-                return (int) Math.max(SessionDetails.NO_REMINDER,
-                        Math.min(SessionDetails.MAX_REMINDER_MIN, requiredLong(f, "reminder")));
+                return (int) Math.max(
+                        SessionDetails.NO_REMINDER,
+                        Math.min(SessionDetails.MAX_REMINDER_MIN, requiredLong(f, "reminder"))
+                );
             } catch (RuntimeException notANumber) {
                 adjusted++;
                 return Reminders.defaultFor(mode);

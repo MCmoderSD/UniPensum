@@ -74,16 +74,26 @@ public class BackupStoreTest {
         var weber = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Weber", "anna@uni.example", "030 123"));
         var koch = TimetableStore.saveLecturer(db, new Lecturer(0, "", "Prof. Koch", null, null));
         var semester = TimetableStore.saveSemester(db, new Semester(0, START, END, "Winter term"));
-        var lecture = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
-                "A1", "https://meet.example/x", weber, "bring laptop", SessionDetails.NO_REMINDER);
-        var exercise = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
-                null, "https://meet.example/y", koch, null, SessionDetails.NO_REMINDER);
-        TimetableStore.createCourse(db, new Course(0, semester, courseName, CourseColor.TEAL, "https://moodle.example/c"),
-                List.of(new Series(0, 0, lecture, new Schedule(DayOfWeek.MONDAY, START, END, 1)),
-                        new Series(0, 0, exercise, new Schedule(DayOfWeek.THURSDAY, START, END, 2))));
+        var lecture = new SessionDetails(
+                SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
+                "A1", "https://meet.example/x", weber, "bring laptop", SessionDetails.NO_REMINDER
+        );
+        var exercise = new SessionDetails(
+                SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
+                null, "https://meet.example/y", koch, null, SessionDetails.NO_REMINDER
+        );
+        TimetableStore.createCourse(
+                db, new Course(0, semester, courseName, CourseColor.TEAL, "https://moodle.example/c"),
+                List.of(
+                        new Series(0, 0, lecture, new Schedule(DayOfWeek.MONDAY, START, END, 1)),
+                        new Series(0, 0, exercise, new Schedule(DayOfWeek.THURSDAY, START, END, 2))
+                )
+        );
         var third = TimetableStore.loadTimetable(db).on(START.plusWeeks(2)).get(0).session();
-        var moved = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
-                "B7", "https://meet.example/x", weber, "bring laptop", SessionDetails.NO_REMINDER);
+        var moved = new SessionDetails(
+                SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
+                "B7", "https://meet.example/x", weber, "bring laptop", SessionDetails.NO_REMINDER
+        );
         TimetableStore.editSession(db, third.id(), EditScope.THIS_ONLY, moved, START.plusWeeks(2).plusDays(1), null);
     }
 
@@ -105,13 +115,17 @@ public class BackupStoreTest {
             if (first == null || s.start().isBefore(first)) first = s.start();
             if (last == null || s.end().isAfter(last)) last = s.end();
             for (var c : TimetableStore.listCourses(db, s.id())) {
-                lines.add("C|" + s.start() + "|" + c.course().name() + "|" + c.course().color() + "|"
-                        + c.course().moodleLink());
+                lines.add(
+                        "C|" + s.start() + "|" + c.course().name() + "|" + c.course().color() + "|"
+                                + c.course().moodleLink()
+                );
                 for (var r : c.series()) {
                     var d = r.details();
-                    lines.add("R|" + c.course().name() + "|" + r.schedule() + "|" + d.type() + "|" + d.startMin()
-                            + "|" + d.endMin() + "|" + d.mode() + "|" + d.hybrid() + "|" + d.room() + "|" + d.link()
-                            + "|" + (d.lecturerId() == 0 ? "-" : lecturerNames.get(d.lecturerId())) + "|" + d.note());
+                    lines.add(
+                            "R|" + c.course().name() + "|" + r.schedule() + "|" + d.type() + "|" + d.startMin()
+                                    + "|" + d.endMin() + "|" + d.mode() + "|" + d.hybrid() + "|" + d.room() + "|" + d.link()
+                                    + "|" + (d.lecturerId() == 0 ? "-" : lecturerNames.get(d.lecturerId())) + "|" + d.note()
+                    );
                 }
             }
         }
@@ -120,9 +134,11 @@ public class BackupStoreTest {
             for (var day = first; !day.isAfter(last); day = day.plusDays(1)) {
                 for (var v : timetable.on(day)) {
                     var d = v.session().details();
-                    lines.add("X|" + day + "|" + v.courseName() + "|" + d.type() + "|" + d.startMin() + "|" + d.endMin()
-                            + "|" + d.mode() + "|" + d.hybrid() + "|" + d.room() + "|" + d.link() + "|"
-                            + (v.lecturer() == null ? "-" : v.lecturer().lastName()) + "|" + d.note());
+                    lines.add(
+                            "X|" + day + "|" + v.courseName() + "|" + d.type() + "|" + d.startMin() + "|" + d.endMin()
+                                    + "|" + d.mode() + "|" + d.hybrid() + "|" + d.room() + "|" + d.link() + "|"
+                                    + (v.lecturer() == null ? "-" : v.lecturer().lastName()) + "|" + d.note()
+                    );
                 }
             }
         }

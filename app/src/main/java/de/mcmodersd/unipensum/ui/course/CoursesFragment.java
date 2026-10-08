@@ -102,8 +102,12 @@ public class CoursesFragment extends Fragment {
         var dp = getResources().getDisplayMetrics().density;
         var row = new UpRow(context);
         row.setTitle(entry.course().name());
-        row.setSubtitle(getResources().getQuantityString(R.plurals.event_count,
-                entry.series().size(), entry.series().size()));
+        row.setSubtitle(
+                getResources().getQuantityString(
+                        R.plurals.event_count,
+                        entry.series().size(), entry.series().size()
+                )
+        );
         row.setLeadingColor(CourseColors.resolve(context, entry.course().color()));
         row.setChevronVisible(true);
         row.setOnClickListener(v -> repository.loadCourse(entry.course().id(), new Database.Callback<CourseContext>() {
@@ -120,7 +124,8 @@ public class CoursesFragment extends Fragment {
             }
         }));
         var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         params.bottomMargin = Math.round(8 * dp);
         row.setLayoutParams(params);
         return row;

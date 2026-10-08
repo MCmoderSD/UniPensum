@@ -87,15 +87,20 @@ public final class LecturerSheet extends UpSheet {
 
         list = new LinearLayout(context);
         list.setOrientation(LinearLayout.VERTICAL);
-        column.addView(list, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        column.addView(
+                list, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+        );
 
         var create = new UpButton(context);
         create.setText(R.string.lecturer_new);
         create.setOnClickListener(v ->
-                LecturerEditorSheet.show(getParentFragmentManager(), null, picking() ? KEY_CREATED : null));
+                LecturerEditorSheet.show(getParentFragmentManager(), null, picking() ? KEY_CREATED : null)
+        );
         var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         params.topMargin = Math.round(12 * dp);
         column.addView(create, params);
         return column;
@@ -105,8 +110,10 @@ public final class LecturerSheet extends UpSheet {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (picking()) {
-            getParentFragmentManager().setFragmentResultListener(KEY_CREATED, getViewLifecycleOwner(),
-                    (key, result) -> pick(result.getLong(LecturerEditorSheet.RESULT_LECTURER_ID)));
+            getParentFragmentManager().setFragmentResultListener(
+                    KEY_CREATED, getViewLifecycleOwner(),
+                    (key, result) -> pick(result.getLong(LecturerEditorSheet.RESULT_LECTURER_ID))
+            );
         }
         UniPensumApp.from(requireContext()).repository().lecturers()
                 .observe(getViewLifecycleOwner(), this::render);
@@ -159,7 +166,8 @@ public final class LecturerSheet extends UpSheet {
 
     private static LinearLayout.LayoutParams rowParams(float dp) {
         var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         params.bottomMargin = Math.round(8 * dp);
         return params;
     }

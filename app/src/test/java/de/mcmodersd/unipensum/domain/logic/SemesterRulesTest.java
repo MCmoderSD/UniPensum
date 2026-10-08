@@ -38,10 +38,14 @@ public class SemesterRulesTest {
 
     @Test
     public void check_endNotAfterStart_isInvalid() {
-        assertEquals(SemesterCheck.INVALID_RANGE,
-                SemesterRules.check(semester(2, date(10, 5), date(10, 5)), List.of()));
-        assertEquals(SemesterCheck.INVALID_RANGE,
-                SemesterRules.check(semester(2, date(10, 6), date(10, 5)), List.of()));
+        assertEquals(
+                SemesterCheck.INVALID_RANGE,
+                SemesterRules.check(semester(2, date(10, 5), date(10, 5)), List.of())
+        );
+        assertEquals(
+                SemesterCheck.INVALID_RANGE,
+                SemesterRules.check(semester(2, date(10, 6), date(10, 5)), List.of())
+        );
     }
 
     @Test
@@ -75,14 +79,22 @@ public class SemesterRulesTest {
 
     @Test
     public void checkSchedule_distinguishesCases() {
-        assertEquals(ScheduleCheck.OK,
-                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(10, 5), date(2, 12))));
-        assertEquals(ScheduleCheck.EMPTY_RANGE,
-                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(11, 2), date(10, 5))));
-        assertEquals(ScheduleCheck.OUTSIDE_SEMESTER,
-                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(9, 28), date(11, 2))));
-        assertEquals(ScheduleCheck.OUTSIDE_SEMESTER,
-                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(10, 5), date(2, 15))));
+        assertEquals(
+                ScheduleCheck.OK,
+                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(10, 5), date(2, 12)))
+        );
+        assertEquals(
+                ScheduleCheck.EMPTY_RANGE,
+                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(11, 2), date(10, 5)))
+        );
+        assertEquals(
+                ScheduleCheck.OUTSIDE_SEMESTER,
+                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(9, 28), date(11, 2)))
+        );
+        assertEquals(
+                ScheduleCheck.OUTSIDE_SEMESTER,
+                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(10, 5), date(2, 15)))
+        );
     }
 
     // --- resize ---

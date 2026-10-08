@@ -89,7 +89,8 @@ public final class SessionDetailSheet extends UpSheet {
             navigator.open(SessionEditorFragment.forSession(sessionId, scope));
         });
         manager.setFragmentResultListener(KEY_DELETE_SCOPE, getViewLifecycleOwner(), (key, result) ->
-                delete(EditScope.valueOf(result.getString(ScopeSheet.RESULT_SCOPE))));
+                delete(EditScope.valueOf(result.getString(ScopeSheet.RESULT_SCOPE)))
+        );
 
         UniPensumApp.from(requireContext()).repository().loadSessionContext(
                 requireArguments().getLong(ARG_SESSION_ID), new Database.Callback<SessionContext>() {
@@ -104,7 +105,8 @@ public final class SessionDetailSheet extends UpSheet {
                         // The session is gone, for example deleted from another sheet.
                         if (isAdded()) dismiss();
                     }
-                });
+                }
+        );
     }
 
     private void render(SessionContext context) {
@@ -115,10 +117,14 @@ public final class SessionDetailSheet extends UpSheet {
 
         setSheetTitle(context.course().name());
 
-        column.addView(info(app, dp, SeriesFormat.timeRange(app, details),
-                SeriesFormat.weekdayFull(app, context.session().day().getDayOfWeek()) + ", "
-                        + TimeFormat.dateMedium(app, context.session().day())
-                        + " · " + TimeFormat.typeName(app, details.type())));
+        column.addView(
+                info(
+                        app, dp, SeriesFormat.timeRange(app, details),
+                        SeriesFormat.weekdayFull(app, context.session().day().getDayOfWeek()) + ", "
+                                + TimeFormat.dateMedium(app, context.session().day())
+                                + " · " + TimeFormat.typeName(app, details.type())
+                )
+        );
 
         // "Online" and "A2 | Hybrid" already name the format; a room on its own gets "In person" below it.
         var place = SeriesFormat.place(app, details);
@@ -134,17 +140,29 @@ public final class SessionDetailSheet extends UpSheet {
             // The large view always spells the name out; the setting only shortens it in the grid and lists.
             column.addView(info(app, dp, lecturer.name(NameStyle.FULL_NAME), getString(R.string.field_lecturer)));
             if (lecturer.email() != null) {
-                column.addView(contact(app, dp, R.drawable.ic_mail, lecturer.email(),
-                        getString(R.string.lecturer_email), Links::mail));
+                column.addView(
+                        contact(
+                                app, dp, R.drawable.ic_mail, lecturer.email(),
+                                getString(R.string.lecturer_email), Links::mail
+                        )
+                );
             }
             if (lecturer.phone() != null) {
-                column.addView(contact(app, dp, R.drawable.ic_phone, lecturer.phone(),
-                        getString(R.string.lecturer_phone), Links::dial));
+                column.addView(
+                        contact(
+                                app, dp, R.drawable.ic_phone, lecturer.phone(),
+                                getString(R.string.lecturer_phone), Links::dial
+                        )
+                );
             }
         }
         if (details.hasReminder()) {
-            column.addView(info(app, dp, ReminderFormat.text(app, details.reminderMin()),
-                    getString(R.string.field_reminder)));
+            column.addView(
+                    info(
+                            app, dp, ReminderFormat.text(app, details.reminderMin()),
+                            getString(R.string.field_reminder)
+                    )
+            );
         }
         if (details.note() != null) {
             column.addView(info(app, dp, details.note(), getString(R.string.field_note)));
@@ -165,12 +183,20 @@ public final class SessionDetailSheet extends UpSheet {
             var links = new LinearLayout(app);
             links.setBaselineAligned(false);
             if (meeting != null) {
-                links.addView(button(app, R.string.action_open_meeting, UpButton.Variant.PRIMARY,
-                        v -> open(v, meeting)), weighted(dp, links.getChildCount() > 0));
+                links.addView(
+                        button(
+                                app, R.string.action_open_meeting, UpButton.Variant.PRIMARY,
+                                v -> open(v, meeting)
+                        ), weighted(dp, links.getChildCount() > 0)
+                );
             }
             if (moodle != null) {
-                links.addView(button(app, R.string.action_open_moodle, UpButton.Variant.SECONDARY,
-                        v -> open(v, moodle)), weighted(dp, links.getChildCount() > 0));
+                links.addView(
+                        button(
+                                app, R.string.action_open_moodle, UpButton.Variant.SECONDARY,
+                                v -> open(v, moodle)
+                        ), weighted(dp, links.getChildCount() > 0)
+                );
             }
             actions.addView(links, rowParams(dp, 0, 8));
         }
@@ -178,13 +204,25 @@ public final class SessionDetailSheet extends UpSheet {
         var manage = new LinearLayout(app);
         manage.setBaselineAligned(false);
         // The first button of the sheet is the filled one: the meeting if there is one, else Edit.
-        manage.addView(button(app, R.string.action_edit,
-                meeting != null ? UpButton.Variant.SECONDARY : UpButton.Variant.PRIMARY,
-                v -> ScopeSheet.show(getParentFragmentManager(), KEY_EDIT_SCOPE,
-                        getString(R.string.scope_edit_title), context.session().day())), weighted(dp, false));
-        manage.addView(button(app, R.string.action_delete, UpButton.Variant.DESTRUCTIVE,
-                v -> ScopeSheet.show(getParentFragmentManager(), KEY_DELETE_SCOPE,
-                        getString(R.string.scope_delete_title), context.session().day())), weighted(dp, true));
+        manage.addView(
+                button(
+                        app, R.string.action_edit,
+                        meeting != null ? UpButton.Variant.SECONDARY : UpButton.Variant.PRIMARY,
+                        v -> ScopeSheet.show(
+                                getParentFragmentManager(), KEY_EDIT_SCOPE,
+                                getString(R.string.scope_edit_title), context.session().day()
+                        )
+                ), weighted(dp, false)
+        );
+        manage.addView(
+                button(
+                        app, R.string.action_delete, UpButton.Variant.DESTRUCTIVE,
+                        v -> ScopeSheet.show(
+                                getParentFragmentManager(), KEY_DELETE_SCOPE,
+                                getString(R.string.scope_delete_title), context.session().day()
+                        )
+                ), weighted(dp, true)
+        );
         actions.addView(manage, rowParams(dp, 0, 0));
         return actions;
     }
@@ -250,7 +288,8 @@ public final class SessionDetailSheet extends UpSheet {
 
     private static LinearLayout.LayoutParams rowParams(float dp, int topDp, int bottomDp) {
         var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;

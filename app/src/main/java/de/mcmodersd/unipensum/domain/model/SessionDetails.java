@@ -78,6 +78,7 @@ public record SessionDetails(
                 (online || hybridEffective) ? TextSanitizer.webLink(link) : null,
                 lecturerId > 0 ? lecturerId : NO_LECTURER,
                 TextSanitizer.text(note, TextSanitizer.MAX_NOTE),
-                reminderMin < 0 ? NO_REMINDER : Math.min(reminderMin, MAX_REMINDER_MIN));
+                reminderMin < 0 ? NO_REMINDER : Math.min(reminderMin, MAX_REMINDER_MIN)
+        );
     }
 }

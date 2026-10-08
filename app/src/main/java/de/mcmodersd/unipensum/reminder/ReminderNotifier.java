@@ -37,8 +37,10 @@ public final class ReminderNotifier {
 
     /** Idempotent. The user can change sound and priority of the channel in the system settings. */
     public static void createChannel(Context context) {
-        var channel = new NotificationChannel(CHANNEL_ID,
-                context.getString(R.string.reminder_channel_name), NotificationManager.IMPORTANCE_HIGH);
+        var channel = new NotificationChannel(
+                CHANNEL_ID,
+                context.getString(R.string.reminder_channel_name), NotificationManager.IMPORTANCE_HIGH
+        );
         channel.setDescription(context.getString(R.string.reminder_channel_description));
         context.getSystemService(NotificationManager.class).createNotificationChannel(channel);
     }
@@ -89,8 +91,10 @@ public final class ReminderNotifier {
         var intent = new Intent(context, MainActivity.class)
                 .putExtra(MainActivity.EXTRA_SESSION_ID, sessionId)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        return PendingIntent.getActivity(context, id, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        return PendingIntent.getActivity(
+                context, id, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
     }
 
     /** A button that opens a web link. The link was checked when it was saved, and is checked again here. */
@@ -103,8 +107,10 @@ public final class ReminderNotifier {
         }
         var intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url == null ? "about:blank" : url))
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        var pending = PendingIntent.getActivity(context, id * 4 + slot, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        var pending = PendingIntent.getActivity(
+                context, id * 4 + slot, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
         return new Notification.Action.Builder(null, title, pending).build();
     }
 }

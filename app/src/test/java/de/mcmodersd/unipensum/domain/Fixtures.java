@@ -32,23 +32,31 @@ public final class Fixtures {
 
     /** Lecture, 08:00 to 11:00, in person, room A1, lecturer {@link #LECTURER}. */
     public static SessionDetails details() {
-        return new SessionDetails(SessionType.LECTURE, 8 * 60, 11 * 60, Mode.IN_PERSON, false,
-                "A1", null, LECTURER, null, SessionDetails.NO_REMINDER);
+        return new SessionDetails(
+                SessionType.LECTURE, 8 * 60, 11 * 60, Mode.IN_PERSON, false,
+                "A1", null, LECTURER, null, SessionDetails.NO_REMINDER
+        );
     }
 
     public static SessionDetails withRoom(SessionDetails d, String room) {
-        return new SessionDetails(d.type(), d.startMin(), d.endMin(), d.mode(), d.hybrid(),
-                room, d.link(), d.lecturerId(), d.note(), d.reminderMin());
+        return new SessionDetails(
+                d.type(), d.startMin(), d.endMin(), d.mode(), d.hybrid(),
+                room, d.link(), d.lecturerId(), d.note(), d.reminderMin()
+        );
     }
 
     public static SessionDetails withNote(SessionDetails d, String note) {
-        return new SessionDetails(d.type(), d.startMin(), d.endMin(), d.mode(), d.hybrid(),
-                d.room(), d.link(), d.lecturerId(), note, d.reminderMin());
+        return new SessionDetails(
+                d.type(), d.startMin(), d.endMin(), d.mode(), d.hybrid(),
+                d.room(), d.link(), d.lecturerId(), note, d.reminderMin()
+        );
     }
 
     public static SessionDetails withLecturer(SessionDetails d, long lecturerId) {
-        return new SessionDetails(d.type(), d.startMin(), d.endMin(), d.mode(), d.hybrid(),
-                d.room(), d.link(), lecturerId, d.note(), d.reminderMin());
+        return new SessionDetails(
+                d.type(), d.startMin(), d.endMin(), d.mode(), d.hybrid(),
+                d.room(), d.link(), lecturerId, d.note(), d.reminderMin()
+        );
     }
 
     public static Schedule weekly(DayOfWeek weekday, LocalDate first, LocalDate last) {

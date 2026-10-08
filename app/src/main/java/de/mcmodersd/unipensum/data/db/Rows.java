@@ -39,7 +39,8 @@ final class Rows {
                 string(cursor, "link"),
                 longOrZero(cursor, "lecturer_id"),
                 string(cursor, "note"),
-                nullableInt(cursor, "reminder_min", SessionDetails.NO_REMINDER));
+                nullableInt(cursor, "reminder_min", SessionDetails.NO_REMINDER)
+        );
     }
 
     static int nullableInt(Cursor cursor, String column, int whenNull) {

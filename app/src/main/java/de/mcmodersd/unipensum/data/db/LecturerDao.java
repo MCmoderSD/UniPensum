@@ -32,8 +32,10 @@ public final class LecturerDao {
 
     /** @return {@code null} if there is no such lecturer */
     public static Lecturer get(SQLiteDatabase db, long id) {
-        try (var cursor = db.query("lecturer", null, "id = ?", new String[]{String.valueOf(id)},
-                null, null, null)) {
+        try (var cursor = db.query(
+                "lecturer", null, "id = ?", new String[]{String.valueOf(id)},
+                null, null, null
+        )) {
             return cursor.moveToFirst() ? read(cursor, "") : null;
         }
     }
@@ -41,8 +43,10 @@ public final class LecturerDao {
     /** Ordered by last name, then first name, case-insensitive. */
     public static List<Lecturer> list(SQLiteDatabase db) {
         var result = new ArrayList<Lecturer>();
-        try (var cursor = db.query("lecturer", null, null, null, null, null,
-                "last_name COLLATE NOCASE, first_name COLLATE NOCASE, id")) {
+        try (var cursor = db.query(
+                "lecturer", null, null, null, null, null,
+                "last_name COLLATE NOCASE, first_name COLLATE NOCASE, id"
+        )) {
             while (cursor.moveToNext()) result.add(read(cursor, ""));
         }
         return result;
@@ -61,7 +65,8 @@ public final class LecturerDao {
                 Rows.string(cursor, prefix + "first_name"),
                 Rows.string(cursor, prefix + "last_name"),
                 Rows.string(cursor, prefix + "email"),
-                Rows.string(cursor, prefix + "phone"));
+                Rows.string(cursor, prefix + "phone")
+        );
     }
 
     private static ContentValues values(Lecturer lecturer) {

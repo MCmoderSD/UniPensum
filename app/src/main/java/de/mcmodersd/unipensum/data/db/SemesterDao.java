@@ -33,8 +33,10 @@ public final class SemesterDao {
 
     /** @return {@code null} if there is no such semester */
     public static Semester get(SQLiteDatabase db, long id) {
-        try (var cursor = db.query("semester", null, "id = ?", new String[]{String.valueOf(id)},
-                null, null, null)) {
+        try (var cursor = db.query(
+                "semester", null, "id = ?", new String[]{String.valueOf(id)},
+                null, null, null
+        )) {
             return cursor.moveToFirst() ? read(cursor) : null;
         }
     }
@@ -61,6 +63,7 @@ public final class SemesterDao {
                 Rows.longValue(cursor, "id"),
                 LocalDate.ofEpochDay(Rows.longValue(cursor, "start_day")),
                 LocalDate.ofEpochDay(Rows.longValue(cursor, "end_day")),
-                Rows.string(cursor, "custom_name"));
+                Rows.string(cursor, "custom_name")
+        );
     }
 }

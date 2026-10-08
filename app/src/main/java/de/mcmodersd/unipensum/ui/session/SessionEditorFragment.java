@@ -192,8 +192,10 @@ public class SessionEditorFragment extends Fragment {
 
         findViews(view);
         view.findViewById(R.id.back).setOnClickListener(v -> Navigator.of(this).pop());
-        ((TextView) view.findViewById(R.id.bar_title)).setText(seriesMode
-                ? (seriesIndex < 0 ? R.string.event_new : R.string.event_edit) : R.string.session_edit);
+        ((TextView) view.findViewById(R.id.bar_title)).setText(
+                seriesMode
+                        ? (seriesIndex < 0 ? R.string.event_new : R.string.event_edit) : R.string.session_edit
+        );
         saveButton.setOnClickListener(v -> save());
 
         FormViewModel holder = new ViewModelProvider(this).get(FormViewModel.class);
@@ -204,7 +206,8 @@ public class SessionEditorFragment extends Fragment {
             form = holder.form = buildSeriesForm();
             bind();
         } else {
-            UniPensumApp.from(requireContext()).repository().loadSessionContext(sessionId,
+            UniPensumApp.from(requireContext()).repository().loadSessionContext(
+                    sessionId,
                     new Database.Callback<SessionContext>() {
                         @Override
                         public void onSuccess(SessionContext context) {
@@ -217,7 +220,8 @@ public class SessionEditorFragment extends Fragment {
                         public void onError(Exception error) {
                             if (isAdded()) Navigator.of(SessionEditorFragment.this).pop();
                         }
-                    });
+                    }
+            );
         }
     }
 
@@ -334,7 +338,8 @@ public class SessionEditorFragment extends Fragment {
 
         typeControl.setOptions(
                 getString(R.string.type_lecture), getString(R.string.type_exercise),
-                getString(R.string.type_lab), getString(R.string.type_tutorial));
+                getString(R.string.type_lab), getString(R.string.type_tutorial)
+        );
         typeControl.setSelectedIndex(form.type.ordinal());
         typeControl.setOnSelectionChangedListener(index -> form.type = SessionType.values()[index]);
 
@@ -401,8 +406,10 @@ public class SessionEditorFragment extends Fragment {
         noteField.setText(form.note);
         noteField.addTextWatcher(text -> form.note = text);
 
-        repeatControl.setOptions(getString(R.string.repeat_weekly), getString(R.string.repeat_biweekly),
-                getString(R.string.repeat_custom));
+        repeatControl.setOptions(
+                getString(R.string.repeat_weekly), getString(R.string.repeat_biweekly),
+                getString(R.string.repeat_custom)
+        );
         repeatControl.setSelectedIndex(repeatIndex(form.interval));
         repeatStepper.setRange(1, 12);
         repeatStepper.setFormatter(value -> SeriesFormat.repeat(requireContext(), value));
@@ -417,16 +424,26 @@ public class SessionEditorFragment extends Fragment {
             updateScheduleNote();
         });
 
-        startRow.setOnClickListener(v -> TimePickerSheet.show(manager, KEY_START,
-                getString(R.string.field_start), form.startMin));
-        endRow.setOnClickListener(v -> TimePickerSheet.show(manager, KEY_END,
-                getString(R.string.field_end), form.endMin));
-        dateRow.setOnClickListener(v -> DatePickerSheet.show(manager, KEY_DAY, getString(R.string.field_date),
-                form.day, form.semester.start(), form.semester.end(), true));
-        fromRow.setOnClickListener(v -> DatePickerSheet.show(manager, KEY_FROM, getString(R.string.field_from),
-                form.first, form.semester.start(), form.semester.end(), false));
-        untilRow.setOnClickListener(v -> DatePickerSheet.show(manager, KEY_UNTIL, getString(R.string.field_until),
-                form.last, form.semester.start(), form.semester.end(), false));
+        startRow.setOnClickListener(v -> TimePickerSheet.show(
+                manager, KEY_START,
+                getString(R.string.field_start), form.startMin
+        ));
+        endRow.setOnClickListener(v -> TimePickerSheet.show(
+                manager, KEY_END,
+                getString(R.string.field_end), form.endMin
+        ));
+        dateRow.setOnClickListener(v -> DatePickerSheet.show(
+                manager, KEY_DAY, getString(R.string.field_date),
+                form.day, form.semester.start(), form.semester.end(), true
+        ));
+        fromRow.setOnClickListener(v -> DatePickerSheet.show(
+                manager, KEY_FROM, getString(R.string.field_from),
+                form.first, form.semester.start(), form.semester.end(), false
+        ));
+        untilRow.setOnClickListener(v -> DatePickerSheet.show(
+                manager, KEY_UNTIL, getString(R.string.field_until),
+                form.last, form.semester.start(), form.semester.end(), false
+        ));
 
         manager.setFragmentResultListener(KEY_START, getViewLifecycleOwner(), (key, result) -> {
             var duration = form.endMin > form.startMin ? form.endMin - form.startMin : DEFAULT_DURATION_MIN;
@@ -474,8 +491,10 @@ public class SessionEditorFragment extends Fragment {
     private void updateReminderVisibility() {
         var on = form.reminderMin != SessionDetails.NO_REMINDER;
         reminderStepper.setVisibility(on ? View.VISIBLE : View.GONE);
-        notificationsOffRow.setVisibility(on && !NotificationAccess.allowed(requireContext())
-                ? View.VISIBLE : View.GONE);
+        notificationsOffRow.setVisibility(
+                on && !NotificationAccess.allowed(requireContext())
+                        ? View.VISIBLE : View.GONE
+        );
     }
 
     private static int repeatIndex(int interval) {
@@ -567,13 +586,17 @@ public class SessionEditorFragment extends Fragment {
             return;
         }
 
-        var details = new SessionDetails(form.type, form.startMin, form.endMin, form.mode, form.hybrid,
-                form.room, form.link, form.lecturerId, form.note, form.reminderMin).normalized();
+        var details = new SessionDetails(
+                form.type, form.startMin, form.endMin, form.mode, form.hybrid,
+                form.room, form.link, form.lecturerId, form.note, form.reminderMin
+        ).normalized();
 
         if (seriesMode) {
             var source = form.source;
-            var result = new Series(source == null ? 0 : source.id(), source == null ? 0 : source.courseId(),
-                    details, schedule);
+            var result = new Series(
+                    source == null ? 0 : source.id(), source == null ? 0 : source.courseId(),
+                    details, schedule
+            );
             var list = draft.series();
             if (seriesIndex >= 0) list.set(seriesIndex, result);
             else list.add(result);
@@ -583,7 +606,8 @@ public class SessionEditorFragment extends Fragment {
         }
 
         saveButton.setEnabled(false);
-        UniPensumApp.from(requireContext()).repository().editSession(sessionId, scope, details,
+        UniPensumApp.from(requireContext()).repository().editSession(
+                sessionId, scope, details,
                 thisOnly() ? form.day : null, schedule, new Database.Callback<Void>() {
                     @Override
                     public void onSuccess(Void result) {
@@ -600,7 +624,8 @@ public class SessionEditorFragment extends Fragment {
                         scheduleError.setVisibility(View.VISIBLE);
                         Haptics.reject(saveButton);
                     }
-                });
+                }
+        );
     }
 
     /** @return a message if the schedule cannot be saved, otherwise {@code null} */
@@ -611,9 +636,11 @@ public class SessionEditorFragment extends Fragment {
             case EMPTY_RANGE:
                 return getString(R.string.error_period_empty);
             case OUTSIDE_SEMESTER:
-                return getString(R.string.error_period_outside,
+                return getString(
+                        R.string.error_period_outside,
                         TimeFormat.dateMedium(requireContext(), semester.start()),
-                        TimeFormat.dateMedium(requireContext(), semester.end()));
+                        TimeFormat.dateMedium(requireContext(), semester.end())
+                );
             default:
                 break;
         }

@@ -67,13 +67,16 @@ public final class TimetableStore {
             var name = cursor.getColumnIndexOrThrow("course_name");
             var color = cursor.getColumnIndexOrThrow("course_color");
             while (cursor.moveToNext()) {
-                views.add(new SessionView(
-                        SessionDao.read(cursor),
-                        cursor.getLong(courseId),
-                        cursor.getLong(semesterId),
-                        cursor.getString(name),
-                        CourseColor.fromKey(cursor.getString(color)),
-                        LecturerDao.read(cursor, "lec_")));
+                views.add(
+                        new SessionView(
+                                SessionDao.read(cursor),
+                                cursor.getLong(courseId),
+                                cursor.getLong(semesterId),
+                                cursor.getString(name),
+                                CourseColor.fromKey(cursor.getString(color)),
+                                LecturerDao.read(cursor, "lec_")
+                        )
+                );
             }
         }
         return new Timetable(SemesterDao.list(db), views);
@@ -92,8 +95,12 @@ public final class TimetableStore {
             var name = cursor.getColumnIndexOrThrow("course_name");
             var moodle = cursor.getColumnIndexOrThrow("moodle_link");
             while (cursor.moveToNext()) {
-                views.add(new ReminderView(SessionDao.read(cursor), cursor.getString(name),
-                        cursor.isNull(moodle) ? null : cursor.getString(moodle)));
+                views.add(
+                        new ReminderView(
+                                SessionDao.read(cursor), cursor.getString(name),
+                                cursor.isNull(moodle) ? null : cursor.getString(moodle)
+                        )
+                );
             }
         }
         return views;
@@ -163,19 +170,31 @@ public final class TimetableStore {
             var courseIds = new HashMap<Long, Long>();
             for (var course : data.courses()) {
                 var semesterId = mapped(semesterIds, course.semesterId(), "semester");
-                courseIds.put(course.id(), CourseDao.insert(db,
-                        new Course(0, semesterId, course.name(), course.color(), course.moodleLink())));
+                courseIds.put(
+                        course.id(), CourseDao.insert(
+                                db,
+                                new Course(0, semesterId, course.name(), course.color(), course.moodleLink())
+                        )
+                );
             }
             var seriesIds = new HashMap<Long, Long>();
             for (var series : data.series()) {
                 var courseId = mapped(courseIds, series.courseId(), "course");
-                seriesIds.put(series.id(), SeriesDao.insert(db,
-                        new Series(0, courseId, withLecturer(series.details(), lecturerIds), series.schedule())));
+                seriesIds.put(
+                        series.id(), SeriesDao.insert(
+                                db,
+                                new Series(0, courseId, withLecturer(series.details(), lecturerIds), series.schedule())
+                        )
+                );
             }
             for (var session : data.sessions()) {
                 var seriesId = mapped(seriesIds, session.seriesId(), "series");
-                SessionDao.insert(db, new Session(0, seriesId, session.day(),
-                        withLecturer(session.details(), lecturerIds)));
+                SessionDao.insert(
+                        db, new Session(
+                                0, seriesId, session.day(),
+                                withLecturer(session.details(), lecturerIds)
+                        )
+                );
             }
             return null;
         });
@@ -238,8 +257,12 @@ public final class TimetableStore {
             Semester old = require(SemesterDao.get(db, clean.id()), "semester", clean.id());
             SemesterDao.update(db, clean);
             if (!old.start().equals(clean.start()) || !old.end().equals(clean.end())) {
-                apply(db, SemesterRules.resize(old, clean,
-                        SeriesDao.listBySemester(db, clean.id()), SessionDao.listBySemester(db, clean.id())));
+                apply(
+                        db, SemesterRules.resize(
+                                old, clean,
+                                SeriesDao.listBySemester(db, clean.id()), SessionDao.listBySemester(db, clean.id())
+                        )
+                );
             }
             return clean.id();
         });
@@ -260,16 +283,24 @@ public final class TimetableStore {
     public static long createCourse(SQLiteDatabase db, Course course, List<Series> series) {
         return transact(db, () -> {
             Semester semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
-            var courseId = CourseDao.insert(db, new Course(0, semester.id(), requireName(course.name()),
-                    course.color(), cleanLink(course.moodleLink())));
+            var courseId = CourseDao.insert(
+                    db, new Course(
+                            0, semester.id(), requireName(course.name()),
+                            course.color(), cleanLink(course.moodleLink())
+                    )
+            );
             for (var template : series) insertSeries(db, semester, courseId, template);
             return courseId;
         });
     }
 
     public static void updateCourse(SQLiteDatabase db, Course course) {
-        CourseDao.update(db, new Course(course.id(), course.semesterId(), requireName(course.name()),
-                course.color(), cleanLink(course.moodleLink())));
+        CourseDao.update(
+                db, new Course(
+                        course.id(), course.semesterId(), requireName(course.name()),
+                        course.color(), cleanLink(course.moodleLink())
+                )
+        );
     }
 
     /**
@@ -280,8 +311,12 @@ public final class TimetableStore {
     public static void saveCourse(SQLiteDatabase db, Course course, List<Series> drafts) {
         transact(db, () -> {
             var stored = loadCourse(db, course.id());
-            CourseDao.update(db, new Course(course.id(), stored.course().semesterId(),
-                    requireName(course.name()), course.color(), cleanLink(course.moodleLink())));
+            CourseDao.update(
+                    db, new Course(
+                            course.id(), stored.course().semesterId(),
+                            requireName(course.name()), course.color(), cleanLink(course.moodleLink())
+                    )
+            );
 
             var storedById = new HashMap<Long, Series>();
             for (var series : stored.series()) storedById.put(series.id(), series);
@@ -303,8 +338,12 @@ public final class TimetableStore {
                 // rules would refuse (a link written long ago) cannot block saving the rest of the course.
                 if (current.details().equals(draft.details()) && current.schedule().equals(draft.schedule())) continue;
                 var details = requireValid(db, draft.details());
-                apply(db, SeriesEditor.editSeries(stored.semester(), current,
-                        SessionDao.listBySeries(db, current.id()), details, draft.schedule()));
+                apply(
+                        db, SeriesEditor.editSeries(
+                                stored.semester(), current,
+                                SessionDao.listBySeries(db, current.id()), details, draft.schedule()
+                        )
+                );
             }
             return null;
         });
@@ -340,8 +379,12 @@ public final class TimetableStore {
         transact(db, () -> {
             var context = loadSessionContext(db, sessionId);
             var sessions = SessionDao.listBySeries(db, context.series().id());
-            apply(db, SeriesEditor.edit(context.semester(), context.series(), sessions, sessionId, scope,
-                    requireValid(db, details), day, schedule));
+            apply(
+                    db, SeriesEditor.edit(
+                            context.semester(), context.series(), sessions, sessionId, scope,
+                            requireValid(db, details), day, schedule
+                    )
+            );
             return null;
         });
     }

@@ -113,8 +113,10 @@ public final class SemesterEditorSheet extends UpSheet {
         end = LocalDate.ofEpochDay(source.getLong(savedInstanceState != null ? STATE_END : ARG_END));
         var name = source.getString(savedInstanceState != null ? STATE_NAME : ARG_NAME);
         endTouched = savedInstanceState != null && savedInstanceState.getBoolean(STATE_END_TOUCHED);
-        original = id == 0 ? null : new Semester(id, LocalDate.ofEpochDay(args.getLong(ARG_START)),
-                LocalDate.ofEpochDay(args.getLong(ARG_END)), args.getString(ARG_NAME));
+        original = id == 0 ? null : new Semester(
+                id, LocalDate.ofEpochDay(args.getLong(ARG_START)),
+                LocalDate.ofEpochDay(args.getLong(ARG_END)), args.getString(ARG_NAME)
+        );
 
         var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
@@ -122,15 +124,19 @@ public final class SemesterEditorSheet extends UpSheet {
         startRow = new UpRow(context);
         startRow.setTitle(getString(R.string.semester_start));
         startRow.setChevronVisible(true);
-        startRow.setOnClickListener(v -> DatePickerSheet.show(getParentFragmentManager(), KEY_START,
-                getString(R.string.semester_start), start, null, null, false));
+        startRow.setOnClickListener(v -> DatePickerSheet.show(
+                getParentFragmentManager(), KEY_START,
+                getString(R.string.semester_start), start, null, null, false
+        ));
         column.addView(startRow, spaced(dp, 8));
 
         endRow = new UpRow(context);
         endRow.setTitle(getString(R.string.semester_end));
         endRow.setChevronVisible(true);
-        endRow.setOnClickListener(v -> DatePickerSheet.show(getParentFragmentManager(), KEY_END,
-                getString(R.string.semester_end), end, null, null, false));
+        endRow.setOnClickListener(v -> DatePickerSheet.show(
+                getParentFragmentManager(), KEY_END,
+                getString(R.string.semester_end), end, null, null, false
+        ));
         column.addView(endRow, spaced(dp, 16));
 
         nameField = new UpTextField(context);
@@ -157,9 +163,11 @@ public final class SemesterEditorSheet extends UpSheet {
             var delete = new UpButton(context);
             delete.setText(R.string.action_delete);
             delete.setVariant(UpButton.Variant.DESTRUCTIVE);
-            delete.setOnClickListener(v -> ConfirmSheet.show(getParentFragmentManager(), KEY_DELETE,
+            delete.setOnClickListener(v -> ConfirmSheet.show(
+                    getParentFragmentManager(), KEY_DELETE,
                     getString(R.string.semester_delete_title), getString(R.string.semester_delete_message),
-                    getString(R.string.action_delete), true));
+                    getString(R.string.action_delete), true
+            ));
             var deleteParams = spaced(dp, 0);
             deleteParams.topMargin = Math.round(8 * dp);
             column.addView(delete, deleteParams);
@@ -228,9 +236,11 @@ public final class SemesterEditorSheet extends UpSheet {
         var shortens = original != null
                 && (start.isAfter(original.start()) || end.isBefore(original.end()));
         if (shortens) {
-            ConfirmSheet.show(getParentFragmentManager(), KEY_SHORTEN,
+            ConfirmSheet.show(
+                    getParentFragmentManager(), KEY_SHORTEN,
                     getString(R.string.semester_shorten_title), getString(R.string.semester_shorten_message),
-                    getString(R.string.action_shorten), true);
+                    getString(R.string.action_shorten), true
+            );
         } else {
             save();
         }
@@ -287,7 +297,8 @@ public final class SemesterEditorSheet extends UpSheet {
 
     private static LinearLayout.LayoutParams spaced(float dp, int bottomDp) {
         var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;
     }

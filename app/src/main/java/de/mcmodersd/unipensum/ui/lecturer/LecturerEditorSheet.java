@@ -86,23 +86,31 @@ public final class LecturerEditorSheet extends UpSheet {
         var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
 
-        firstNameField = field(context, R.string.lecturer_first_name,
+        firstNameField = field(
+                context, R.string.lecturer_first_name,
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS | InputType.TYPE_TEXT_VARIATION_PERSON_NAME,
-                TextSanitizer.MAX_NAME, source.getString(ARG_FIRST_NAME));
+                TextSanitizer.MAX_NAME, source.getString(ARG_FIRST_NAME)
+        );
         column.addView(firstNameField, spaced(dp, 0, 12));
 
-        lastNameField = field(context, R.string.lecturer_last_name,
+        lastNameField = field(
+                context, R.string.lecturer_last_name,
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS | InputType.TYPE_TEXT_VARIATION_PERSON_NAME,
-                TextSanitizer.MAX_NAME, source.getString(ARG_LAST_NAME));
+                TextSanitizer.MAX_NAME, source.getString(ARG_LAST_NAME)
+        );
         column.addView(lastNameField, spaced(dp, 0, 12));
 
-        emailField = field(context, R.string.lecturer_email,
+        emailField = field(
+                context, R.string.lecturer_email,
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
-                TextSanitizer.MAX_EMAIL, source.getString(ARG_EMAIL));
+                TextSanitizer.MAX_EMAIL, source.getString(ARG_EMAIL)
+        );
         column.addView(emailField, spaced(dp, 0, 12));
 
-        phoneField = field(context, R.string.lecturer_phone, InputType.TYPE_CLASS_PHONE,
-                TextSanitizer.MAX_PHONE, source.getString(ARG_PHONE));
+        phoneField = field(
+                context, R.string.lecturer_phone, InputType.TYPE_CLASS_PHONE,
+                TextSanitizer.MAX_PHONE, source.getString(ARG_PHONE)
+        );
         column.addView(phoneField, spaced(dp, 0, 0));
 
         saveButton = new UpButton(context);
@@ -114,9 +122,11 @@ public final class LecturerEditorSheet extends UpSheet {
             var delete = new UpButton(context);
             delete.setText(R.string.action_delete);
             delete.setVariant(UpButton.Variant.DESTRUCTIVE);
-            delete.setOnClickListener(v -> ConfirmSheet.show(getParentFragmentManager(), KEY_DELETE,
+            delete.setOnClickListener(v -> ConfirmSheet.show(
+                    getParentFragmentManager(), KEY_DELETE,
                     getString(R.string.lecturer_delete_title), getString(R.string.lecturer_delete_message),
-                    getString(R.string.action_delete), true));
+                    getString(R.string.action_delete), true
+            ));
             column.addView(delete, spaced(dp, 8, 0));
         }
         return column;
@@ -125,8 +135,10 @@ public final class LecturerEditorSheet extends UpSheet {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getParentFragmentManager().setFragmentResultListener(KEY_DELETE, getViewLifecycleOwner(),
-                (key, result) -> delete());
+        getParentFragmentManager().setFragmentResultListener(
+                KEY_DELETE, getViewLifecycleOwner(),
+                (key, result) -> delete()
+        );
     }
 
     @Override
@@ -149,8 +161,10 @@ public final class LecturerEditorSheet extends UpSheet {
     }
 
     private void onSave() {
-        var candidate = new Lecturer(id, firstNameField.getText(), lastNameField.getText(),
-                emailField.getText(), phoneField.getText()).normalized();
+        var candidate = new Lecturer(
+                id, firstNameField.getText(), lastNameField.getText(),
+                emailField.getText(), phoneField.getText()
+        ).normalized();
 
         var valid = true;
         if (candidate.lastName().isEmpty()) {
@@ -207,7 +221,8 @@ public final class LecturerEditorSheet extends UpSheet {
 
     private static LinearLayout.LayoutParams spaced(float dp, int topDp, int bottomDp) {
         var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;

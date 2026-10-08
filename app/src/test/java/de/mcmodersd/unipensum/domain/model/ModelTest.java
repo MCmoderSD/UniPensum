@@ -19,16 +19,22 @@ public class ModelTest {
 
     @Test
     public void schedule_rejectsWeekend() {
-        assertThrows(IllegalArgumentException.class,
-                () -> new Schedule(DayOfWeek.SATURDAY, date(10, 5), date(11, 2), 1));
-        assertThrows(IllegalArgumentException.class,
-                () -> new Schedule(DayOfWeek.SUNDAY, date(10, 5), date(11, 2), 1));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Schedule(DayOfWeek.SATURDAY, date(10, 5), date(11, 2), 1)
+        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Schedule(DayOfWeek.SUNDAY, date(10, 5), date(11, 2), 1)
+        );
     }
 
     @Test
     public void schedule_rejectsIntervalBelowOne() {
-        assertThrows(IllegalArgumentException.class,
-                () -> new Schedule(DayOfWeek.MONDAY, date(10, 5), date(11, 2), 0));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Schedule(DayOfWeek.MONDAY, date(10, 5), date(11, 2), 0)
+        );
     }
 
     @Test
@@ -72,8 +78,10 @@ public class ModelTest {
 
     @Test
     public void normalized_cleansTextAndTheLink() {
-        var dirty = new SessionDetails(SessionType.LECTURE, 480, 570, Mode.IN_PERSON, true,
-                "  A1\t ​", " meet.example/abc ", 0, " bring ‮laptop \r\n\r\n\r\n room B2 ", SessionDetails.NO_REMINDER);
+        var dirty = new SessionDetails(
+                SessionType.LECTURE, 480, 570, Mode.IN_PERSON, true,
+                "  A1\t ​", " meet.example/abc ", 0, " bring ‮laptop \r\n\r\n\r\n room B2 ", SessionDetails.NO_REMINDER
+        );
 
         var result = dirty.normalized();
 
@@ -84,17 +92,23 @@ public class ModelTest {
 
     @Test
     public void normalized_isIdempotent() {
-        var once = new SessionDetails(SessionType.LAB, 480, 570, Mode.IN_PERSON, true,
-                " A1 ", "HTTPS://meet.example/a b", 3, " x \n\n\n y ", SessionDetails.NO_REMINDER).normalized();
+        var once = new SessionDetails(
+                SessionType.LAB, 480, 570, Mode.IN_PERSON, true,
+                " A1 ", "HTTPS://meet.example/a b", 3, " x \n\n\n y ", SessionDetails.NO_REMINDER
+        ).normalized();
         assertEquals(once, once.normalized());
     }
 
     @Test
     public void normalized_refusesALinkThatIsNoWebLink() {
-        assertThrows(IllegalArgumentException.class,
-                () -> details(Mode.ONLINE, false, null, "javascript:alert(1)").normalized());
-        assertThrows(IllegalArgumentException.class,
-                () -> details(Mode.IN_PERSON, true, "A1", "ftp://files.example/x").normalized());
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> details(Mode.ONLINE, false, null, "javascript:alert(1)").normalized()
+        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> details(Mode.IN_PERSON, true, "A1", "ftp://files.example/x").normalized()
+        );
     }
 
     @Test
@@ -110,8 +124,10 @@ public class ModelTest {
     }
 
     private static SessionDetails withLecturer(SessionDetails d, long lecturerId) {
-        return new SessionDetails(d.type(), d.startMin(), d.endMin(), d.mode(), d.hybrid(),
-                d.room(), d.link(), lecturerId, d.note(), d.reminderMin());
+        return new SessionDetails(
+                d.type(), d.startMin(), d.endMin(), d.mode(), d.hybrid(),
+                d.room(), d.link(), lecturerId, d.note(), d.reminderMin()
+        );
     }
 
     @Test
@@ -128,8 +144,10 @@ public class ModelTest {
     @Test
     public void reminder_isKeptForEveryFormat() {
         assertEquals(5, details(Mode.ONLINE, false, null, null).withReminder(5).normalized().reminderMin());
-        assertEquals(45, details(Mode.IN_PERSON, true, "A1", "https://meet.example/x").withReminder(45)
-                .normalized().reminderMin());
+        assertEquals(
+                45, details(Mode.IN_PERSON, true, "A1", "https://meet.example/x").withReminder(45)
+                        .normalized().reminderMin()
+        );
     }
 
     @Test
@@ -142,8 +160,12 @@ public class ModelTest {
     public void with_changesOnlyThatField() {
         var base = details(Mode.ONLINE, false, null, "https://meet.example/x").withReminder(15);
 
-        assertEquals(base.withLecturer(9), new SessionDetails(base.type(), base.startMin(), base.endMin(), base.mode(),
-                base.hybrid(), base.room(), base.link(), 9, base.note(), 15));
+        assertEquals(
+                base.withLecturer(9), new SessionDetails(
+                        base.type(), base.startMin(), base.endMin(), base.mode(),
+                        base.hybrid(), base.room(), base.link(), 9, base.note(), 15
+                )
+        );
         assertEquals(15, base.withLink(null).reminderMin());
         assertNull(base.withLink(null).link());
         assertEquals("https://meet.example/x", base.withReminder(0).link());
@@ -173,8 +195,10 @@ public class ModelTest {
 
     @Test
     public void lecturer_normalized_cleansEveryField() {
-        var result = new Lecturer(2, " Anna​\n ", "‮Weber  Koch", " anna .weber@uni.example ",
-                "tel: +49 (30) 123").normalized();
+        var result = new Lecturer(
+                2, " Anna​\n ", "‮Weber  Koch", " anna .weber@uni.example ",
+                "tel: +49 (30) 123"
+        ).normalized();
 
         assertEquals("Anna", result.firstName());
         assertEquals("Weber Koch", result.lastName());

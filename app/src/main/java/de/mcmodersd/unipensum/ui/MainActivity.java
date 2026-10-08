@@ -55,8 +55,10 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         pane = findViewById(R.id.pane);
         View side = findViewById(R.id.side);
         ViewCompat.setOnApplyWindowInsetsListener(pane, (view, windowInsets) -> {
-            var bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
-                    | WindowInsetsCompat.Type.displayCutout());
+            var bars = windowInsets.getInsets(
+                    WindowInsetsCompat.Type.systemBars()
+                            | WindowInsetsCompat.Type.displayCutout()
+            );
             var ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
             // Only the pane holds text fields, so only it makes room for the keyboard.
@@ -124,8 +126,10 @@ public class MainActivity extends AppCompatActivity implements Navigator {
     @SuppressLint("SourceLockedOrientationActivity")
     private void lockPhonesToPortrait() {
         var tablet = getResources().getConfiguration().smallestScreenWidthDp >= TABLET_MIN_SMALLEST_WIDTH_DP;
-        setRequestedOrientation(tablet
-                ? ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(
+                tablet
+                        ? ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        );
     }
 
     @Override
@@ -169,8 +173,10 @@ public class MainActivity extends AppCompatActivity implements Navigator {
             // The pane slides in and out by itself; the page only has to stay put while it does.
             transaction.setCustomAnimations(0, 0, 0, R.animator.pane_hold);
         } else {
-            transaction.setCustomAnimations(R.animator.screen_enter, R.animator.screen_exit,
-                    R.animator.screen_pop_enter, R.animator.screen_pop_exit);
+            transaction.setCustomAnimations(
+                    R.animator.screen_enter, R.animator.screen_exit,
+                    R.animator.screen_pop_enter, R.animator.screen_pop_exit
+            );
         }
         transaction.replace(R.id.side, fragment, firstPage ? FIRST_PAGE : null).addToBackStack(null).commit();
     }

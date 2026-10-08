@@ -85,19 +85,29 @@ public class BackupFileTest {
         var koch = TimetableStore.saveLecturer(db, new Lecturer(0, "", "Prof. Koch", null, null));
         var semester = TimetableStore.saveSemester(db, new Semester(0, START, END, "Winter term"));
 
-        var lecture = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
-                "A1", "https://meet.example/x", weber, "bring laptop\n\nroom B2", 45);
-        var exercise = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
-                null, "https://meet.example/y", koch, null, SessionDetails.NO_REMINDER);
-        TimetableStore.createCourse(db,
+        var lecture = new SessionDetails(
+                SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
+                "A1", "https://meet.example/x", weber, "bring laptop\n\nroom B2", 45
+        );
+        var exercise = new SessionDetails(
+                SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
+                null, "https://meet.example/y", koch, null, SessionDetails.NO_REMINDER
+        );
+        TimetableStore.createCourse(
+                db,
                 new Course(0, semester, "Math", CourseColor.TEAL, "https://moodle.example/c/1"),
-                List.of(new Series(0, 0, lecture, new Schedule(DayOfWeek.MONDAY, START, END, 1)),
-                        new Series(0, 0, exercise, new Schedule(DayOfWeek.THURSDAY, START, END, 2))));
+                List.of(
+                        new Series(0, 0, lecture, new Schedule(DayOfWeek.MONDAY, START, END, 1)),
+                        new Series(0, 0, exercise, new Schedule(DayOfWeek.THURSDAY, START, END, 2))
+                )
+        );
 
         // One session of the lecture deviates: another day and room.
         var first = TimetableStore.loadTimetable(db).on(START.plusWeeks(2)).get(0).session();
-        var moved = new SessionDetails(SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
-                "B7", "https://meet.example/x", weber, "bring laptop\n\nroom B2", 45);
+        var moved = new SessionDetails(
+                SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
+                "B7", "https://meet.example/x", weber, "bring laptop\n\nroom B2", 45
+        );
         TimetableStore.editSession(db, first.id(), EditScope.THIS_ONLY, moved, START.plusWeeks(2).plusDays(1), null);
         return TimetableStore.exportData(db);
     }
@@ -186,8 +196,10 @@ public class BackupFileTest {
         var file = BackupFile.write(sample(), META, PASSWORD.clone(), ITERATIONS);
         var entries = unzip(file);
         var manifest = new String(entries.get("manifest.json"), StandardCharsets.UTF_8);
-        entries.put("manifest.json", manifest.replace("\"appVersion\":\"1.0\"", "\"appVersion\":\"6.6\"")
-                .getBytes(StandardCharsets.UTF_8));
+        entries.put(
+                "manifest.json", manifest.replace("\"appVersion\":\"1.0\"", "\"appVersion\":\"6.6\"")
+                        .getBytes(StandardCharsets.UTF_8)
+        );
 
         var opened = open(zip(entries));
 
@@ -210,8 +222,10 @@ public class BackupFileTest {
 
     @Test
     public void anotherKindOfFile_isNotABackup() {
-        assertEquals(BackupException.Reason.NOT_A_BACKUP,
-                reasonOf(() -> open("just some text".getBytes(StandardCharsets.UTF_8))));
+        assertEquals(
+                BackupException.Reason.NOT_A_BACKUP,
+                reasonOf(() -> open("just some text".getBytes(StandardCharsets.UTF_8)))
+        );
         assertEquals(BackupException.Reason.NOT_A_BACKUP, reasonOf(() -> open(new byte[0])));
         assertEquals(BackupException.Reason.NOT_A_BACKUP, reasonOf(() -> open(new byte[]{0x1f, (byte) 0x8b, 8, 0, 0})));
     }
@@ -268,8 +282,10 @@ public class BackupFileTest {
 
     @Test
     public void aFileLargerThanAnyBackup_isRefusedBeforeItIsOpened() {
-        assertEquals(BackupException.Reason.TOO_LARGE,
-                reasonOf(() -> open(new byte[(int) BackupFile.MAX_FILE_BYTES + 1])));
+        assertEquals(
+                BackupException.Reason.TOO_LARGE,
+                reasonOf(() -> open(new byte[(int) BackupFile.MAX_FILE_BYTES + 1]))
+        );
     }
 
     @Test
@@ -317,23 +333,28 @@ public class BackupFileTest {
     @Test
     public void aFixedSampleOfTheCurrentFormat_isStillUnderstood() throws Exception {
         // Do not "fix" this sample when the code changes: it stands for files that already exist.
-        var opened = open(zip(sampleFile(
-                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"appVersion\":\"1.0\",\"appVersionCode\":1,"
-                        + "\"exportedAt\":\"2026-10-05T10:00:00Z\"}",
-                "{\"lecturers\":[{\"id\":1,\"firstName\":\"Anna\",\"lastName\":\"Weber\",\"email\":\"anna@uni.example\","
-                        + "\"phone\":\"+49 30 123\"},{\"id\":2,\"firstName\":\"\",\"lastName\":\"Prof. Koch\"}],"
-                        + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\",\"name\":\"Winter term\"}],"
-                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"blue\","
-                        + "\"moodle\":\"https://moodle.example/c/1\"}],"
-                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-12\","
-                        + "\"interval\":1,\"type\":\"lecture\",\"startMin\":480,\"endMin\":675,\"mode\":\"in_person\","
-                        + "\"hybrid\":true,\"room\":\"A1\",\"link\":\"https://meet.example/x\",\"lecturer\":1,"
-                        + "\"note\":\"bring laptop\"}],"
-                        + "\"sessions\":[{\"id\":1,\"series\":1,\"day\":\"2026-10-05\",\"type\":\"lecture\","
-                        + "\"startMin\":480,\"endMin\":675,\"mode\":\"in_person\",\"hybrid\":true,\"room\":\"A1\","
-                        + "\"link\":\"https://meet.example/x\",\"lecturer\":1,\"note\":\"bring laptop\"},"
-                        + "{\"id\":2,\"series\":1,\"day\":\"2026-10-13\",\"type\":\"exercise\",\"startMin\":600,"
-                        + "\"endMin\":700,\"mode\":\"online\",\"link\":\"https://meet.example/y\",\"lecturer\":2}]}")));
+        var opened = open(
+                zip(
+                        sampleFile(
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"appVersion\":\"1.0\",\"appVersionCode\":1,"
+                                        + "\"exportedAt\":\"2026-10-05T10:00:00Z\"}",
+                                "{\"lecturers\":[{\"id\":1,\"firstName\":\"Anna\",\"lastName\":\"Weber\",\"email\":\"anna@uni.example\","
+                                        + "\"phone\":\"+49 30 123\"},{\"id\":2,\"firstName\":\"\",\"lastName\":\"Prof. Koch\"}],"
+                                        + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\",\"name\":\"Winter term\"}],"
+                                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"blue\","
+                                        + "\"moodle\":\"https://moodle.example/c/1\"}],"
+                                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-12\","
+                                        + "\"interval\":1,\"type\":\"lecture\",\"startMin\":480,\"endMin\":675,\"mode\":\"in_person\","
+                                        + "\"hybrid\":true,\"room\":\"A1\",\"link\":\"https://meet.example/x\",\"lecturer\":1,"
+                                        + "\"note\":\"bring laptop\"}],"
+                                        + "\"sessions\":[{\"id\":1,\"series\":1,\"day\":\"2026-10-05\",\"type\":\"lecture\","
+                                        + "\"startMin\":480,\"endMin\":675,\"mode\":\"in_person\",\"hybrid\":true,\"room\":\"A1\","
+                                        + "\"link\":\"https://meet.example/x\",\"lecturer\":1,\"note\":\"bring laptop\"},"
+                                        + "{\"id\":2,\"series\":1,\"day\":\"2026-10-13\",\"type\":\"exercise\",\"startMin\":600,"
+                                        + "\"endMin\":700,\"mode\":\"online\",\"link\":\"https://meet.example/y\",\"lecturer\":2}]}"
+                        )
+                )
+        );
 
         var result = opened.read(null);
 
@@ -358,18 +379,23 @@ public class BackupFileTest {
     @Test
     public void aFileFromBeforeTheReminders_getsTheDefaultOfEachEvent() throws Exception {
         // Do not "fix" this sample when the code changes: it stands for files that already exist.
-        var opened = open(zip(sampleFile(
-                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"appVersion\":\"1.0\",\"appVersionCode\":1}",
-                "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
-                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
-                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-12\","
-                        + "\"type\":\"lecture\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"},"
-                        + "{\"id\":2,\"course\":1,\"weekday\":2,\"first\":\"2026-10-06\",\"last\":\"2026-10-13\","
-                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"online\"}],"
-                        + "\"sessions\":[{\"id\":1,\"series\":1,\"day\":\"2026-10-05\",\"type\":\"lecture\","
-                        + "\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"},"
-                        + "{\"id\":2,\"series\":2,\"day\":\"2026-10-06\",\"type\":\"lab\",\"startMin\":480,"
-                        + "\"endMin\":600,\"mode\":\"online\"}]}")));
+        var opened = open(
+                zip(
+                        sampleFile(
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"appVersion\":\"1.0\",\"appVersionCode\":1}",
+                                "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
+                                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
+                                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-12\","
+                                        + "\"type\":\"lecture\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"},"
+                                        + "{\"id\":2,\"course\":1,\"weekday\":2,\"first\":\"2026-10-06\",\"last\":\"2026-10-13\","
+                                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"online\"}],"
+                                        + "\"sessions\":[{\"id\":1,\"series\":1,\"day\":\"2026-10-05\",\"type\":\"lecture\","
+                                        + "\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"},"
+                                        + "{\"id\":2,\"series\":2,\"day\":\"2026-10-06\",\"type\":\"lab\",\"startMin\":480,"
+                                        + "\"endMin\":600,\"mode\":\"online\"}]}"
+                        )
+                )
+        );
 
         var result = opened.read(null);
 
@@ -383,18 +409,23 @@ public class BackupFileTest {
 
     @Test
     public void remindersInAFile_areKeptBroughtIntoRangeOrReplacedByTheDefault() throws Exception {
-        var opened = open(zip(sampleFile(
-                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":3}",
-                "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
-                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
-                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-05\","
-                        + "\"type\":\"lecture\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\",\"reminder\":0},"
-                        + "{\"id\":2,\"course\":1,\"weekday\":2,\"first\":\"2026-10-06\",\"last\":\"2026-10-06\","
-                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"online\",\"reminder\":-1},"
-                        + "{\"id\":3,\"course\":1,\"weekday\":3,\"first\":\"2026-10-07\",\"last\":\"2026-10-07\","
-                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\",\"reminder\":9999},"
-                        + "{\"id\":4,\"course\":1,\"weekday\":4,\"first\":\"2026-10-08\",\"last\":\"2026-10-08\","
-                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"online\",\"reminder\":\"soon\"}]}")));
+        var opened = open(
+                zip(
+                        sampleFile(
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":3}",
+                                "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
+                                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
+                                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-05\","
+                                        + "\"type\":\"lecture\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\",\"reminder\":0},"
+                                        + "{\"id\":2,\"course\":1,\"weekday\":2,\"first\":\"2026-10-06\",\"last\":\"2026-10-06\","
+                                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"online\",\"reminder\":-1},"
+                                        + "{\"id\":3,\"course\":1,\"weekday\":3,\"first\":\"2026-10-07\",\"last\":\"2026-10-07\","
+                                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\",\"reminder\":9999},"
+                                        + "{\"id\":4,\"course\":1,\"weekday\":4,\"first\":\"2026-10-08\",\"last\":\"2026-10-08\","
+                                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"online\",\"reminder\":\"soon\"}]}"
+                        )
+                )
+        );
 
         var result = opened.read(null);
 
@@ -409,17 +440,22 @@ public class BackupFileTest {
 
     @Test
     public void aNewerVersionsFile_isReadAsFarAsItIsUnderstood() throws Exception {
-        var opened = open(zip(sampleFile(
-                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":99,\"appVersion\":\"9.9\",\"appVersionCode\":999,"
-                        + "\"somethingNew\":{\"x\":1}}",
-                "{\"futureThings\":[1,2,3],"
-                        + "\"lecturers\":[{\"id\":1,\"firstName\":\"Anna\",\"lastName\":\"Weber\",\"office\":\"B12\"}],"
-                        + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
-                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"magenta\"}],"
-                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-12\","
-                        + "\"type\":\"workshop\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"}],"
-                        + "\"sessions\":[{\"id\":1,\"series\":1,\"day\":\"2026-10-05\",\"type\":\"lecture\","
-                        + "\"startMin\":480,\"endMin\":600,\"mode\":\"hologram\"}]}")));
+        var opened = open(
+                zip(
+                        sampleFile(
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":99,\"appVersion\":\"9.9\",\"appVersionCode\":999,"
+                                        + "\"somethingNew\":{\"x\":1}}",
+                                "{\"futureThings\":[1,2,3],"
+                                        + "\"lecturers\":[{\"id\":1,\"firstName\":\"Anna\",\"lastName\":\"Weber\",\"office\":\"B12\"}],"
+                                        + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
+                                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"magenta\"}],"
+                                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-12\","
+                                        + "\"type\":\"workshop\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"}],"
+                                        + "\"sessions\":[{\"id\":1,\"series\":1,\"day\":\"2026-10-05\",\"type\":\"lecture\","
+                                        + "\"startMin\":480,\"endMin\":600,\"mode\":\"hologram\"}]}"
+                        )
+                )
+        );
 
         var result = opened.read(null);
 
@@ -433,14 +469,19 @@ public class BackupFileTest {
 
     @Test
     public void entriesThatCannotBeReadAreSkippedAndCounted_theRestIsTakenOver() throws Exception {
-        var opened = open(zip(sampleFile(
-                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
-                "{\"lecturers\":[{\"id\":1,\"lastName\":\"Weber\"},{\"id\":2,\"firstName\":\"X\"},42],"
-                        + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"},"
-                        + "{\"id\":2,\"start\":\"2026-13-45\",\"end\":\"2027-01-22\"}],"
-                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\"},{\"id\":2,\"semester\":1}],"
-                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":6,\"first\":\"2026-10-05\",\"last\":\"2026-10-12\","
-                        + "\"startMin\":480,\"endMin\":600}]}")));
+        var opened = open(
+                zip(
+                        sampleFile(
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
+                                "{\"lecturers\":[{\"id\":1,\"lastName\":\"Weber\"},{\"id\":2,\"firstName\":\"X\"},42],"
+                                        + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"},"
+                                        + "{\"id\":2,\"start\":\"2026-13-45\",\"end\":\"2027-01-22\"}],"
+                                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\"},{\"id\":2,\"semester\":1}],"
+                                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":6,\"first\":\"2026-10-05\",\"last\":\"2026-10-12\","
+                                        + "\"startMin\":480,\"endMin\":600}]}"
+                        )
+                )
+        );
 
         var result = opened.read(null);
 
@@ -452,12 +493,17 @@ public class BackupFileTest {
 
     @Test
     public void optionalFieldsMayBeMissing() throws Exception {
-        var opened = open(zip(sampleFile(
-                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
-                "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
-                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
-                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":3,\"first\":\"2026-10-07\",\"last\":\"2026-10-07\","
-                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"}]}")));
+        var opened = open(
+                zip(
+                        sampleFile(
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
+                                "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
+                                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
+                                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":3,\"first\":\"2026-10-07\",\"last\":\"2026-10-07\","
+                                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"}]}"
+                        )
+                )
+        );
 
         var result = opened.read(null);
 
@@ -475,12 +521,17 @@ public class BackupFileTest {
 
     @Test
     public void textInAFileIsCleanedLikeTypedText() throws Exception {
-        var opened = open(zip(sampleFile(
-                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
-                "{\"lecturers\":[{\"id\":1,\"firstName\":\" Anna\\u200b \",\"lastName\":\"  Weber \\t Koch\","
-                        + "\"email\":\" a @uni.example \"}],"
-                        + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
-                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"  Math \\u202e II \",\"moodle\":\"javascript:alert(1)\"}]}")));
+        var opened = open(
+                zip(
+                        sampleFile(
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
+                                "{\"lecturers\":[{\"id\":1,\"firstName\":\" Anna\\u200b \",\"lastName\":\"  Weber \\t Koch\","
+                                        + "\"email\":\" a @uni.example \"}],"
+                                        + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
+                                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"  Math \\u202e II \",\"moodle\":\"javascript:alert(1)\"}]}"
+                        )
+                )
+        );
 
         var result = opened.read(null);
 

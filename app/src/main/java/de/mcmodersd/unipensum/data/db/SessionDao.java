@@ -29,8 +29,10 @@ public final class SessionDao {
 
     /** @return {@code null} if there is no such session */
     public static Session get(SQLiteDatabase db, long id) {
-        try (var cursor = db.query("session", null, "id = ?", new String[]{String.valueOf(id)},
-                null, null, null)) {
+        try (var cursor = db.query(
+                "session", null, "id = ?", new String[]{String.valueOf(id)},
+                null, null, null
+        )) {
             return cursor.moveToFirst() ? read(cursor) : null;
         }
     }
@@ -38,8 +40,10 @@ public final class SessionDao {
     /** Ordered by date. */
     public static List<Session> listBySeries(SQLiteDatabase db, long seriesId) {
         var result = new ArrayList<Session>();
-        try (var cursor = db.query("session", null, "series_id = ?", new String[]{String.valueOf(seriesId)},
-                null, null, "day, id")) {
+        try (var cursor = db.query(
+                "session", null, "series_id = ?", new String[]{String.valueOf(seriesId)},
+                null, null, "day, id"
+        )) {
             while (cursor.moveToNext()) result.add(read(cursor));
         }
         return result;
@@ -61,7 +65,8 @@ public final class SessionDao {
                 Rows.longValue(cursor, "id"),
                 Rows.longValue(cursor, "series_id"),
                 LocalDate.ofEpochDay(Rows.longValue(cursor, "day")),
-                Rows.readDetails(cursor));
+                Rows.readDetails(cursor)
+        );
     }
 
     private static ContentValues values(Session session) {

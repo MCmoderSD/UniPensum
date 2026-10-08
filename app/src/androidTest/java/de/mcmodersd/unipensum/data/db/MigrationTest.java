@@ -77,8 +77,10 @@ public class MigrationTest {
 
         var old = context.openOrCreateDatabase(NAME, Context.MODE_PRIVATE, null);
         for (var statement : VERSION_1) old.execSQL(statement);
-        old.execSQL("INSERT INTO semester VALUES (1, " + MONDAY.toEpochDay() + ", "
-                + LocalDate.of(2027, 2, 12).toEpochDay() + ", NULL)");
+        old.execSQL(
+                "INSERT INTO semester VALUES (1, " + MONDAY.toEpochDay() + ", "
+                        + LocalDate.of(2027, 2, 12).toEpochDay() + ", NULL)"
+        );
         old.execSQL("INSERT INTO course (id, semester_id, name, color) VALUES (1, 1, 'Math', 'blue')");
         // Series 1: text with spaces around it. Series 2: the same text. Series 3: none. Series 4: only blanks.
         series(old, 1, DayOfWeek.MONDAY, "'  Prof. Weber '");
@@ -101,16 +103,20 @@ public class MigrationTest {
     }
 
     private static void series(SQLiteDatabase db, int id, DayOfWeek weekday, String lecturer) {
-        db.execSQL("INSERT INTO series (id, course_id, type, weekday, start_min, end_min, mode, hybrid, room, link, "
-                + "lecturer, note, first_day, last_day, interval_weeks) VALUES (" + id + ", 1, 'lecture', "
-                + weekday.getValue() + ", 480, 570, 'in_person', 0, 'A1', NULL, " + lecturer + ", NULL, "
-                + MONDAY.toEpochDay() + ", " + NEXT_MONDAY.plusDays(4).toEpochDay() + ", 1)");
+        db.execSQL(
+                "INSERT INTO series (id, course_id, type, weekday, start_min, end_min, mode, hybrid, room, link, "
+                        + "lecturer, note, first_day, last_day, interval_weeks) VALUES (" + id + ", 1, 'lecture', "
+                        + weekday.getValue() + ", 480, 570, 'in_person', 0, 'A1', NULL, " + lecturer + ", NULL, "
+                        + MONDAY.toEpochDay() + ", " + NEXT_MONDAY.plusDays(4).toEpochDay() + ", 1)"
+        );
     }
 
     private static void session(SQLiteDatabase db, int id, int seriesId, LocalDate day, String lecturer) {
-        db.execSQL("INSERT INTO session (id, series_id, day, type, start_min, end_min, mode, hybrid, room, link, "
-                + "lecturer, note) VALUES (" + id + ", " + seriesId + ", " + day.toEpochDay() + ", 'lecture', 480, 570, "
-                + "'in_person', 0, 'A1', NULL, " + lecturer + ", NULL)");
+        db.execSQL(
+                "INSERT INTO session (id, series_id, day, type, start_min, end_min, mode, hybrid, room, link, "
+                        + "lecturer, note) VALUES (" + id + ", " + seriesId + ", " + day.toEpochDay() + ", 'lecture', 480, 570, "
+                        + "'in_person', 0, 'A1', NULL, " + lecturer + ", NULL)"
+        );
     }
 
     private SQLiteDatabase migrate() {
@@ -181,10 +187,16 @@ public class MigrationTest {
 
         // New data on top of the migrated layout, which still has the unused text columns.
         var created = TimetableStore.saveLecturer(db, new Lecturer(0, "Anna", "Neu", "neu@uni.example", null));
-        var details = new SessionDetails(SessionType.EXERCISE, 600, 700, Mode.IN_PERSON, false,
-                "B1", null, created, null, SessionDetails.NO_REMINDER);
-        TimetableStore.addSeries(db, 1, new Series(0, 0, details,
-                new Schedule(DayOfWeek.FRIDAY, MONDAY, NEXT_MONDAY.plusDays(4), 1)));
+        var details = new SessionDetails(
+                SessionType.EXERCISE, 600, 700, Mode.IN_PERSON, false,
+                "B1", null, created, null, SessionDetails.NO_REMINDER
+        );
+        TimetableStore.addSeries(
+                db, 1, new Series(
+                        0, 0, details,
+                        new Schedule(DayOfWeek.FRIDAY, MONDAY, NEXT_MONDAY.plusDays(4), 1)
+                )
+        );
         assertEquals(created, TimetableStore.loadTimetable(db).on(MONDAY.plusDays(4)).get(0).session().details().lecturerId());
 
         // Deleting a lecturer still clears the references (foreign keys survived the ALTER TABLE).
@@ -242,18 +254,24 @@ public class MigrationTest {
         context.deleteDatabase(NAME);
         var old = context.openOrCreateDatabase(NAME, Context.MODE_PRIVATE, null);
         for (var statement : VERSION_2) old.execSQL(statement);
-        old.execSQL("INSERT INTO semester VALUES (1, " + MONDAY.toEpochDay() + ", "
-                + LocalDate.of(2027, 2, 12).toEpochDay() + ", NULL)");
+        old.execSQL(
+                "INSERT INTO semester VALUES (1, " + MONDAY.toEpochDay() + ", "
+                        + LocalDate.of(2027, 2, 12).toEpochDay() + ", NULL)"
+        );
         old.execSQL("INSERT INTO course (id, semester_id, name, color) VALUES (1, 1, 'Math', 'blue')");
         // Series 1 is in person, series 2 online, series 3 hybrid.
         String[] modes = {"'in_person', 0", "'online', 0", "'in_person', 1"};
         for (var i = 0; i < 3; i++) {
-            old.execSQL("INSERT INTO series (id, course_id, type, weekday, start_min, end_min, mode, hybrid, "
-                    + "first_day, last_day, interval_weeks) VALUES (" + (i + 1) + ", 1, 'lecture', " + (i + 1)
-                    + ", 480, 570, " + modes[i] + ", " + MONDAY.toEpochDay() + ", " + MONDAY.toEpochDay() + ", 1)");
-            old.execSQL("INSERT INTO session (id, series_id, day, type, start_min, end_min, mode, hybrid) VALUES ("
-                    + (i + 1) + ", " + (i + 1) + ", " + MONDAY.plusDays(i).toEpochDay() + ", 'lecture', 480, 570, "
-                    + modes[i] + ")");
+            old.execSQL(
+                    "INSERT INTO series (id, course_id, type, weekday, start_min, end_min, mode, hybrid, "
+                            + "first_day, last_day, interval_weeks) VALUES (" + (i + 1) + ", 1, 'lecture', " + (i + 1)
+                            + ", 480, 570, " + modes[i] + ", " + MONDAY.toEpochDay() + ", " + MONDAY.toEpochDay() + ", 1)"
+            );
+            old.execSQL(
+                    "INSERT INTO session (id, series_id, day, type, start_min, end_min, mode, hybrid) VALUES ("
+                            + (i + 1) + ", " + (i + 1) + ", " + MONDAY.plusDays(i).toEpochDay() + ", 'lecture', 480, 570, "
+                            + modes[i] + ")"
+            );
         }
         old.setVersion(2);
         old.close();

@@ -45,7 +45,8 @@ public final class BackupExportSheet extends UpSheet {
     private static final int MIN_PASSWORD_LENGTH = 8;
 
     private final ActivityResultLauncher<String> createDocument = registerForActivityResult(
-            new ActivityResultContracts.CreateDocument("application/octet-stream"), this::onTargetChosen);
+            new ActivityResultContracts.CreateDocument("application/octet-stream"), this::onTargetChosen
+    );
 
     private View form;
     private UpSwitch protect;
@@ -84,8 +85,10 @@ public final class BackupExportSheet extends UpSheet {
         formColumn.setOrientation(LinearLayout.VERTICAL);
         form = formColumn;
 
-        formColumn.addView(text(context, R.string.backup_export_description, 16, R.color.text_secondary),
-                spaced(dp, 0, 16));
+        formColumn.addView(
+                text(context, R.string.backup_export_description, 16, R.color.text_secondary),
+                spaced(dp, 0, 16)
+        );
 
         var switchRow = new LinearLayout(context);
         switchRow.setGravity(Gravity.CENTER_VERTICAL);
@@ -153,8 +156,12 @@ public final class BackupExportSheet extends UpSheet {
             var again = repeat.getTextChars();
             var valid = true;
             if (chars.length < MIN_PASSWORD_LENGTH) {
-                password.setError(getResources().getQuantityString(R.plurals.backup_error_password_short,
-                        MIN_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH));
+                password.setError(
+                        getResources().getQuantityString(
+                                R.plurals.backup_error_password_short,
+                                MIN_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH
+                        )
+                );
                 valid = false;
             }
             if (!Arrays.equals(chars, again)) {
@@ -238,7 +245,8 @@ public final class BackupExportSheet extends UpSheet {
 
     private static LinearLayout.LayoutParams spaced(float dp, int topDp, int bottomDp) {
         var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;

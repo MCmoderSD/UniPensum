@@ -59,8 +59,12 @@ public final class ScopeSheet extends UpSheet {
         var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
         column.addView(row(context, dp, EditScope.THIS_ONLY, R.string.scope_this_only, date));
-        column.addView(row(context, dp, EditScope.THIS_AND_FOLLOWING, R.string.scope_this_and_following,
-                getString(R.string.scope_from, date)));
+        column.addView(
+                row(
+                        context, dp, EditScope.THIS_AND_FOLLOWING, R.string.scope_this_and_following,
+                        getString(R.string.scope_from, date)
+                )
+        );
         column.addView(row(context, dp, EditScope.ALL, R.string.scope_all, null));
         return column;
     }
@@ -77,7 +81,8 @@ public final class ScopeSheet extends UpSheet {
             dismiss();
         });
         var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         params.bottomMargin = Math.round(8 * dp);
         row.setLayoutParams(params);
         return row;

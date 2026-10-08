@@ -101,7 +101,8 @@ public class CourseEditorFragment extends Fragment {
         events = view.findViewById(R.id.events);
         eventsError = view.findViewById(R.id.events_error);
         ((UpButton) view.findViewById(R.id.add_event)).setOnClickListener(v ->
-                Navigator.of(this).push(SessionEditorFragment.forSeries(-1)));
+                Navigator.of(this).push(SessionEditorFragment.forSeries(-1))
+        );
         renderEvents();
         // The event rows name their lecturer, so they follow changes to the lecturers and to the name style.
         repository.lecturers().observe(getViewLifecycleOwner(), list -> {
@@ -130,11 +131,15 @@ public class CourseEditorFragment extends Fragment {
 
         UpButton delete = view.findViewById(R.id.delete);
         delete.setVisibility(draft.isNew() ? View.GONE : View.VISIBLE);
-        delete.setOnClickListener(v -> ConfirmSheet.show(getParentFragmentManager(), KEY_DELETE,
+        delete.setOnClickListener(v -> ConfirmSheet.show(
+                getParentFragmentManager(), KEY_DELETE,
                 getString(R.string.course_delete_title), getString(R.string.course_delete_message),
-                getString(R.string.action_delete), true));
-        getParentFragmentManager().setFragmentResultListener(KEY_DELETE, getViewLifecycleOwner(),
-                (key, result) -> deleteCourse());
+                getString(R.string.action_delete), true
+        ));
+        getParentFragmentManager().setFragmentResultListener(
+                KEY_DELETE, getViewLifecycleOwner(),
+                (key, result) -> deleteCourse()
+        );
     }
 
     private void renderEvents() {
@@ -148,15 +153,20 @@ public class CourseEditorFragment extends Fragment {
             var row = new UpRow(requireContext());
             row.setTitle(SeriesFormat.title(requireContext(), entry));
             var lecturer = lecturers.get(entry.details().lecturerId());
-            row.setSubtitle(SeriesFormat.subtitle(requireContext(), entry,
-                    lecturer == null ? null : lecturer.name(nameStyle)));
+            row.setSubtitle(
+                    SeriesFormat.subtitle(
+                            requireContext(), entry,
+                            lecturer == null ? null : lecturer.name(nameStyle)
+                    )
+            );
             row.setAction(R.drawable.ic_close, getString(R.string.event_remove), v -> {
                 draft.series().remove(index);
                 renderEvents();
             });
             row.setOnClickListener(v -> Navigator.of(this).push(SessionEditorFragment.forSeries(index)));
             var params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            );
             params.bottomMargin = Math.round(8 * dp);
             events.addView(row, params);
         }
@@ -185,8 +195,10 @@ public class CourseEditorFragment extends Fragment {
         }
 
         saveButton.setEnabled(false);
-        var course = new Course(draft.courseId(), draft.semester().id(), name, draft.color(),
-                draft.moodleLink());
+        var course = new Course(
+                draft.courseId(), draft.semester().id(), name, draft.color(),
+                draft.moodleLink()
+        );
         // The database thread gets its own copy, the draft stays editable while it works.
         var snapshot = new ArrayList<Series>(draft.series());
         if (draft.isNew()) {

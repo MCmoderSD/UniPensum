@@ -49,8 +49,10 @@ public class RemindersTest {
 
     @Test
     public void afterModeChange_keepsNoReminder() {
-        assertEquals(SessionDetails.NO_REMINDER,
-                Reminders.afterModeChange(SessionDetails.NO_REMINDER, Mode.IN_PERSON, Mode.ONLINE));
+        assertEquals(
+                SessionDetails.NO_REMINDER,
+                Reminders.afterModeChange(SessionDetails.NO_REMINDER, Mode.IN_PERSON, Mode.ONLINE)
+        );
     }
 
     // --- one reminder ---
@@ -133,8 +135,10 @@ public class RemindersTest {
     @Test
     public void due_isOrderedByTimeAndThenById() {
         // 07:30, 07:50, 07:50 and 07:00, all on the same day and still on at 07:55.
-        List<Session> sessions = List.of(session(3, 10, 5, 30), session(2, 10, 5, 10), session(1, 10, 5, 10),
-                session(4, 10, 5, 60));
+        List<Session> sessions = List.of(
+                session(3, 10, 5, 30), session(2, 10, 5, 10), session(1, 10, 5, 10),
+                session(4, 10, 5, 60)
+        );
 
         var due = Reminders.due(sessions, at(10, 4, 0, 0), at(10, 5, 7, 55));
 

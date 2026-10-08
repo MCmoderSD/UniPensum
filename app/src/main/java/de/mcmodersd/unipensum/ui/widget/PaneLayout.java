@@ -87,8 +87,10 @@ public final class PaneLayout extends ViewGroup {
      */
     public void setSideOpen(boolean open, boolean animate) {
         var covered = open && !isSplit();
-        main.setImportantForAccessibility(covered
-                ? IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS : IMPORTANT_FOR_ACCESSIBILITY_AUTO);
+        main.setImportantForAccessibility(
+                covered
+                        ? IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS : IMPORTANT_FOR_ACCESSIBILITY_AUTO
+        );
         main.setDescendantFocusability(covered ? FOCUS_BLOCK_DESCENDANTS : FOCUS_BEFORE_DESCENDANTS);
 
         var target = open ? 1f : 0f;
@@ -103,8 +105,12 @@ public final class PaneLayout extends ViewGroup {
 
         var slide = ValueAnimator.ofFloat(progress, target);
         slide.setDuration(open ? OPEN_MILLIS : CLOSE_MILLIS);
-        slide.setInterpolator(AnimationUtils.loadInterpolator(getContext(),
-                open ? android.R.interpolator.decelerate_cubic : android.R.interpolator.accelerate_cubic));
+        slide.setInterpolator(
+                AnimationUtils.loadInterpolator(
+                        getContext(),
+                        open ? android.R.interpolator.decelerate_cubic : android.R.interpolator.accelerate_cubic
+                )
+        );
         slide.addUpdateListener(a -> {
             progress = (float) a.getAnimatedValue();
             requestLayout();
@@ -141,8 +147,10 @@ public final class PaneLayout extends ViewGroup {
     }
 
     private static void measureExactly(View child, int width, int height) {
-        child.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
+        child.measure(
+                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+        );
     }
 
     @Override
@@ -162,7 +170,9 @@ public final class PaneLayout extends ViewGroup {
         super.dispatchDraw(canvas);
         if (!split || progress <= 0f) return;
         // A thin line where the calendar ends and the pane begins.
-        canvas.drawRect(side.getLeft() - dividerWidth, getPaddingTop(), side.getLeft(),
-                getHeight() - getPaddingBottom(), dividerPaint);
+        canvas.drawRect(
+                side.getLeft() - dividerWidth, getPaddingTop(), side.getLeft(),
+                getHeight() - getPaddingBottom(), dividerPaint
+        );
     }
 }

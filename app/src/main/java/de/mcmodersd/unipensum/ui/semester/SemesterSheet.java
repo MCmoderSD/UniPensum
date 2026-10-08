@@ -61,8 +61,11 @@ public final class SemesterSheet extends UpSheet {
 
         list = new LinearLayout(context);
         list.setOrientation(LinearLayout.VERTICAL);
-        column.addView(list, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        column.addView(
+                list, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+        );
 
         var create = new UpButton(context);
         create.setText(R.string.semester_new);
@@ -70,7 +73,8 @@ public final class SemesterSheet extends UpSheet {
             SemesterEditorSheet.show(getParentFragmentManager(), null, current);
         });
         var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         params.topMargin = Math.round(12 * dp);
         column.addView(create, params);
         return column;
@@ -104,10 +108,13 @@ public final class SemesterSheet extends UpSheet {
         for (var semester : newestFirst) {
             var row = new UpRow(context);
             row.setTitle(SemesterNames.display(context, semester));
-            row.setSubtitle(TimeFormat.dateMedium(context, semester.start()) + " – "
-                    + TimeFormat.dateMedium(context, semester.end()));
+            row.setSubtitle(
+                    TimeFormat.dateMedium(context, semester.start()) + " – "
+                            + TimeFormat.dateMedium(context, semester.end())
+            );
             row.setAction(R.drawable.ic_edit, getString(R.string.action_edit), v ->
-                    SemesterEditorSheet.show(getParentFragmentManager(), semester, semesters));
+                    SemesterEditorSheet.show(getParentFragmentManager(), semester, semesters)
+            );
             row.setOnClickListener(v -> {
                 var result = new Bundle();
                 result.putLong(RESULT_EPOCH_DAY, semester.start().toEpochDay());
@@ -115,7 +122,8 @@ public final class SemesterSheet extends UpSheet {
                 dismiss();
             });
             var params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            );
             params.bottomMargin = Math.round(8 * dp);
             list.addView(row, params);
         }

@@ -82,17 +82,23 @@ final class SessionBlockView extends LinearLayout {
         // Two sessions side by side leave very little width; hyphenate instead of breaking inside a word.
         title.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_FULL);
         title.setBreakStrategy(LineBreaker.BREAK_STRATEGY_HIGH_QUALITY);
-        time = line(context, false, TimeFormat.time(context, details.startMin()) + BREAKABLE_DASH
-                + TimeFormat.time(context, details.endMin()));
+        time = line(
+                context, false, TimeFormat.time(context, details.startMin()) + BREAKABLE_DASH
+                        + TimeFormat.time(context, details.endMin())
+        );
         place = line(context, false, SeriesFormat.place(context, details));
         type = line(context, false, TimeFormat.typeName(context, details.type()));
         lecturer = line(context, false, session.lecturer() == null ? "" : session.lecturer().name(nameStyle));
 
-        setContentDescription(context.getString(R.string.session_description,
-                session.courseName(),
-                TimeFormat.typeName(context, details.type()),
-                TimeFormat.time(context, details.startMin()),
-                TimeFormat.time(context, details.endMin())));
+        setContentDescription(
+                context.getString(
+                        R.string.session_description,
+                        session.courseName(),
+                        TimeFormat.typeName(context, details.type()),
+                        TimeFormat.time(context, details.startMin()),
+                        TimeFormat.time(context, details.endMin())
+                )
+        );
     }
 
     SessionView session() {
@@ -110,8 +116,10 @@ final class SessionBlockView extends LinearLayout {
         fittedHeight = heightPx;
 
         var narrow = widthPx < 52 * dp;
-        setPadding(barWidth + Math.round((narrow ? 2 : 4) * dp), Math.round(3 * dp),
-                Math.round((narrow ? 1 : 3) * dp), Math.round(3 * dp));
+        setPadding(
+                barWidth + Math.round((narrow ? 2 : 4) * dp), Math.round(3 * dp),
+                Math.round((narrow ? 1 : 3) * dp), Math.round(3 * dp)
+        );
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, narrow ? 9.5f : 11.5f);
         for (var detail : new TextView[]{time, place, type, lecturer}) {
             detail.setTextSize(TypedValue.COMPLEX_UNIT_SP, narrow ? 9f : 10f);

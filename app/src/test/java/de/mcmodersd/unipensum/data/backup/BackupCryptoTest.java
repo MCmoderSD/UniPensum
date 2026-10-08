@@ -45,10 +45,14 @@ public class BackupCryptoTest {
         var params = BackupCrypto.newParams(ITERATIONS);
         var sealed = BackupCrypto.encrypt("correct horse".toCharArray(), params, AAD, PLAIN);
 
-        assertThrows(AEADBadTagException.class,
-                () -> BackupCrypto.decrypt("correct hors".toCharArray(), params, AAD, sealed));
-        assertThrows(AEADBadTagException.class,
-                () -> BackupCrypto.decrypt("Correct horse".toCharArray(), params, AAD, sealed));
+        assertThrows(
+                AEADBadTagException.class,
+                () -> BackupCrypto.decrypt("correct hors".toCharArray(), params, AAD, sealed)
+        );
+        assertThrows(
+                AEADBadTagException.class,
+                () -> BackupCrypto.decrypt("Correct horse".toCharArray(), params, AAD, sealed)
+        );
     }
 
     @Test
@@ -58,8 +62,10 @@ public class BackupCryptoTest {
 
         var otherManifest = "{\"schema\":3}".getBytes(StandardCharsets.UTF_8);
 
-        assertThrows(AEADBadTagException.class,
-                () -> BackupCrypto.decrypt("correct horse".toCharArray(), params, otherManifest, sealed));
+        assertThrows(
+                AEADBadTagException.class,
+                () -> BackupCrypto.decrypt("correct horse".toCharArray(), params, otherManifest, sealed)
+        );
     }
 
     @Test
@@ -68,8 +74,10 @@ public class BackupCryptoTest {
         var sealed = BackupCrypto.encrypt("correct horse".toCharArray(), params, AAD, PLAIN);
         sealed[sealed.length / 2] ^= 0x01;
 
-        assertThrows(AEADBadTagException.class,
-                () -> BackupCrypto.decrypt("correct horse".toCharArray(), params, AAD, sealed));
+        assertThrows(
+                AEADBadTagException.class,
+                () -> BackupCrypto.decrypt("correct horse".toCharArray(), params, AAD, sealed)
+        );
     }
 
     @Test
@@ -81,9 +89,12 @@ public class BackupCryptoTest {
         assertEquals(BackupCrypto.IV_BYTES, first.iv().length);
         assertFalse(Arrays.equals(first.salt(), second.salt()));
         assertFalse(Arrays.equals(first.iv(), second.iv()));
-        assertFalse(Arrays.equals(
-                BackupCrypto.encrypt("pw-12345".toCharArray(), first, AAD, PLAIN),
-                BackupCrypto.encrypt("pw-12345".toCharArray(), second, AAD, PLAIN)));
+        assertFalse(
+                Arrays.equals(
+                        BackupCrypto.encrypt("pw-12345".toCharArray(), first, AAD, PLAIN),
+                        BackupCrypto.encrypt("pw-12345".toCharArray(), second, AAD, PLAIN)
+                )
+        );
     }
 
     @Test

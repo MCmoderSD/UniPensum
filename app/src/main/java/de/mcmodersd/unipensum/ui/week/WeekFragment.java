@@ -96,7 +96,8 @@ public class WeekFragment extends Fragment {
         // The view is rebuilt while the grid is zoomed (turning, theme, language): the label has to come back.
         if (viewModel.zoom() > ZoomMetrics.MIN) showZoom(viewModel.zoom());
         adapter.setOnSessionClickListener(session ->
-                SessionDetailSheet.show(getParentFragmentManager(), session.session().id()));
+                SessionDetailSheet.show(getParentFragmentManager(), session.session().id())
+        );
         pager.setAdapter(adapter);
         pager.setOffscreenPageLimit(1);
         // The view is rebuilt when the screen is recreated (turning, theme, language); come back to the same week.
@@ -109,8 +110,10 @@ public class WeekFragment extends Fragment {
             }
         });
 
-        getParentFragmentManager().setFragmentResultListener(KEY_NOTIFICATIONS, getViewLifecycleOwner(),
-                (key, result) -> allowNotifications());
+        getParentFragmentManager().setFragmentResultListener(
+                KEY_NOTIFICATIONS, getViewLifecycleOwner(),
+                (key, result) -> allowNotifications()
+        );
         title.setOnClickListener(v -> {
             Haptics.tap(v);
             SemesterSheet.show(getParentFragmentManager());
@@ -118,12 +121,17 @@ public class WeekFragment extends Fragment {
         addCourse.setOnClickListener(v -> openNewCourse());
         openCourses.setOnClickListener(v -> openCourses());
         view.findViewById(R.id.open_settings).setOnClickListener(v ->
-                Navigator.of(this).toggle(new SettingsFragment()));
+                Navigator.of(this).toggle(new SettingsFragment())
+        );
         view.findViewById(R.id.create_semester).setOnClickListener(v ->
-                SemesterEditorSheet.show(getParentFragmentManager(), null, timetable.semesters()));
-        getParentFragmentManager().setFragmentResultListener(SemesterSheet.REQUEST_JUMP, getViewLifecycleOwner(),
+                SemesterEditorSheet.show(getParentFragmentManager(), null, timetable.semesters())
+        );
+        getParentFragmentManager().setFragmentResultListener(
+                SemesterSheet.REQUEST_JUMP, getViewLifecycleOwner(),
                 (key, result) -> pager.setCurrentItem(
-                        Weeks.positionOf(LocalDate.ofEpochDay(result.getLong(SemesterSheet.RESULT_EPOCH_DAY))), false));
+                        Weeks.positionOf(LocalDate.ofEpochDay(result.getLong(SemesterSheet.RESULT_EPOCH_DAY))), false
+                )
+        );
 
         viewModel.timeWindow().observe(getViewLifecycleOwner(), adapter::setWindow);
         viewModel.lecturerNameStyle().observe(getViewLifecycleOwner(), adapter::setNameStyle);
@@ -181,9 +189,11 @@ public class WeekFragment extends Fragment {
             return;
         }
         settings.setNotificationsAsked();
-        ConfirmSheet.show(getParentFragmentManager(), KEY_NOTIFICATIONS,
+        ConfirmSheet.show(
+                getParentFragmentManager(), KEY_NOTIFICATIONS,
                 getString(R.string.reminder_permission_title), getString(R.string.reminder_permission_message),
-                getString(R.string.reminder_permission_allow), false);
+                getString(R.string.reminder_permission_allow), false
+        );
     }
 
     private void allowNotifications() {
@@ -226,13 +236,19 @@ public class WeekFragment extends Fragment {
         if (semester != null) {
             title.setText(SemesterNames.display(requireContext(), semester));
         } else {
-            title.setText(timetable == null || timetable.semesters().isEmpty()
-                    ? getString(R.string.app_name) : getString(R.string.no_semester));
+            title.setText(
+                    timetable == null || timetable.semesters().isEmpty()
+                            ? getString(R.string.app_name) : getString(R.string.no_semester)
+            );
         }
-        subtitle.setText(getString(R.string.week_subtitle,
-                TimeFormat.dateShort(requireContext(), monday),
-                TimeFormat.dateShort(requireContext(), friday),
-                Weeks.isoWeekNumber(monday)));
+        subtitle.setText(
+                getString(
+                        R.string.week_subtitle,
+                        TimeFormat.dateShort(requireContext(), monday),
+                        TimeFormat.dateShort(requireContext(), friday),
+                        Weeks.isoWeekNumber(monday)
+                )
+        );
     }
 
     /** The first semester that holds a day of the week, which decides what the title says at a boundary. */

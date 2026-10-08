@@ -97,10 +97,14 @@ public final class TimePickerSheet extends UpSheet {
 
         var column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
-        column.addView(stack, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        column.addView(
+                stack, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+        );
         var doneParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         doneParams.topMargin = Math.round(12 * dp);
         column.addView(done, doneParams);
         return column;
@@ -140,10 +144,16 @@ public final class TimePickerSheet extends UpSheet {
         var band = new View(context);
         band.setBackground(rounded(context, 12 * dp));
         var layer = new FrameLayout(context);
-        layer.addView(band, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, Math.round(44 * dp), Gravity.CENTER_VERTICAL));
-        layer.addView(wheels, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        layer.addView(
+                band, new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, Math.round(44 * dp), Gravity.CENTER_VERTICAL
+                )
+        );
+        layer.addView(
+                wheels, new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER
+                )
+        );
         return layer;
     }
 
@@ -175,10 +185,12 @@ public final class TimePickerSheet extends UpSheet {
             return true;
         });
         // After two digits, or one that can only be a full hour, move on to the minutes.
-        hourInput.addTextChangedListener(new AfterChange(text -> {
-            var complete = text.length() == 2 || (text.length() == 1 && text.charAt(0) > '2');
-            if (complete && hourInput.hasFocus()) minuteInput.requestFocus();
-        }));
+        hourInput.addTextChangedListener(
+                new AfterChange(text -> {
+                    var complete = text.length() == 2 || (text.length() == 1 && text.charAt(0) > '2');
+                    if (complete && hourInput.hasFocus()) minuteInput.requestFocus();
+                })
+        );
 
         var row = new LinearLayout(context);
         row.setGravity(Gravity.CENTER);
@@ -263,8 +275,10 @@ public final class TimePickerSheet extends UpSheet {
     private void applyMode(boolean byUser) {
         wheelsLayer.setVisibility(typing ? View.INVISIBLE : View.VISIBLE);
         typingLayer.setVisibility(typing ? View.VISIBLE : View.INVISIBLE);
-        setHeaderAction(typing ? R.drawable.ic_clock : R.drawable.ic_keyboard,
-                getString(typing ? R.string.time_use_wheels : R.string.time_type), v -> toggleMode());
+        setHeaderAction(
+                typing ? R.drawable.ic_clock : R.drawable.ic_keyboard,
+                getString(typing ? R.string.time_use_wheels : R.string.time_type), v -> toggleMode()
+        );
 
         if (getDialog() == null || getDialog().getWindow() == null) return;
         if (typing) {

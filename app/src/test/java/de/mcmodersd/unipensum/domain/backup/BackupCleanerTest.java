@@ -35,17 +35,21 @@ public class BackupCleanerTest {
 
     /** One lecturer, one semester, one course, one series with its four Monday sessions. */
     private static BackupData good() {
-        return new BackupData(List.of(WEBER), List.of(SEMESTER), List.of(COURSE), List.of(SERIES),
-                sessionsOf(SERIES, 100));
+        return new BackupData(
+                List.of(WEBER), List.of(SEMESTER), List.of(COURSE), List.of(SERIES),
+                sessionsOf(SERIES, 100)
+        );
     }
 
     private static BackupData with(BackupData base, List<Lecturer> lecturers, List<Semester> semesters,
                                    List<Course> courses, List<Series> series, List<Session> sessions) {
-        return new BackupData(lecturers != null ? lecturers : base.lecturers(),
+        return new BackupData(
+                lecturers != null ? lecturers : base.lecturers(),
                 semesters != null ? semesters : base.semesters(),
                 courses != null ? courses : base.courses(),
                 series != null ? series : base.series(),
-                sessions != null ? sessions : base.sessions());
+                sessions != null ? sessions : base.sessions()
+        );
     }
 
     private static BackupCleaner.Result clean(BackupData data) {
@@ -53,13 +57,17 @@ public class BackupCleanerTest {
     }
 
     private static SessionDetails withLink(SessionDetails d, Mode mode, String link) {
-        return new SessionDetails(d.type(), d.startMin(), d.endMin(), mode, d.hybrid(), d.room(), link,
-                d.lecturerId(), d.note(), d.reminderMin());
+        return new SessionDetails(
+                d.type(), d.startMin(), d.endMin(), mode, d.hybrid(), d.room(), link,
+                d.lecturerId(), d.note(), d.reminderMin()
+        );
     }
 
     private static SessionDetails withTimes(SessionDetails d, int start, int end) {
-        return new SessionDetails(d.type(), start, end, d.mode(), d.hybrid(), d.room(), d.link(),
-                d.lecturerId(), d.note(), d.reminderMin());
+        return new SessionDetails(
+                d.type(), start, end, d.mode(), d.hybrid(), d.room(), d.link(),
+                d.lecturerId(), d.note(), d.reminderMin()
+        );
     }
 
     @Test
@@ -153,12 +161,16 @@ public class BackupCleanerTest {
     public void overlappingSemester_isSkipped_theEarlierOneWins() {
         var later = new Semester(2, date(12, 1), LocalDate.of(2027, 3, 1), null);
         var laterCourse = new Course(2, 2, "Physics", CourseColor.RED, null);
-        var laterSeries = new Series(20, 2, details(),
-                weekly(DayOfWeek.TUESDAY, date(12, 1), date(12, 15)));
+        var laterSeries = new Series(
+                20, 2, details(),
+                weekly(DayOfWeek.TUESDAY, date(12, 1), date(12, 15))
+        );
         List<Semester> semesters = List.of(later, SEMESTER);               // the order in the file does not matter
 
-        var data = new BackupData(List.of(WEBER), semesters, List.of(COURSE, laterCourse),
-                List.of(SERIES, laterSeries), sessionsOf(SERIES, 100));
+        var data = new BackupData(
+                List.of(WEBER), semesters, List.of(COURSE, laterCourse),
+                List.of(SERIES, laterSeries), sessionsOf(SERIES, 100)
+        );
         var result = clean(data);
 
         assertEquals(List.of(SEMESTER), result.data().semesters());
@@ -282,8 +294,10 @@ public class BackupCleanerTest {
         var sessions = new ArrayList<Session>(sessionsOf(SERIES, 100));
         sessions.add(new Session(100, 10, date(10, 12), details()));                       // id 100 again
 
-        var data = new BackupData(List.of(WEBER, duplicate, zero), List.of(SEMESTER), List.of(COURSE),
-                List.of(SERIES), sessions);
+        var data = new BackupData(
+                List.of(WEBER, duplicate, zero), List.of(SEMESTER), List.of(COURSE),
+                List.of(SERIES), sessions
+        );
         var result = clean(data);
 
         assertEquals(List.of(WEBER), result.data().lecturers());

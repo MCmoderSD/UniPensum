@@ -323,8 +323,10 @@ public class MonthCalendarView extends LinearLayout {
                 var bounds = new Rect();
                 cellBounds(day, bounds);
                 node.setBoundsInParent(bounds);
-                node.setContentDescription(day.getDayOfWeek().getDisplayName(TextStyle.FULL, TimeFormat.locale(context))
-                        + ", " + TimeFormat.dateMedium(context, day));
+                node.setContentDescription(
+                        day.getDayOfWeek().getDisplayName(TextStyle.FULL, TimeFormat.locale(context))
+                                + ", " + TimeFormat.dateMedium(context, day)
+                );
                 node.setCheckable(true);
                 node.setChecked(day.equals(selected));
                 node.setEnabled(isSelectable(day));

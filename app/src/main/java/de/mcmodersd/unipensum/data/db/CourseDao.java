@@ -28,8 +28,10 @@ public final class CourseDao {
 
     /** @return {@code null} if there is no such course */
     public static Course get(SQLiteDatabase db, long id) {
-        try (var cursor = db.query("course", null, "id = ?", new String[]{String.valueOf(id)},
-                null, null, null)) {
+        try (var cursor = db.query(
+                "course", null, "id = ?", new String[]{String.valueOf(id)},
+                null, null, null
+        )) {
             return cursor.moveToFirst() ? read(cursor) : null;
         }
     }
@@ -37,8 +39,10 @@ public final class CourseDao {
     /** Ordered by name, case-insensitive. */
     public static List<Course> listBySemester(SQLiteDatabase db, long semesterId) {
         var result = new ArrayList<Course>();
-        try (var cursor = db.query("course", null, "semester_id = ?", new String[]{String.valueOf(semesterId)},
-                null, null, "name COLLATE NOCASE, id")) {
+        try (var cursor = db.query(
+                "course", null, "semester_id = ?", new String[]{String.valueOf(semesterId)},
+                null, null, "name COLLATE NOCASE, id"
+        )) {
             while (cursor.moveToNext()) result.add(read(cursor));
         }
         return result;
@@ -59,6 +63,7 @@ public final class CourseDao {
                 Rows.longValue(cursor, "semester_id"),
                 Rows.string(cursor, "name"),
                 CourseColor.fromKey(Rows.string(cursor, "color")),
-                Rows.string(cursor, "moodle_link"));
+                Rows.string(cursor, "moodle_link")
+        );
     }
 }

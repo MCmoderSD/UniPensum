@@ -44,7 +44,8 @@ public class SettingsFragment extends Fragment {
     private final ActivityResultLauncher<String[]> pickBackup = registerForActivityResult(
             new ActivityResultContracts.OpenDocument(), uri -> {
                 if (uri != null) BackupImportSheet.show(getParentFragmentManager(), uri);
-            });
+            }
+    );
 
     private AppSettings settings;
     private UpStepper hoursStart;
@@ -70,11 +71,14 @@ public class SettingsFragment extends Fragment {
         bindReminders(view.findViewById(R.id.reminders_switch), view.findViewById(R.id.notifications_row));
 
         view.findViewById(R.id.manage_lecturers).setOnClickListener(v ->
-                LecturerSheet.showManager(getParentFragmentManager()));
+                LecturerSheet.showManager(getParentFragmentManager())
+        );
         view.findViewById(R.id.manage_semesters).setOnClickListener(v ->
-                SemesterSheet.show(getParentFragmentManager()));
+                SemesterSheet.show(getParentFragmentManager())
+        );
         view.findViewById(R.id.export_backup).setOnClickListener(v ->
-                BackupExportSheet.show(getParentFragmentManager()));
+                BackupExportSheet.show(getParentFragmentManager())
+        );
         // The system's file dialog needs no permission. A backup has no registered file type, so any file
         // can be picked; what is not a backup is recognized and refused when it is opened.
         view.findViewById(R.id.import_backup).setOnClickListener(v -> pickBackup.launch(new String[]{"*/*"}));
@@ -87,12 +91,15 @@ public class SettingsFragment extends Fragment {
     }
 
     private void bindTheme(UpSegmentedControl control) {
-        control.setOptions(getString(R.string.theme_system), getString(R.string.theme_light),
-                getString(R.string.theme_dark));
+        control.setOptions(
+                getString(R.string.theme_system), getString(R.string.theme_light),
+                getString(R.string.theme_dark)
+        );
         control.setSelectedIndex(settings.themeMode().ordinal());
         // Changing the theme recreates the activity, which restores this screen from the back stack.
         control.setOnSelectionChangedListener(index ->
-                afterSlide(control, () -> settings.setThemeMode(ThemeMode.values()[index])));
+                afterSlide(control, () -> settings.setThemeMode(ThemeMode.values()[index]))
+        );
     }
 
     /**
@@ -133,8 +140,12 @@ public class SettingsFragment extends Fragment {
     }
 
     private void renderNotifications() {
-        notificationsRow.setValue(getString(NotificationAccess.allowed(requireContext())
-                ? R.string.notifications_on : R.string.notifications_off));
+        notificationsRow.setValue(
+                getString(
+                        NotificationAccess.allowed(requireContext())
+                                ? R.string.notifications_on : R.string.notifications_off
+                )
+        );
     }
 
     private void bindHours(UpStepper start, UpStepper end) {

@@ -162,8 +162,11 @@ public final class SeriesEditor {
                 generated.add(new Session(0, 0, date, template));
             }
         }
-        changes.newSeries.add(new ChangeSet.NewSeries(
-                new Series(0, series.courseId(), template, split), generated, adopted));
+        changes.newSeries.add(
+                new ChangeSet.NewSeries(
+                        new Series(0, series.courseId(), template, split), generated, adopted
+                )
+        );
         return changes;
     }
 
@@ -217,7 +220,8 @@ public final class SeriesEditor {
                 pick(before.link(), after.link(), base.link()),
                 pick(before.lecturerId(), after.lecturerId(), base.lecturerId()),
                 pick(before.note(), after.note(), base.note()),
-                pick(before.reminderMin(), after.reminderMin(), base.reminderMin()));
+                pick(before.reminderMin(), after.reminderMin(), base.reminderMin())
+        );
     }
 
     private static <T> T pick(T before, T after, T base) {

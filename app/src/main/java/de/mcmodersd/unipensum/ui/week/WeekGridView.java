@@ -89,8 +89,11 @@ final class WeekGridView extends ViewGroup {
         linePaint.setStrokeWidth(Math.max(1f, getResources().getDisplayMetrics().density * 0.75f));
 
         labelPaint.setColor(ContextCompat.getColor(context, R.color.text_secondary));
-        labelPaint.setTextSize(TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
+        labelPaint.setTextSize(
+                TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()
+                )
+        );
         labelPaint.setTextAlign(Paint.Align.RIGHT);
 
         // The marker is black on the light theme and white on the dark one, like the rest of the app.
@@ -122,8 +125,12 @@ final class WeekGridView extends ViewGroup {
             var sessions = perDay.get(day);
             var blocks = new ArrayList<WeekLayout.Block>();
             for (var session : sessions) {
-                blocks.add(new WeekLayout.Block(session.session().id(),
-                        session.session().details().startMin(), session.session().details().endMin()));
+                blocks.add(
+                        new WeekLayout.Block(
+                                session.session().id(),
+                                session.session().details().startMin(), session.session().details().endMin()
+                        )
+                );
             }
             for (var placement : WeekLayout.layout(blocks)) {
                 var session = find(sessions, placement.id());
@@ -131,8 +138,10 @@ final class WeekGridView extends ViewGroup {
                 var end = Math.min(session.session().details().endMin(), windowEnd);
                 if (end <= start) continue;
 
-                var block = new SessionBlockView(getContext(), metrics, session, nameStyle,
-                        placement.overlapping());
+                var block = new SessionBlockView(
+                        getContext(), metrics, session, nameStyle,
+                        placement.overlapping()
+                );
                 if (listener != null) block.setOnClickListener(v -> listener.onSessionClick(session));
                 addView(block);
                 placed.add(new Placed(block, day, placement, start, end));
@@ -223,10 +232,14 @@ final class WeekGridView extends ViewGroup {
         var columnWidth = metrics.columnWidth(width);
         for (var item : placed) {
             var columnShare = columnWidth / item.placement.columns();
-            var blockLeft = Math.round(metrics.gutter + item.dayIndex * columnWidth
-                    + item.placement.column() * columnShare) + metrics.blockInset;
-            var blockRight = Math.round(metrics.gutter + item.dayIndex * columnWidth
-                    + (item.placement.column() + 1) * columnShare) - metrics.blockInset;
+            var blockLeft = Math.round(
+                    metrics.gutter + item.dayIndex * columnWidth
+                            + item.placement.column() * columnShare
+            ) + metrics.blockInset;
+            var blockRight = Math.round(
+                    metrics.gutter + item.dayIndex * columnWidth
+                            + (item.placement.column() + 1) * columnShare
+            ) - metrics.blockInset;
             var blockTop = Math.round(yOf(item.startMin, hourHeight)) + metrics.blockInset;
             var blockBottom = Math.round(yOf(item.endMin, hourHeight)) - metrics.blockInset;
             item.bounds.set(blockLeft, blockTop, Math.max(blockLeft, blockRight), Math.max(blockTop, blockBottom));
@@ -234,7 +247,8 @@ final class WeekGridView extends ViewGroup {
             item.view.fitTo(item.bounds.width(), item.bounds.height());
             item.view.measure(
                     MeasureSpec.makeMeasureSpec(item.bounds.width(), MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(item.bounds.height(), MeasureSpec.EXACTLY));
+                    MeasureSpec.makeMeasureSpec(item.bounds.height(), MeasureSpec.EXACTLY)
+            );
         }
     }
 
@@ -256,8 +270,10 @@ final class WeekGridView extends ViewGroup {
             var hour = window.startHour() + i;
             var label = TimeFormat.hour(getContext(), hour);
             var paint = now != null && now.minutes() / 60 == hour ? nowLabelPaint : labelPaint;
-            canvas.drawText(label, metrics.gutter - 6 * getResources().getDisplayMetrics().density,
-                    y - labelOffset, paint);
+            canvas.drawText(
+                    label, metrics.gutter - 6 * getResources().getDisplayMetrics().density,
+                    y - labelOffset, paint
+            );
         }
         var columnWidth = metrics.columnWidth(getWidth());
         for (var i = 0; i <= 5; i++) {

@@ -20,7 +20,8 @@ public class RecurrenceTest {
         var schedule = new Schedule(DayOfWeek.MONDAY, date(10, 5), date(11, 2), 1);
         assertEquals(
                 List.of(date(10, 5), date(10, 12), date(10, 19), date(10, 26), date(11, 2)),
-                Recurrence.occurrences(schedule));
+                Recurrence.occurrences(schedule)
+        );
     }
 
     @Test
@@ -34,7 +35,8 @@ public class RecurrenceTest {
         var schedule = new Schedule(DayOfWeek.THURSDAY, date(10, 5), date(11, 30), 2);
         assertEquals(
                 List.of(date(10, 8), date(10, 22), date(11, 5), date(11, 19)),
-                Recurrence.occurrences(schedule));
+                Recurrence.occurrences(schedule)
+        );
     }
 
     @Test

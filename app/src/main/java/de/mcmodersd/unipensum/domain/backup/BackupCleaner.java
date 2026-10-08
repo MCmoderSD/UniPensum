@@ -40,10 +40,16 @@ public final class BackupCleaner {
         var series = cleanSeries(raw.series(), courses, semesters, lecturers.keySet());
         var sessions = cleanSessions(raw.sessions(), series, courses, semesters, lecturers.keySet());
 
-        var data = new BackupData(new ArrayList<>(lecturers.values()), new ArrayList<>(semesters.values()),
-                new ArrayList<>(courses.values()), new ArrayList<>(series.values()), sessions);
-        return new Result(data, new BackupReport(data.lecturers().size(), data.semesters().size(),
-                data.courses().size(), data.series().size(), data.sessions().size(), skipped, adjusted));
+        var data = new BackupData(
+                new ArrayList<>(lecturers.values()), new ArrayList<>(semesters.values()),
+                new ArrayList<>(courses.values()), new ArrayList<>(series.values()), sessions
+        );
+        return new Result(
+                data, new BackupReport(
+                        data.lecturers().size(), data.semesters().size(),
+                        data.courses().size(), data.series().size(), data.sessions().size(), skipped, adjusted
+                )
+        );
     }
 
     private Map<Long, Lecturer> cleanLecturers(List<Lecturer> raw) {
@@ -67,8 +73,12 @@ public final class BackupCleaner {
                 skipped++;
                 continue;
             }
-            candidates.add(new Semester(semester.id(), semester.start(), semester.end(),
-                    TextSanitizer.lineOrNull(semester.customName(), TextSanitizer.MAX_NAME)));
+            candidates.add(
+                    new Semester(
+                            semester.id(), semester.start(), semester.end(),
+                            TextSanitizer.lineOrNull(semester.customName(), TextSanitizer.MAX_NAME)
+                    )
+            );
         }
 
         // Earlier semesters win when two overlap.
@@ -93,8 +103,12 @@ public final class BackupCleaner {
                 skipped++;
                 continue;
             }
-            kept.put(course.id(), new Course(course.id(), course.semesterId(), name, course.color(),
-                    webLinkOrNull(course.moodleLink())));
+            kept.put(
+                    course.id(), new Course(
+                            course.id(), course.semesterId(), name, course.color(),
+                            webLinkOrNull(course.moodleLink())
+                    )
+            );
         }
         return kept;
     }
@@ -125,7 +139,8 @@ public final class BackupCleaner {
             var parent = series.get(session.seriesId());
             var fits = session.id() > 0 && seen.add(session.id()) && parent != null
                     && SemesterRules.isValidMoveTarget(
-                    semesters.get(courses.get(parent.courseId()).semesterId()), session.day());
+                            semesters.get(courses.get(parent.courseId()).semesterId()), session.day()
+                    );
             var details = fits ? cleanDetails(session.details(), lecturerIds) : null;
             if (details == null) {
                 skipped++;

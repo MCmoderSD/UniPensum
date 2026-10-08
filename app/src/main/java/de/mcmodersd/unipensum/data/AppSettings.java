@@ -131,7 +131,8 @@ public final class AppSettings {
         try {
             return new TimeWindow(
                     prefs.getInt(KEY_WINDOW_START, TimeWindow.DEFAULT.startHour()),
-                    prefs.getInt(KEY_WINDOW_END, TimeWindow.DEFAULT.endHour()));
+                    prefs.getInt(KEY_WINDOW_END, TimeWindow.DEFAULT.endHour())
+            );
         } catch (IllegalArgumentException invalid) {
             return TimeWindow.DEFAULT;
         }

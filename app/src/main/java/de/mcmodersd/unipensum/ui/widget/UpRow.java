@@ -61,8 +61,10 @@ public class UpRow extends LinearLayout {
 
         chevron = new ImageView(context);
         chevron.setImageResource(R.drawable.ic_chevron_right);
-        ImageViewCompat.setImageTintList(chevron,
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.text_secondary)));
+        ImageViewCompat.setImageTintList(
+                chevron,
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.text_secondary))
+        );
         chevron.setVisibility(GONE);
         addView(chevron, new LayoutParams(Math.round(20 * dp), Math.round(20 * dp)));
 
@@ -114,8 +116,10 @@ public class UpRow extends LinearLayout {
         if (leadingIcon == null) {
             var dp = getResources().getDisplayMetrics().density;
             leadingIcon = new ImageView(getContext());
-            ImageViewCompat.setImageTintList(leadingIcon,
-                    ColorStateList.valueOf(ContextCompat.getColor(getContext(), R.color.text_secondary)));
+            ImageViewCompat.setImageTintList(
+                    leadingIcon,
+                    ColorStateList.valueOf(ContextCompat.getColor(getContext(), R.color.text_secondary))
+            );
             var params = new LayoutParams(Math.round(22 * dp), Math.round(22 * dp));
             params.setMarginEnd(Math.round(14 * dp));
             addView(leadingIcon, 0, params);

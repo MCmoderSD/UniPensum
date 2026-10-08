@@ -147,8 +147,10 @@ public class TextSanitizerTest {
 
     @Test
     public void webLink_keepsHttpAndHttpsAndLowercasesTheScheme() {
-        assertEquals("https://moodle.uni.example/course/view.php?id=7",
-                TextSanitizer.webLink("https://moodle.uni.example/course/view.php?id=7"));
+        assertEquals(
+                "https://moodle.uni.example/course/view.php?id=7",
+                TextSanitizer.webLink("https://moodle.uni.example/course/view.php?id=7")
+        );
         assertEquals("http://intranet.example/x", TextSanitizer.webLink("HTTP://intranet.example/x"));
         assertEquals("https://Moodle.Example/Kurs", TextSanitizer.webLink("HTTPS://Moodle.Example/Kurs"));
     }
@@ -202,8 +204,10 @@ public class TextSanitizerTest {
 
     @Test
     public void webLink_aSchemeInsideTheQueryDoesNotCount() {
-        assertEquals("https://meet.example/r?u=https://other.example",
-                TextSanitizer.webLink("meet.example/r?u=https://other.example"));
+        assertEquals(
+                "https://meet.example/r?u=https://other.example",
+                TextSanitizer.webLink("meet.example/r?u=https://other.example")
+        );
     }
 
     @Test

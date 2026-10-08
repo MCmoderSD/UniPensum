@@ -30,8 +30,10 @@ public final class SeriesDao {
 
     /** @return {@code null} if there is no such series */
     public static Series get(SQLiteDatabase db, long id) {
-        try (var cursor = db.query("series", null, "id = ?", new String[]{String.valueOf(id)},
-                null, null, null)) {
+        try (var cursor = db.query(
+                "series", null, "id = ?", new String[]{String.valueOf(id)},
+                null, null, null
+        )) {
             return cursor.moveToFirst() ? read(cursor) : null;
         }
     }
@@ -39,8 +41,10 @@ public final class SeriesDao {
     /** Ordered by weekday, then start time. */
     public static List<Series> listByCourse(SQLiteDatabase db, long courseId) {
         var result = new ArrayList<Series>();
-        try (var cursor = db.query("series", null, "course_id = ?", new String[]{String.valueOf(courseId)},
-                null, null, "weekday, start_min, id")) {
+        try (var cursor = db.query(
+                "series", null, "course_id = ?", new String[]{String.valueOf(courseId)},
+                null, null, "weekday, start_min, id"
+        )) {
             while (cursor.moveToNext()) result.add(read(cursor));
         }
         return result;
@@ -72,11 +76,13 @@ public final class SeriesDao {
                 DayOfWeek.of(Rows.integer(cursor, "weekday")),
                 LocalDate.ofEpochDay(Rows.longValue(cursor, "first_day")),
                 LocalDate.ofEpochDay(Rows.longValue(cursor, "last_day")),
-                Rows.integer(cursor, "interval_weeks"));
+                Rows.integer(cursor, "interval_weeks")
+        );
         return new Series(
                 Rows.longValue(cursor, "id"),
                 Rows.longValue(cursor, "course_id"),
                 Rows.readDetails(cursor),
-                schedule);
+                schedule
+        );
     }
 }

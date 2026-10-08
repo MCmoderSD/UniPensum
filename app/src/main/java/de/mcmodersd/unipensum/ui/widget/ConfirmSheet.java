@@ -76,15 +76,19 @@ public final class ConfirmSheet extends UpSheet {
             getParentFragmentManager().setFragmentResult(args.getString(ARG_KEY), result);
             dismiss();
         });
-        column.addView(confirm, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        column.addView(
+                confirm, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+        );
 
         var cancel = new UpButton(context);
         cancel.setText(R.string.action_cancel);
         cancel.setVariant(UpButton.Variant.SECONDARY);
         cancel.setOnClickListener(v -> dismiss());
         var cancelParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         cancelParams.topMargin = Math.round(8 * dp);
         column.addView(cancel, cancelParams);
         return column;

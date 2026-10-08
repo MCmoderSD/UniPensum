@@ -25,11 +25,13 @@ public record Lecturer(long id, String firstName, String lastName, String email,
      * of dialable characters; blank e-mail and phone become {@code null}.
      */
     public Lecturer normalized() {
-        return new Lecturer(id,
+        return new Lecturer(
+                id,
                 TextSanitizer.line(firstName, TextSanitizer.MAX_NAME),
                 TextSanitizer.line(lastName, TextSanitizer.MAX_NAME),
                 TextSanitizer.email(email),
-                TextSanitizer.phone(phone));
+                TextSanitizer.phone(phone)
+        );
     }
 
     /** The last name, or first and last name; without a first name both styles show the last name. */

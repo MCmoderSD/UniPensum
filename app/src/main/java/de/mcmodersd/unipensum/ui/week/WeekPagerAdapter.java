@@ -76,8 +76,11 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     @Override
     public PageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         var page = new WeekPageView(parent.getContext(), new GridMetrics(parent.getContext()));
-        page.setLayoutParams(new RecyclerView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        page.setLayoutParams(
+                new RecyclerView.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+                )
+        );
         page.setScrollListener(this::onPageScrolled);
         page.setZoomListener(this::onPageZoomed);
         return new PageHolder(page);

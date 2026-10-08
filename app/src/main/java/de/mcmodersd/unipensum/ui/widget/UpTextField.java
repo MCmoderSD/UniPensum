@@ -140,8 +140,10 @@ public class UpTextField extends LinearLayout {
         input.setSingleLine(false);
         input.setMinLines(minLines);
         input.setGravity(Gravity.TOP | Gravity.START);
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
-                | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        input.setInputType(
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                        | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+        );
         input.setPadding(input.getPaddingLeft(), Math.round(14 * dp), input.getPaddingRight(), Math.round(14 * dp));
     }
 

@@ -143,8 +143,14 @@ public final class BackupImportSheet extends UpSheet {
 
         var origin = new StringBuilder();
         if (info.exportedAt() != null) {
-            origin.append(getString(R.string.backup_created, TimeFormat.dateMedium(context,
-                    info.exportedAt().atZone(ZoneId.systemDefault()).toLocalDate())));
+            origin.append(
+                    getString(
+                            R.string.backup_created, TimeFormat.dateMedium(
+                                    context,
+                                    info.exportedAt().atZone(ZoneId.systemDefault()).toLocalDate()
+                            )
+                    )
+            );
         }
         if (!info.appVersion().isEmpty()) {
             if (origin.length() > 0) origin.append(" · ");
@@ -156,8 +162,12 @@ public final class BackupImportSheet extends UpSheet {
         var compatibility =
                 info.compatibility(current.format(), current.schema(), current.appVersionCode());
         if (compatibility != BackupInfo.Compatibility.SAME) {
-            column.addView(text(compatibility == BackupInfo.Compatibility.NEWER
-                    ? R.string.backup_warning_newer : R.string.backup_warning_older, 15, R.color.danger, 0, 12));
+            column.addView(
+                    text(
+                            compatibility == BackupInfo.Compatibility.NEWER
+                                    ? R.string.backup_warning_newer : R.string.backup_warning_older, 15, R.color.danger, 0, 12
+                    )
+            );
         }
 
         column.addView(text(R.string.backup_contents, 13, R.color.text_secondary, 0, 6));
@@ -167,12 +177,24 @@ public final class BackupImportSheet extends UpSheet {
         column.addView(countRow(R.string.lecturers_title, report.lecturers()), params(dp, 0, 8));
 
         if (report.skipped() > 0) {
-            column.addView(plainText(getResources().getQuantityString(R.plurals.backup_skipped,
-                    report.skipped(), report.skipped()), 14, R.color.danger, 4, 4));
+            column.addView(
+                    plainText(
+                            getResources().getQuantityString(
+                                    R.plurals.backup_skipped,
+                                    report.skipped(), report.skipped()
+                            ), 14, R.color.danger, 4, 4
+                    )
+            );
         }
         if (report.adjusted() > 0) {
-            column.addView(plainText(getResources().getQuantityString(R.plurals.backup_adjusted,
-                    report.adjusted(), report.adjusted()), 14, R.color.text_secondary, 4, 4));
+            column.addView(
+                    plainText(
+                            getResources().getQuantityString(
+                                    R.plurals.backup_adjusted,
+                                    report.adjusted(), report.adjusted()
+                            ), 14, R.color.text_secondary, 4, 4
+                    )
+            );
         }
 
         column.addView(text(R.string.backup_replace_warning, 15, R.color.text_primary, 8, 12));
@@ -230,7 +252,8 @@ public final class BackupImportSheet extends UpSheet {
 
     private static LinearLayout.LayoutParams params(float dp, int topDp, int bottomDp) {
         var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;

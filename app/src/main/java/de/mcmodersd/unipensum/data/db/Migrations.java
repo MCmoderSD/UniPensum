@@ -53,26 +53,32 @@ final class Migrations {
      * the tables would cascade-delete the sessions while foreign keys are on.
      */
     private static void lecturersAndMoodleLink(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE lecturer ("
-                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + "first_name TEXT NOT NULL, "
-                + "last_name TEXT NOT NULL, "
-                + "email TEXT, "
-                + "phone TEXT)");
+        db.execSQL(
+                "CREATE TABLE lecturer ("
+                        + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + "first_name TEXT NOT NULL, "
+                        + "last_name TEXT NOT NULL, "
+                        + "email TEXT, "
+                        + "phone TEXT)"
+        );
         db.execSQL("ALTER TABLE course ADD COLUMN moodle_link TEXT");
         db.execSQL("ALTER TABLE series ADD COLUMN lecturer_id INTEGER REFERENCES lecturer(id) ON DELETE SET NULL");
         db.execSQL("ALTER TABLE session ADD COLUMN lecturer_id INTEGER REFERENCES lecturer(id) ON DELETE SET NULL");
 
-        db.execSQL("INSERT INTO lecturer (first_name, last_name) "
-                + "SELECT '', name FROM ("
-                + "SELECT TRIM(lecturer) AS name FROM series WHERE lecturer IS NOT NULL "
-                + "UNION SELECT TRIM(lecturer) FROM session WHERE lecturer IS NOT NULL) "
-                + "WHERE name <> '' ORDER BY name");
+        db.execSQL(
+                "INSERT INTO lecturer (first_name, last_name) "
+                        + "SELECT '', name FROM ("
+                        + "SELECT TRIM(lecturer) AS name FROM series WHERE lecturer IS NOT NULL "
+                        + "UNION SELECT TRIM(lecturer) FROM session WHERE lecturer IS NOT NULL) "
+                        + "WHERE name <> '' ORDER BY name"
+        );
 
         for (var table : new String[]{"series", "session"}) {
-            db.execSQL("UPDATE " + table + " SET lecturer_id = ("
-                    + "SELECT l.id FROM lecturer l WHERE l.first_name = '' AND l.last_name = TRIM(" + table + ".lecturer)) "
-                    + "WHERE lecturer IS NOT NULL AND TRIM(lecturer) <> ''");
+            db.execSQL(
+                    "UPDATE " + table + " SET lecturer_id = ("
+                            + "SELECT l.id FROM lecturer l WHERE l.first_name = '' AND l.last_name = TRIM(" + table + ".lecturer)) "
+                            + "WHERE lecturer IS NOT NULL AND TRIM(lecturer) <> ''"
+            );
             db.execSQL("UPDATE " + table + " SET lecturer = NULL");
         }
 

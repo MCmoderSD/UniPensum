@@ -58,8 +58,10 @@ public final class BackupManager {
     public Current current() {
         try {
             var info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            return new Current(BackupFile.FORMAT, Schema.VERSION, (int) info.getLongVersionCode(),
-                    info.versionName == null ? "" : info.versionName);
+            return new Current(
+                    BackupFile.FORMAT, Schema.VERSION, (int) info.getLongVersionCode(),
+                    info.versionName == null ? "" : info.versionName
+            );
         } catch (PackageManager.NameNotFoundException ownPackage) {
             return new Current(BackupFile.FORMAT, Schema.VERSION, 0, "");
         }
@@ -75,8 +77,10 @@ public final class BackupManager {
                 worker.execute(() -> {
                     try {
                         var current = current();
-                        var meta = new BackupFile.Meta(current.schema(), current.appVersionCode(),
-                                current.appVersion(), Instant.now());
+                        var meta = new BackupFile.Meta(
+                                current.schema(), current.appVersionCode(),
+                                current.appVersion(), Instant.now()
+                        );
                         var file = BackupFile.write(data, meta, password);
                         try (var out = context.getContentResolver().openOutputStream(target, "wt")) {
                             if (out == null) throw new IOException("Cannot write to " + target);
