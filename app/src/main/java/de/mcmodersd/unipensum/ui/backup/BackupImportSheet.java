@@ -49,7 +49,6 @@ public final class BackupImportSheet extends UpSheet {
         sheet.show(manager, "backup-import");
     }
 
-    @Nullable
     @Override
     protected CharSequence title(@NonNull Context context) {
         return context.getString(R.string.backup_import_title);

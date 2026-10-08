@@ -136,10 +136,10 @@ public final class BackupCleaner {
         var kept = new ArrayList<Session>();
         for (var session : raw) {
             var parent = series.get(session.seriesId());
-            var fits = session.id() > 0 && seen.add(session.id()) && parent != null
-                    && SemesterRules.isValidMoveTarget(
-                            semesters.get(courses.get(parent.courseId()).semesterId()), session.day()
-                    );
+            var course = parent == null ? null : courses.get(parent.courseId());
+            var semester = course == null ? null : semesters.get(course.semesterId());
+            var fits = session.id() > 0 && seen.add(session.id()) && semester != null
+                    && SemesterRules.isValidMoveTarget(semester, session.day());
             var details = fits ? cleanDetails(session.details(), lecturerIds) : null;
             if (details == null) {
                 skipped++;

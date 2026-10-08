@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -28,6 +29,7 @@ import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 
 import de.mcmodersd.unipensum.R;
 
@@ -279,21 +281,28 @@ public final class TimePickerSheet extends UpSheet {
                 getString(typing ? R.string.time_use_wheels : R.string.time_type), v -> toggleMode()
         );
 
-        if (getDialog() == null || getDialog().getWindow() == null) return;
+        var window = window();
+        if (window == null) return;
         if (typing) {
             hourInput.requestFocus();
             hourInput.selectAll();
             hourInput.post(() -> {
-                if (getDialog() != null && getDialog().getWindow() != null) {
-                    WindowCompat.getInsetsController(getDialog().getWindow(), hourInput)
-                            .show(WindowInsetsCompat.Type.ime());
-                }
+                // The sheet may be gone by now.
+                var current = window();
+                if (current != null) WindowCompat.getInsetsController(current, hourInput).show(WindowInsetsCompat.Type.ime());
             });
         } else if (byUser) {
             hourInput.clearFocus();
             minuteInput.clearFocus();
-            WindowCompat.getInsetsController(getDialog().getWindow(), hourInput).hide(WindowInsetsCompat.Type.ime());
+            WindowCompat.getInsetsController(window, hourInput).hide(WindowInsetsCompat.Type.ime());
         }
+    }
+
+    /** @return the window of the sheet, or {@code null} while there is none */
+    @Nullable
+    private Window window() {
+        var dialog = getDialog();
+        return dialog == null ? null : dialog.getWindow();
     }
 
     private void finish(View source) {
@@ -304,7 +313,7 @@ public final class TimePickerSheet extends UpSheet {
         }
         var result = new Bundle();
         result.putInt(RESULT_MINUTES, time[0] * 60 + time[1]);
-        getParentFragmentManager().setFragmentResult(requireArguments().getString(ARG_KEY), result);
+        getParentFragmentManager().setFragmentResult(Objects.requireNonNull(requireArguments().getString(ARG_KEY)), result);
         dismiss();
     }
 

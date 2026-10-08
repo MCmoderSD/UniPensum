@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.Objects;
+
 import de.mcmodersd.unipensum.domain.model.NameStyle;
 
 /**
@@ -116,6 +118,11 @@ public final class AppSettings {
 
     public LiveData<TimeWindow> timeWindow() {
         return timeWindow;
+    }
+
+    /** The window as it is now. It is set in the constructor, so unlike the value of the LiveData it is never null. */
+    public TimeWindow currentTimeWindow() {
+        return Objects.requireNonNull(timeWindow.getValue());
     }
 
     /** Must be called on the main thread. */

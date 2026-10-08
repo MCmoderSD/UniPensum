@@ -151,20 +151,20 @@ public class SettingsFragment extends Fragment {
     private void bindHours(UpStepper start, UpStepper end) {
         hoursStart = start;
         hoursEnd = end;
-        var window = settings.timeWindow().getValue();
+        var window = settings.currentTimeWindow();
         UpStepper.Formatter hourLabel = value -> String.format(Locale.ROOT, "%02d:00", value);
         start.setFormatter(hourLabel);
         end.setFormatter(hourLabel);
         applyHourRanges(window);
 
         start.setOnValueChangedListener(value -> {
-            var current = settings.timeWindow().getValue();
+            var current = settings.currentTimeWindow();
             var updated = new TimeWindow(value, current.endHour());
             settings.setTimeWindow(updated);
             applyHourRanges(updated);
         });
         end.setOnValueChangedListener(value -> {
-            var current = settings.timeWindow().getValue();
+            var current = settings.currentTimeWindow();
             var updated = new TimeWindow(current.startHour(), value);
             settings.setTimeWindow(updated);
             applyHourRanges(updated);

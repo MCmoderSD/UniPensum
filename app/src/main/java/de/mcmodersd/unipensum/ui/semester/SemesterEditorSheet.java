@@ -93,7 +93,6 @@ public final class SemesterEditorSheet extends UpSheet {
         sheet.show(manager, "semester-editor");
     }
 
-    @Nullable
     @Override
     protected CharSequence title(@NonNull Context context) {
         return context.getString(requireArguments().getLong(ARG_ID) == 0 ? R.string.semester_new : R.string.semester_edit);

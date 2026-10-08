@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.domain.model.EditScope;
@@ -77,7 +78,7 @@ public final class ScopeSheet extends UpSheet {
         row.setOnClickListener(v -> {
             var result = new Bundle();
             result.putString(RESULT_SCOPE, scope.name());
-            getParentFragmentManager().setFragmentResult(requireArguments().getString(ARG_KEY), result);
+            getParentFragmentManager().setFragmentResult(Objects.requireNonNull(requireArguments().getString(ARG_KEY)), result);
             dismiss();
         });
         var params = new LinearLayout.LayoutParams(

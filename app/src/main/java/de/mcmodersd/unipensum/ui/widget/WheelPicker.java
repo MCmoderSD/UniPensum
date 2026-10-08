@@ -38,6 +38,7 @@ public class WheelPicker extends RecyclerView {
     private final int itemHeight;
     private final LinearSnapHelper snapHelper = new LinearSnapHelper();
     private final LinearLayoutManager layoutManager;
+    private final LabelAdapter adapter = new LabelAdapter();
     private String[] labels = new String[0];
     private int selected;
     /** The value in the center row the last time the wheel moved, to notice when the next one arrives. */
@@ -59,7 +60,7 @@ public class WheelPicker extends RecyclerView {
         // Scrolling must not be offered to the surrounding sheet, which would move instead of the wheel.
         setNestedScrollingEnabled(false);
         snapHelper.attachToRecyclerView(this);
-        setAdapter(new LabelAdapter());
+        setAdapter(adapter);
         addOnChildAttachStateChangeListener(new OnChildAttachStateChangeListener() {
             @Override
             public void onChildViewAttachedToWindow(@NonNull View view) {
@@ -73,7 +74,7 @@ public class WheelPicker extends RecyclerView {
 
     public void setLabels(String... labels) {
         this.labels = labels;
-        getAdapter().notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
     }
 
     /** The value in the center row; while the wheel is still settling, the one it is settling on. */

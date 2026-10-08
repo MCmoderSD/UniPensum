@@ -42,7 +42,6 @@ public final class SemesterSheet extends UpSheet {
         new SemesterSheet().show(manager, "semesters");
     }
 
-    @Nullable
     @Override
     protected CharSequence title(@NonNull Context context) {
         return context.getString(R.string.semesters_title);

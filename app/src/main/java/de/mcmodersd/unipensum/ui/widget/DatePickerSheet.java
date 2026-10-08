@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /** Picks a date from a month calendar. Delivers {@link #RESULT_EPOCH_DAY} under the request key and closes. */
 public final class DatePickerSheet extends UpSheet {
@@ -60,7 +61,7 @@ public final class DatePickerSheet extends UpSheet {
         calendar.setOnDateSelectedListener(date -> {
             var result = new Bundle();
             result.putLong(RESULT_EPOCH_DAY, date.toEpochDay());
-            getParentFragmentManager().setFragmentResult(args.getString(ARG_KEY), result);
+            getParentFragmentManager().setFragmentResult(Objects.requireNonNull(args.getString(ARG_KEY)), result);
             dismiss();
         });
         return calendar;

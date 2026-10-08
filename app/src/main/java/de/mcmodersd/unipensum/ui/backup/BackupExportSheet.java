@@ -65,7 +65,6 @@ public final class BackupExportSheet extends UpSheet {
         new BackupExportSheet().show(manager, "backup-export");
     }
 
-    @Nullable
     @Override
     protected CharSequence title(@NonNull Context context) {
         return context.getString(R.string.backup_export_title);

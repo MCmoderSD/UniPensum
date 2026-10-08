@@ -67,7 +67,6 @@ public final class LecturerEditorSheet extends UpSheet {
         sheet.show(manager, "lecturer-editor");
     }
 
-    @Nullable
     @Override
     protected CharSequence title(@NonNull Context context) {
         return context.getString(requireArguments().getLong(ARG_ID) == 0 ? R.string.lecturer_new : R.string.lecturer_edit);

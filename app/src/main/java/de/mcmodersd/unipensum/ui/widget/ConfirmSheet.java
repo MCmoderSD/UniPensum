@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
+import java.util.Objects;
+
 import de.mcmodersd.unipensum.R;
 
 /**
@@ -73,7 +75,7 @@ public final class ConfirmSheet extends UpSheet {
             Haptics.confirm(v);
             var result = new Bundle();
             result.putBoolean(RESULT_CONFIRMED, true);
-            getParentFragmentManager().setFragmentResult(args.getString(ARG_KEY), result);
+            getParentFragmentManager().setFragmentResult(Objects.requireNonNull(args.getString(ARG_KEY)), result);
             dismiss();
         });
         column.addView(

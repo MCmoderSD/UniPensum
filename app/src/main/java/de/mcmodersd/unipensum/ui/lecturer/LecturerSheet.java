@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
@@ -70,7 +71,6 @@ public final class LecturerSheet extends UpSheet {
         return args == null ? null : args.getString(ARG_PICK_KEY);
     }
 
-    @Nullable
     @Override
     protected CharSequence title(@NonNull Context context) {
         return context.getString(picking() ? R.string.lecturer_pick_title : R.string.lecturers_title);
@@ -160,7 +160,7 @@ public final class LecturerSheet extends UpSheet {
     private void pick(long lecturerId) {
         var result = new Bundle();
         result.putLong(RESULT_LECTURER_ID, lecturerId);
-        getParentFragmentManager().setFragmentResult(requireArguments().getString(ARG_PICK_KEY), result);
+        getParentFragmentManager().setFragmentResult(Objects.requireNonNull(requireArguments().getString(ARG_PICK_KEY)), result);
         dismiss();
     }
 
