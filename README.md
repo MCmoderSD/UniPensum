@@ -49,7 +49,7 @@ de.mcmodersd.unipensum
 │   ├── text            Cleaning and checking of typed text, web links, e-mail addresses and phone numbers
 │   └── backup          What a backup holds, and the checks that make imported data safe
 ├── data                Repository, settings and the read models of the UI
-│   ├── db              SQLite schema, migrations and data access
+│   ├── db              SQLite schema and data access
 │   └── backup          The .unipensum file: zip container, JSON, encryption, export and import
 ├── reminder            The alarm for the next reminder, and the notification
 └── ui

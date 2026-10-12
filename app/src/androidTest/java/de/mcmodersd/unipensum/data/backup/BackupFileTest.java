@@ -305,7 +305,7 @@ public class BackupFileTest {
 
     @Test
     public void aProtectionThisVersionDoesNotKnow_isReportedAsSuch() throws Exception {
-        var manifest = "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"encryption\":"
+        var manifest = "{\"app\":\"UniPensum\",\"format\":1,\"schema\":1,\"encryption\":"
                 + "{\"cipher\":\"ChaCha20\",\"kdf\":\"Argon2\",\"iterations\":3,\"salt\":\"AAAA\",\"iv\":\"AAAA\"}}";
         var entries = new LinkedHashMap<String, byte[]>();
         entries.put("manifest.json", manifest.getBytes(StandardCharsets.UTF_8));
@@ -317,7 +317,7 @@ public class BackupFileTest {
     @Test
     public void implausibleKeyParameters_areRefused() throws Exception {
         for (var iterations : new int[]{1, 5_000, 50_000_000}) {
-            var manifest = "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"encryption\":"
+            var manifest = "{\"app\":\"UniPensum\",\"format\":1,\"schema\":1,\"encryption\":"
                     + "{\"cipher\":\"AES-256-GCM\",\"kdf\":\"PBKDF2WithHmacSHA256\",\"iterations\":" + iterations
                     + ",\"salt\":\"AAAAAAAAAAAAAAAAAAAAAA==\",\"iv\":\"AAAAAAAAAAAAAAAA\"}}";
             var entries = new LinkedHashMap<String, byte[]>();
@@ -336,7 +336,7 @@ public class BackupFileTest {
         var opened = open(
                 zip(
                         sampleFile(
-                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"appVersion\":\"1.0\",\"appVersionCode\":1,"
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":1,\"appVersion\":\"1.0\",\"appVersionCode\":1,"
                                         + "\"exportedAt\":\"2026-10-05T10:00:00Z\"}",
                                 "{\"lecturers\":[{\"id\":1,\"firstName\":\"Anna\",\"lastName\":\"Weber\",\"email\":\"anna@uni.example\","
                                         + "\"phone\":\"+49 30 123\"},{\"id\":2,\"firstName\":\"\",\"lastName\":\"Prof. Koch\"}],"
@@ -377,42 +377,11 @@ public class BackupFileTest {
     }
 
     @Test
-    public void aFileFromBeforeTheReminders_getsTheDefaultOfEachEvent() throws Exception {
-        // Do not "fix" this sample when the code changes: it stands for files that already exist.
-        var opened = open(
-                zip(
-                        sampleFile(
-                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2,\"appVersion\":\"1.0\",\"appVersionCode\":1}",
-                                "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
-                                        + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
-                                        + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-12\","
-                                        + "\"type\":\"lecture\",\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"},"
-                                        + "{\"id\":2,\"course\":1,\"weekday\":2,\"first\":\"2026-10-06\",\"last\":\"2026-10-13\","
-                                        + "\"type\":\"lab\",\"startMin\":480,\"endMin\":600,\"mode\":\"online\"}],"
-                                        + "\"sessions\":[{\"id\":1,\"series\":1,\"day\":\"2026-10-05\",\"type\":\"lecture\","
-                                        + "\"startMin\":480,\"endMin\":600,\"mode\":\"in_person\"},"
-                                        + "{\"id\":2,\"series\":2,\"day\":\"2026-10-06\",\"type\":\"lab\",\"startMin\":480,"
-                                        + "\"endMin\":600,\"mode\":\"online\"}]}"
-                        )
-                )
-        );
-
-        var result = opened.read(null);
-
-        // Nothing was changed by the reader: a file that never had the field is not a damaged one.
-        assertEquals(new BackupReport(0, 1, 1, 2, 2, 0, 0), result.report());
-        assertEquals(30, result.data().series().get(0).details().reminderMin());
-        assertEquals(5, result.data().series().get(1).details().reminderMin());
-        assertEquals(30, result.data().sessions().get(0).details().reminderMin());
-        assertEquals(5, result.data().sessions().get(1).details().reminderMin());
-    }
-
-    @Test
     public void remindersInAFile_areKeptBroughtIntoRangeOrReplacedByTheDefault() throws Exception {
         var opened = open(
                 zip(
                         sampleFile(
-                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":3}",
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":1}",
                                 "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
                                         + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
                                         + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":1,\"first\":\"2026-10-05\",\"last\":\"2026-10-05\","
@@ -472,7 +441,7 @@ public class BackupFileTest {
         var opened = open(
                 zip(
                         sampleFile(
-                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":1}",
                                 "{\"lecturers\":[{\"id\":1,\"lastName\":\"Weber\"},{\"id\":2,\"firstName\":\"X\"},42],"
                                         + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"},"
                                         + "{\"id\":2,\"start\":\"2026-13-45\",\"end\":\"2027-01-22\"}],"
@@ -496,7 +465,7 @@ public class BackupFileTest {
         var opened = open(
                 zip(
                         sampleFile(
-                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":1}",
                                 "{\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"
                                         + "\"courses\":[{\"id\":1,\"semester\":1,\"name\":\"Math\",\"color\":\"red\"}],"
                                         + "\"series\":[{\"id\":1,\"course\":1,\"weekday\":3,\"first\":\"2026-10-07\",\"last\":\"2026-10-07\","
@@ -515,6 +484,7 @@ public class BackupFileTest {
         assertNull(details.link());
         assertNull(details.note());
         assertEquals(SessionDetails.NO_LECTURER, details.lecturerId());
+        assertEquals(30, details.reminderMin());
         assertNull(result.data().semesters().get(0).customName());
         assertNull(result.data().courses().get(0).moodleLink());
     }
@@ -524,7 +494,7 @@ public class BackupFileTest {
         var opened = open(
                 zip(
                         sampleFile(
-                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":2}",
+                                "{\"app\":\"UniPensum\",\"format\":1,\"schema\":1}",
                                 "{\"lecturers\":[{\"id\":1,\"firstName\":\" Anna\\u200b \",\"lastName\":\"  Weber \\t Koch\","
                                         + "\"email\":\" a @uni.example \"}],"
                                         + "\"semesters\":[{\"id\":1,\"start\":\"2026-10-05\",\"end\":\"2027-01-22\"}],"

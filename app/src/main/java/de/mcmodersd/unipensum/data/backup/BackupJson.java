@@ -32,8 +32,7 @@ import de.mcmodersd.unipensum.domain.model.SessionType;
 
 /**
  * The data of a backup as JSON: five lists, one entry per row, dates as {@code 2026-10-05}, times as
- * minutes since midnight, enums as their stable keys, empty values left out. A file without the reminders
- * (from before they existed) is read with the default reminder of each event.
+ * minutes since midnight, enums as their stable keys, empty values left out.
  * <p>
  * Reading is as forgiving as it can be, because the file may come from another version: unknown fields
  * and lists are ignored, a missing optional value takes its default, an unknown enum value is replaced
@@ -128,7 +127,7 @@ final class BackupJson {
         optional(json, "link", details.link());
         if (details.lecturerId() != SessionDetails.NO_LECTURER) json.name("lecturer").value(details.lecturerId());
         optional(json, "note", details.note());
-        // Always written, "none" as -1: a file without the field is older and gets the default reminder.
+        // Always written, "none" as -1.
         json.name("reminder").value(details.reminderMin());
     }
 
@@ -303,7 +302,7 @@ final class BackupJson {
             );
         }
 
-        /** A file from before the reminders has no field and gets the default; so does a value that is no number. */
+        /** A missing reminder gets the default of the event, and so does a value that is no number. */
         private int reminder(HashMap<String, Object> f, Mode mode) {
             if (!f.containsKey("reminder")) return Reminders.defaultFor(mode);
             try {

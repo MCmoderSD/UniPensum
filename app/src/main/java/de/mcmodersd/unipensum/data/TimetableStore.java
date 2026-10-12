@@ -341,15 +341,6 @@ public final class TimetableStore {
         CourseDao.delete(db, id);
     }
 
-    public static void addSeries(SQLiteDatabase db, long courseId, Series series) {
-        transact(db, () -> {
-            Course course = require(CourseDao.get(db, courseId), "course", courseId);
-            Semester semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
-            insertSeries(db, semester, courseId, series);
-            return null;
-        });
-    }
-
     // --- sessions ---
 
     /**

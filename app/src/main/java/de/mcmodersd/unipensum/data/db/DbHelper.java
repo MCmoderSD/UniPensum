@@ -23,8 +23,12 @@ public final class DbHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * Version 1 is the first one, so there is nothing to upgrade from yet. The first change of the layout
+     * adds its migration here.
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Migrations.upgrade(db, oldVersion, newVersion);
+        throw new IllegalStateException("No migration from version " + oldVersion + " to " + newVersion);
     }
 }
