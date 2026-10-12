@@ -24,8 +24,10 @@ import de.mcmodersd.unipensum.domain.model.SessionDetails;
 import de.mcmodersd.unipensum.domain.model.SessionType;
 
 /**
- * Debug builds only. Replaces all data with a sample semester, including two overlapping courses and
- * lecturers with contact details. Triggered with
+ * Debug builds only. Replaces all data with a sample semester like a university would plan it: six courses, six
+ * lecturers with contact details, and events on the fixed slots 8:00, 9:45, 11:30, 14:00 and 15:45 of 90 minutes
+ * each (a double slot makes 3 h 15 min), nothing during the lunch break from 13:00 to 14:00 and nothing that
+ * overlaps. These are the data of the store screenshots, see {@code screenshots/PLAN.md}. Triggered with
  * {@code adb shell am start -n de.mcmodersd.unipensum/.ui.MainActivity --ez unipensum.debug.seed true}.
  * <p>
  * With {@code --ei unipensum.debug.reminder_in 4} one more session is added today that begins in 4 minutes and
@@ -63,58 +65,102 @@ public final class DebugSeeder {
 
             TimetableStore.createCourse(
                     db, new Course(
-                            0, semester, "Analysis", CourseColor.BLUE,
+                            0, semester, "Analysis I", CourseColor.BLUE,
                             "https://moodle.uni.example/course/view.php?id=101"
                     ), List.of(
                             series(
                                     DayOfWeek.MONDAY, start, end, 1,
-                                    details(SessionType.LECTURE, 8, 0, 10, 30, Mode.IN_PERSON, false, "A1", null, weber)
+                                    note(
+                                            details(SessionType.LECTURE, 9, 45, 11, 15, Mode.IN_PERSON, false, "A1", null, weber),
+                                            "Bring the exercise sheet."
+                                    )
                             ),
                             series(
-                                    DayOfWeek.THURSDAY, start, end, 2,
-                                    details(SessionType.EXERCISE, 13, 0, 14, 30, Mode.IN_PERSON, false, "B3", null, koch)
+                                    DayOfWeek.THURSDAY, start, end, 1,
+                                    details(SessionType.EXERCISE, 14, 0, 15, 30, Mode.IN_PERSON, false, "B3", null, koch)
                             )
                     )
             );
-            // Overlaps the Analysis lecture on Mondays from 09:30 to 10:30.
+            // Every second week, starting in the week of the screenshots.
             TimetableStore.createCourse(
                     db, new Course(0, semester, "Linear Algebra", CourseColor.GREEN, null), List.of(
                             series(
-                                    DayOfWeek.MONDAY, start, end, 1,
-                                    details(SessionType.EXERCISE, 9, 30, 11, 0, Mode.IN_PERSON, false, "C 0.12", null, lang)
+                                    DayOfWeek.WEDNESDAY, LocalDate.of(2026, 10, 12), end, 2,
+                                    details(SessionType.EXERCISE, 9, 45, 11, 15, Mode.IN_PERSON, false, "C 0.12", null, koch)
+                            ),
+                            series(
+                                    DayOfWeek.FRIDAY, start, end, 1,
+                                    details(SessionType.LECTURE, 14, 0, 15, 30, Mode.IN_PERSON, false, "H1", null, weber)
                             )
                     )
             );
             TimetableStore.createCourse(
                     db, new Course(
                             0, semester, "Algorithms", CourseColor.RED,
-                            "moodle.uni.example/course/view.php?id=202"
+                            "https://moodle.uni.example/course/view.php?id=202"
                     ), List.of(
                             series(
                                     DayOfWeek.TUESDAY, start, end, 1,
-                                    details(SessionType.LECTURE, 10, 0, 12, 0, Mode.IN_PERSON, false, "H1", null, neumann)
+                                    reminder(
+                                            details(SessionType.LECTURE, 8, 0, 11, 15, Mode.IN_PERSON, false, "H1", null, neumann),
+                                            15
+                                    )
                             ),
                             series(
                                     DayOfWeek.WEDNESDAY, start, end, 1,
-                                    details(SessionType.LAB, 14, 0, 16, 0, Mode.ONLINE, false, null, "https://meet.example/algo", brandt)
+                                    details(
+                                            SessionType.LAB, 14, 0, 17, 15, Mode.ONLINE, false, null,
+                                            "https://meet.example/algorithms", brandt
+                                    )
                             )
                     )
             );
             TimetableStore.createCourse(
-                    db, new Course(0, semester, "Physics", CourseColor.ORANGE, null), List.of(
+                    db, new Course(
+                            0, semester, "Databases", CourseColor.TEAL,
+                            "https://moodle.uni.example/course/view.php?id=303"
+                    ), List.of(
+                            series(
+                                    DayOfWeek.TUESDAY, start, end, 1,
+                                    details(SessionType.LECTURE, 14, 0, 15, 30, Mode.IN_PERSON, false, "H2", null, brandt)
+                            ),
                             series(
                                     DayOfWeek.FRIDAY, start, end, 1,
-                                    details(SessionType.LECTURE, 9, 0, 12, 0, Mode.IN_PERSON, true, "A2", "https://meet.example/physics", sommer)
+                                    details(SessionType.LAB, 8, 0, 9, 30, Mode.IN_PERSON, false, "Lab 3", null, brandt)
                             )
                     )
             );
             TimetableStore.createCourse(
-                    db, new Course(0, semester, "Seminar", CourseColor.GRAPHITE, null), List.of(
+                    db, new Course(
+                            0, semester, "Software Engineering", CourseColor.VIOLET,
+                            "https://moodle.uni.example/course/view.php?id=404"
+                    ), List.of(
                             series(
-                                    DayOfWeek.WEDNESDAY, start, end, 1,
+                                    DayOfWeek.MONDAY, start, end, 1,
                                     details(
-                                            SessionType.TUTORIAL, 11, 0, 12, 30, Mode.IN_PERSON, false, "Library 2", null,
+                                            SessionType.LECTURE, 14, 0, 15, 30, Mode.IN_PERSON, true, "H3",
+                                            "https://meet.example/software-engineering", sommer
+                                    )
+                            ),
+                            series(
+                                    DayOfWeek.FRIDAY, start, end, 1,
+                                    details(
+                                            SessionType.TUTORIAL, 11, 30, 13, 0, Mode.IN_PERSON, false, "Library 2", null,
                                             SessionDetails.NO_LECTURER
+                                    )
+                            )
+                    )
+            );
+            TimetableStore.createCourse(
+                    db, new Course(
+                            0, semester, "Physics", CourseColor.ORANGE,
+                            "https://moodle.uni.example/course/view.php?id=505"
+                    ), List.of(
+                            series(
+                                    DayOfWeek.THURSDAY, start, end, 1,
+                                    details(
+                                            SessionType.LECTURE, 8, 0, 11, 15, Mode.IN_PERSON, true, "A2",
+                                            "https://meet.example/physics", lang
                                     )
                             )
                     )
@@ -156,6 +202,20 @@ public final class DebugSeeder {
         return new SessionDetails(
                 type, startHour * 60 + startMinute, endHour * 60 + endMinute, mode, hybrid,
                 room, link, lecturerId, null, Reminders.defaultFor(mode)
+        );
+    }
+
+    private static SessionDetails note(SessionDetails details, String note) {
+        return new SessionDetails(
+                details.type(), details.startMin(), details.endMin(), details.mode(), details.hybrid(),
+                details.room(), details.link(), details.lecturerId(), note, details.reminderMin()
+        );
+    }
+
+    private static SessionDetails reminder(SessionDetails details, int minutes) {
+        return new SessionDetails(
+                details.type(), details.startMin(), details.endMin(), details.mode(), details.hybrid(),
+                details.room(), details.link(), details.lecturerId(), details.note(), minutes
         );
     }
 }
