@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The mortarboard of the launcher icon for the splash screen, without its background. The launcher icon takes its
+    colors from the phone (ic_launcher_colors.xml). The splash screen has to take them from the theme of the app, so
+    that it matches the theme chosen in the settings, so the paths are the ones of ic_launcher_foreground.xml in the
+    colors of the text.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.5538"
+        android:scaleY="0.5538"
+        android:translateX="18"
+        android:translateY="18">
+        <path
+            android:fillColor="@color/text_primary"
+            android:pathData="M65,19.5 L111.5,37 L65,54.5 L18.5,37 Z" />
+        <path
+            android:fillColor="@color/text_primary"
+            android:pathData="M37,47.4 V63 Q65,77 93,63 V47.4 L65,57.9 Z" />
+        <path
+            android:fillColor="@color/text_primary"
+            android:pathData="M28.5,94 h5 a2.5,2.5 0 0 1 2.5,2.5 v11 a2.5,2.5 0 0 1 -2.5,2.5 h-5 a2.5,2.5 0 0 1 -2.5,-2.5 v-11 a2.5,2.5 0 0 1 2.5,-2.5 z" />
+        <path
+            android:fillColor="@color/text_primary"
+            android:pathData="M45.5,84 h5 a2.5,2.5 0 0 1 2.5,2.5 v21 a2.5,2.5 0 0 1 -2.5,2.5 h-5 a2.5,2.5 0 0 1 -2.5,-2.5 v-21 a2.5,2.5 0 0 1 2.5,-2.5 z" />
+        <path
+            android:fillColor="@color/text_primary"
+            android:pathData="M62.5,90 h5 a2.5,2.5 0 0 1 2.5,2.5 v15 a2.5,2.5 0 0 1 -2.5,2.5 h-5 a2.5,2.5 0 0 1 -2.5,-2.5 v-15 a2.5,2.5 0 0 1 2.5,-2.5 z" />
+        <path
+            android:fillColor="@color/text_primary"
+            android:pathData="M79.5,78 h5 a2.5,2.5 0 0 1 2.5,2.5 v27 a2.5,2.5 0 0 1 -2.5,2.5 h-5 a2.5,2.5 0 0 1 -2.5,-2.5 v-27 a2.5,2.5 0 0 1 2.5,-2.5 z" />
+        <path
+            android:fillColor="@color/text_primary"
+            android:pathData="M96.5,88 h5 a2.5,2.5 0 0 1 2.5,2.5 v17 a2.5,2.5 0 0 1 -2.5,2.5 h-5 a2.5,2.5 0 0 1 -2.5,-2.5 v-17 a2.5,2.5 0 0 1 2.5,-2.5 z" />
+    </group>
+</vector>

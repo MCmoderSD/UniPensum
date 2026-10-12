@@ -1,9 +1,9 @@
 package de.mcmodersd.unipensum.data;
 
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -16,10 +16,11 @@ import de.mcmodersd.unipensum.domain.model.NameStyle;
  */
 public final class AppSettings {
 
+    /** The choice is handed to the system (see {@link #applyTheme()}), so these are the modes of {@link UiModeManager}. */
     public enum ThemeMode {
-        SYSTEM(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
-        LIGHT(AppCompatDelegate.MODE_NIGHT_NO),
-        DARK(AppCompatDelegate.MODE_NIGHT_YES);
+        SYSTEM(UiModeManager.MODE_NIGHT_AUTO),
+        LIGHT(UiModeManager.MODE_NIGHT_NO),
+        DARK(UiModeManager.MODE_NIGHT_YES);
 
         final int nightMode;
 
@@ -51,11 +52,13 @@ public final class AppSettings {
     private static final String KEY_NOTIFICATIONS_ASKED = "notifications_asked";
 
     private final SharedPreferences prefs;
+    private final UiModeManager uiModeManager;
     private final MutableLiveData<TimeWindow> timeWindow = new MutableLiveData<>();
     private final MutableLiveData<NameStyle> lecturerNameStyle = new MutableLiveData<>();
 
     public AppSettings(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        uiModeManager = context.getSystemService(UiModeManager.class);
         timeWindow.setValue(readTimeWindow());
         lecturerNameStyle.setValue(readLecturerNameStyle());
     }
@@ -110,9 +113,13 @@ public final class AppSettings {
         applyTheme();
     }
 
-    /** Pushes the stored theme into AppCompat. Call once at startup. */
+    /**
+     * Tells the system which theme the app wants, instead of leaving it to the activity. The system keeps the choice
+     * for the app and applies it to every screen, also to the splash screen, which it draws before any code of the app
+     * runs and which would otherwise follow the theme of the phone. Call once at startup.
+     */
     public void applyTheme() {
-        AppCompatDelegate.setDefaultNightMode(themeMode().nightMode);
+        uiModeManager.setApplicationNightMode(themeMode().nightMode);
     }
 
     public LiveData<TimeWindow> timeWindow() {

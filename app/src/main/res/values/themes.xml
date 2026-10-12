@@ -24,6 +24,13 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:enforceNavigationBarContrast">false</item>
 
+        <!--
+            The splash screen is drawn by the system before the app runs. Without these two items it takes the colors
+            of the launcher icon, which follow the phone, not the theme chosen in the app (see AppSettings.applyTheme).
+        -->
+        <item name="android:windowSplashScreenBackground">@color/bg</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.Up.BottomSheetDialog</item>
     </style>
 
