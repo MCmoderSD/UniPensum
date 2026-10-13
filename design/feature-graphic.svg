@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500" font-family="Roboto, 'Segoe UI', Arial, sans-serif">
+    <title>UniPensum feature graphic</title>
+    <rect id="background" width="1024" height="500" fill="#0A0A0B"/>
+    <text id="name" x="72" y="232" font-size="76" font-weight="500" letter-spacing="-1.52" fill="#F5F5F6">UniPensum</text>
+    <text id="tagline" font-size="26" font-weight="400" fill="#9A9AA3">
+        <tspan x="74" y="287.1">A simple calendar for</tspan>
+        <tspan x="74" y="319.6">universities and lectures.</tspan>
+    </text>
+    <g id="bars" fill="#F5F5F6">
+        <rect id="bar-mon" x="606" y="240" width="44" height="120" rx="12"/>
+        <rect id="bar-tue" x="676" y="165" width="44" height="195" rx="12"/>
+        <rect id="bar-wed" x="746" y="210" width="44" height="150" rx="12"/>
+        <rect id="bar-thu" x="816" y="120" width="44" height="240" rx="12"/>
+        <rect id="bar-fri" x="886" y="195" width="44" height="165" rx="12"/>
+    </g>
+    <g id="days" font-size="13" font-weight="500" letter-spacing="1.56" text-anchor="middle" fill="#9A9AA3">
+        <text id="day-mon" x="628" y="390.1">MON</text>
+        <text id="day-tue" x="698" y="390.1">TUE</text>
+        <text id="day-wed" x="768" y="390.1">WED</text>
+        <text id="day-thu" x="838" y="390.1">THU</text>
+        <text id="day-fri" x="908" y="390.1">FRI</text>
+    </g>
+</svg>
