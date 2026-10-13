@@ -22,13 +22,12 @@ app/debug/
 *.keystore
 keystore.properties
 
-### Kotlin ###
-.kotlin/
+### Screenshots ###
+screenshots/tools
 
-### OS ###
-.DS_Store
-Thumbs.db
+### Brag video ###
+brag-output/*
+!brag-output/brag-plan.md
 
-### Other ###
-*.hprof
-*.log
+### Design tools ###
+.impeccable/
