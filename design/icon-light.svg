@@ -1,15 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 130 130">
-    <title>UniPensum icon, light</title>
-    <rect id="background" width="130" height="130" fill="#F5F5F6"/>
-    <g id="mortarboard" fill="#0A0A0B">
-        <path id="mortarboard-top" d="M65,19.5 L111.5,37 L65,54.5 L18.5,37 Z"/>
-        <path id="mortarboard-body" d="M37,47.4 V63 Q65,77 93,63 V47.4 L65,57.9 Z"/>
-    </g>
-    <g id="bars" fill="#0A0A0B">
-        <rect id="bar-mon" x="26" y="94" width="10" height="16" rx="2.5"/>
-        <rect id="bar-tue" x="43" y="84" width="10" height="26" rx="2.5"/>
-        <rect id="bar-wed" x="60" y="90" width="10" height="20" rx="2.5"/>
-        <rect id="bar-thu" x="77" y="78" width="10" height="32" rx="2.5"/>
-        <rect id="bar-fri" x="94" y="88" width="10" height="22" rx="2.5"/>
-    </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 130 130"><title>UniPensum icon, light</title><rect id="background" width="130" height="130" fill="#F5F5F6"/><g id="mortarboard" fill="#0A0A0B"><path id="mortarboard-top" d="M65,19.5 L111.5,37 L65,54.5 L18.5,37 Z"/><path id="mortarboard-body" d="M37,47.4 V63 Q65,77 93,63 V47.4 L65,57.9 Z"/></g><g id="bars" fill="#0A0A0B"><rect id="bar-mon" width="10" height="16" x="26" y="94" rx="2.5"/><rect id="bar-tue" width="10" height="26" x="43" y="84" rx="2.5"/><rect id="bar-wed" width="10" height="20" x="60" y="90" rx="2.5"/><rect id="bar-thu" width="10" height="32" x="77" y="78" rx="2.5"/><rect id="bar-fri" width="10" height="22" x="94" y="88" rx="2.5"/></g></svg>
