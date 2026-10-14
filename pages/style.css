@@ -196,6 +196,14 @@ a:hover {
     animation: fade-up 0.7s var(--ease) both;
 }
 
+.prose .lead {
+    margin: 0 0 2rem;
+    color: var(--muted);
+    font-size: clamp(1.15rem, 2.6vw, 1.4rem);
+    line-height: 1.45;
+    animation: fade-up 0.7s var(--ease) 0.08s both;
+}
+
 .prose .updated {
     margin: 0 0 2.5rem;
     color: var(--muted);
