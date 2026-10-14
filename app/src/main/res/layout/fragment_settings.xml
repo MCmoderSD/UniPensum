@@ -196,7 +196,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:upChevron="true"
-                app:upSubtitle="@string/about_summary"
                 app:upTitle="@string/app_name" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

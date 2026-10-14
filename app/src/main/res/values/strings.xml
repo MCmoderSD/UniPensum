@@ -98,7 +98,6 @@
     <string name="settings_manage_semesters">Manage semesters</string>
     <string name="settings_about">About</string>
     <string name="about_version">Version %1$s</string>
-    <string name="about_summary">Website, privacy policy and source code</string>
     <string name="website_url" translatable="false">https://unipensum.mcmodersd.de/</string>
 
     <!-- Event form -->
