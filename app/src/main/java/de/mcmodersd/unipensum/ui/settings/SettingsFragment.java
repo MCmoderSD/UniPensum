@@ -88,6 +88,10 @@ public class SettingsFragment extends Fragment {
         about.setOnClickListener(v -> {
             if (!Links.openWeb(requireContext(), getString(R.string.about_url))) Haptics.reject(v);
         });
+        // The privacy policy is a page of the project website; like the project link it opens in the browser.
+        view.findViewById(R.id.privacy).setOnClickListener(v -> {
+            if (!Links.openWeb(requireContext(), getString(R.string.privacy_url))) Haptics.reject(v);
+        });
     }
 
     private void bindTheme(UpSegmentedControl control) {

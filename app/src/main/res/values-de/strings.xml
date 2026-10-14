@@ -99,6 +99,8 @@
     <string name="settings_about">Über</string>
     <string name="about_version">Version %1$s</string>
     <string name="about_open_source">Kostenlos und Open Source.</string>
+    <string name="settings_privacy">Datenschutzerklärung</string>
+    <string name="settings_privacy_summary">Die App erhebt keine Daten.</string>
 
     <!-- Event form -->
     <string name="session_edit">Termin bearbeiten</string>
