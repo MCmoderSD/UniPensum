@@ -88,7 +88,8 @@ https://unipensum.mcmodersd.de/privacy/
 The page is in `pages/privacy/` (plain HTML and `pages/style.css`, no site generator) and is published with GitHub Pages
 by the workflow `.github/workflows/pages.yaml`. It is served from the custom domain `unipensum.mcmodersd.de`: a CNAME
 record at the domain provider points to `mcmodersd.github.io`, and the domain is set in the repository settings under
-Pages. The app links to it in Settings → About → Privacy policy (`privacy_url` in `strings.xml`). The
+Pages. The record is proxied by Cloudflare, which the policy names in section 06; Cloudflare rewrites e-mail addresses
+into a script, so the two addresses in the policy sit between `<!--email_off-->` comments to stay readable. The app links to it in Settings → About → Privacy policy (`privacy_url` in `strings.xml`). The
 date at the top of the page ("Last updated") is its version history.
 
 The policy follows what Google asks for: it is public, over HTTPS, a normal web page and not a PDF, it names the
