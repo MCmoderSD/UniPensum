@@ -98,11 +98,8 @@
     <string name="settings_manage_semesters">Manage semesters</string>
     <string name="settings_about">About</string>
     <string name="about_version">Version %1$s</string>
-    <string name="about_open_source">Free and open source.</string>
-    <string name="about_url" translatable="false">https://github.com/MCmoderSD/UniPensum</string>
-    <string name="settings_privacy">Privacy policy</string>
-    <string name="settings_privacy_summary">The app collects no data.</string>
-    <string name="privacy_url" translatable="false">https://unipensum.mcmodersd.de/privacy/</string>
+    <string name="about_summary">Website, privacy policy and source code</string>
+    <string name="website_url" translatable="false">https://unipensum.mcmodersd.de/</string>
 
     <!-- Event form -->
     <string name="session_edit">Edit session</string>

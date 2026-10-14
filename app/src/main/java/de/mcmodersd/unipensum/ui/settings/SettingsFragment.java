@@ -84,13 +84,10 @@ public class SettingsFragment extends Fragment {
         view.findViewById(R.id.import_backup).setOnClickListener(v -> pickBackup.launch(new String[]{"*/*"}));
         UpRow about = view.findViewById(R.id.about);
         about.setValue(versionName());
-        // The project lives on GitHub; the link opens in the browser, which the app itself never needs.
+        // The project website has the privacy policy and the link to GitHub; it opens in the browser, which the
+        // app itself never needs.
         about.setOnClickListener(v -> {
-            if (!Links.openWeb(requireContext(), getString(R.string.about_url))) Haptics.reject(v);
-        });
-        // The privacy policy is a page of the project website; like the project link it opens in the browser.
-        view.findViewById(R.id.privacy).setOnClickListener(v -> {
-            if (!Links.openWeb(requireContext(), getString(R.string.privacy_url))) Haptics.reject(v);
+            if (!Links.openWeb(requireContext(), getString(R.string.website_url))) Haptics.reject(v);
         });
     }
 

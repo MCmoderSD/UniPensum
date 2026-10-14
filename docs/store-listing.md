@@ -89,8 +89,10 @@ The page is in `pages/privacy/` (plain HTML and `pages/style.css`, no site gener
 by the workflow `.github/workflows/pages.yaml`. It is served from the custom domain `unipensum.mcmodersd.de`: a CNAME
 record at the domain provider points to `mcmodersd.github.io`, and the domain is set in the repository settings under
 Pages. The record is proxied by Cloudflare, which the policy names in section 06; Cloudflare rewrites e-mail addresses
-into a script, so the two addresses in the policy sit between `<!--email_off-->` comments to stay readable. The app links to it in Settings → About → Privacy policy (`privacy_url` in `strings.xml`). The
-date at the top of the page ("Last updated") is its version history.
+into a script, so the two addresses in the policy sit between `<!--email_off-->` comments to stay readable. The app has one row for the
+website in Settings → About (`website_url` in `strings.xml`). It opens the start page, whose first link is the policy;
+the Console gets the address of the policy itself. The date at the top of the page ("Last updated") is its version
+history.
 
 The policy follows what Google asks for: it is public, over HTTPS, a normal web page and not a PDF, it names the
 developer and a contact (business@mcmodersd.de), the data the app handles, who sees it, how long it is kept and how to

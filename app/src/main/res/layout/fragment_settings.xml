@@ -196,17 +196,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:upChevron="true"
-                app:upSubtitle="@string/about_open_source"
+                app:upSubtitle="@string/about_summary"
                 app:upTitle="@string/app_name" />
-
-            <de.mcmodersd.unipensum.ui.widget.UpRow
-                android:id="@+id/privacy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_2"
-                app:upChevron="true"
-                app:upSubtitle="@string/settings_privacy_summary"
-                app:upTitle="@string/settings_privacy" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>
