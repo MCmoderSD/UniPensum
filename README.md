@@ -14,6 +14,7 @@ Free and open source, without an account and without internet access.
 
 UniPensum has no internet access. 
 The only permissions it asks for are the ones for the reminders.
+See the [privacy policy](https://unipensum.mcmodersd.de/privacy/).
 
 ## Translations
 UniPensum is available in English and German, and more languages are welcome. 

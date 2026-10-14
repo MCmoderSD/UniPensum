@@ -70,6 +70,7 @@ From the [metadata policy](https://play.google.com/about/storelisting-promotiona
 - [Advance notice to the app review team](https://support.google.com/googleplay/android-developer/answer/6320428): see
   below
 - [Screenshots](../screenshots/PLAN.md) and [app icon](../design/README.md) of this repository, with their alt texts
+- [Privacy policy](https://unipensum.mcmodersd.de/privacy/) of the app
 - [Repository](https://github.com/MCmoderSD/UniPensum), [issues](https://github.com/MCmoderSD/UniPensum/issues)
 
 ## Advance notice
@@ -78,6 +79,31 @@ content, permission of a government or health organization, a Korean gambling ra
 service, a validated non-profit, or documents of law enforcement or a regulator. None applies to UniPensum, so no
 advance notice is needed. If one of them applies later, use the form on the linked page.
 
+## Privacy policy
+The Play Console needs a link to a privacy policy even for an app that collects nothing, and the app has to link to it
+too. The URL for App content → Privacy policy:
+```
+https://unipensum.mcmodersd.de/privacy/
+```
+The page is in `pages/privacy/` (plain HTML and `pages/style.css`, no site generator) and is published with GitHub Pages
+by the workflow `.github/workflows/pages.yaml`. It is served from the custom domain `unipensum.mcmodersd.de`: a CNAME
+record at the domain provider points to `mcmodersd.github.io`, and the domain is set in the repository settings under
+Pages. The app links to it in Settings → About → Privacy policy (`privacy_url` in `strings.xml`). The
+date at the top of the page ("Last updated") is its version history.
+
+The policy follows what Google asks for: it is public, over HTTPS, a normal web page and not a PDF, it names the
+developer and a contact (business@mcmodersd.de), the data the app handles, who sees it, how long it is kept and how to
+delete it. `PrivacyPolicyTest` fails if a permission of the manifest is missing in the policy, if the app gets the
+`INTERNET` permission, or if the link in the app and the address of the page differ.
+
+Answers for the other forms in App content (as I understand the questions, read each one again in the Console):
+- **Data safety:** the app does not collect or share any of the listed data types. There is no network access, no
+  account, no SDK. The backup of Android is done by the system, not by the app, which the policy says openly.
+- **Ads:** the app has no ads.
+- **Permissions for exact alarms:** a calendar app whose reminders have to arrive on time (`USE_EXACT_ALARM`).
+- **Target audience:** students, not children.
+
 ## Keeping it up to date
 The features in the texts are the ones of the [README](../README.md). When a feature is added or removed, change both,
 and count the characters again: the numbers above are the length of the text in the block, line breaks included.
+A new permission or data flow also goes into `pages/privacy/index.html`, with a new date.
