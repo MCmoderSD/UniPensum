@@ -101,6 +101,9 @@ Answers for the other forms in App content (as I understand the questions, read 
 - **Data safety:** the app does not collect or share any of the listed data types. There is no network access, no
   account, no SDK. The backup of Android is done by the system, not by the app, which the policy says openly.
 - **Ads:** the app has no ads.
+- **Advertising ID** (the app targets Android 13 and higher, so the Console asks): No. The app uses no advertising ID, and
+  the merged manifests of the debug and the release build contain no `com.google.android.gms.permission.AD_ID`. A library
+  that adds the permission (ads, some analytics) would change this answer and the Data safety form.
 - **Permissions for exact alarms:** a calendar app whose reminders have to arrive on time (`USE_EXACT_ALARM`).
 - **Target audience:** students, not children.
 
