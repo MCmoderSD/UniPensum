@@ -14,7 +14,6 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
-import android.view.View;
 import android.view.animation.PathInterpolator;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -139,8 +138,8 @@ public class UpSegmentedControl extends LinearLayout {
         var from = Math.max(0, Math.min(segments.size() - 1, (int) Math.floor(position)));
         var to = Math.min(segments.size() - 1, from + 1);
         var fraction = position - from;
-        View a = segments.get(from);
-        View b = segments.get(to);
+        var a = segments.get(from);
+        var b = segments.get(to);
         var left = a.getLeft() + (b.getLeft() - a.getLeft()) * fraction;
         var right = a.getRight() + (b.getRight() - a.getRight()) * fraction;
         pillRect.set(left, getPaddingTop(), right, getHeight() - getPaddingBottom());
@@ -157,6 +156,6 @@ public class UpSegmentedControl extends LinearLayout {
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-        for (View segment : segments) segment.setEnabled(enabled);
+        for (var segment : segments) segment.setEnabled(enabled);
     }
 }

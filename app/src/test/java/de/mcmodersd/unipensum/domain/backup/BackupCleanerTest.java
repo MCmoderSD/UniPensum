@@ -158,7 +158,7 @@ public class BackupCleanerTest {
                 20, 2, details(),
                 weekly(TUESDAY, date(12, 1), date(12, 15))
         );
-        List<Semester> semesters = List.of(later, SEMESTER);               // the order in the file does not matter
+        var semesters = List.of(later, SEMESTER);               // the order in the file does not matter
 
         var data = new BackupData(
                 List.of(WEBER), semesters, List.of(COURSE, laterCourse),

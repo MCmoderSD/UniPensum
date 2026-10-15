@@ -12,7 +12,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.DayOfWeek.*;
 import static org.junit.Assert.*;
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import androidx.test.core.app.ApplicationProvider;
@@ -66,7 +65,7 @@ public class BackupFileTest {
 
     @Before
     public void openDatabase() {
-        Context context = ApplicationProvider.getApplicationContext();
+        var context = ApplicationProvider.getApplicationContext();
         helper = new DbHelper(context, null);
         db = helper.getWritableDatabase();
     }

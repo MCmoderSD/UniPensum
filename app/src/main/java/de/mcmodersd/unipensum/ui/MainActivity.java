@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         setContentView(activity_main);
 
         pane = findViewById(R.id.pane);
-        View side = findViewById(R.id.side);
+        var side = findViewById(R.id.side);
         ViewCompat.setOnApplyWindowInsetsListener(pane, (view, windowInsets) -> {
             var bars = windowInsets.getInsets(
                     WindowInsetsCompat.Type.systemBars()
@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements Navigator {
      * Done here once, so the pages keep a plain back button that always calls {@link #pop}.
      */
     private void updateBackIcon(@Nullable Fragment page) {
-        View view = page == null ? null : page.getView();
+        var view = page == null ? null : page.getView();
         ImageView back = view == null ? null : view.findViewById(R.id.back);
         if (back == null) return;
         var closes = pane.isSplit() && FIRST_PAGE.equals(page.getTag());

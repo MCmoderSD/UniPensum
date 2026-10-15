@@ -105,7 +105,7 @@ public final class ReminderScheduler {
 
     /** @param triggerMillis when the alarm goes off, {@code null} to have none */
     private static void setAlarm(Context context, @Nullable Long triggerMillis) {
-        AlarmManager alarms = context.getSystemService(AlarmManager.class);
+        var alarms = context.getSystemService(AlarmManager.class);
         var pending = alarmIntent(context);
         if (triggerMillis == null) {
             alarms.cancel(pending);

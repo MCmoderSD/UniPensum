@@ -21,7 +21,6 @@ import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -140,7 +139,7 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
     private boolean isOnHeader(float rawX, float rawY) {
         var root = getView();
         if (root == null) return false;
-        View header = root.findViewById(sheet_header);
+        var header = root.findViewById(sheet_header);
         var location = new int[2];
         header.getLocationOnScreen(location);
         return rawX >= location[0] && rawX < location[0] + header.getWidth()
@@ -151,7 +150,7 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
     public void onStart() {
         super.onStart();
         var dialog = (BottomSheetDialog) requireDialog();
-        BottomSheetBehavior<?> behavior = dialog.getBehavior();
+        var behavior = dialog.getBehavior();
         behavior.setSkipCollapsed(true);
         behavior.setState(STATE_EXPANDED);
     }

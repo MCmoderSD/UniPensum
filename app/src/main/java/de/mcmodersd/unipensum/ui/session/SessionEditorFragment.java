@@ -210,7 +210,7 @@ public class SessionEditorFragment extends Fragment {
         );
         saveButton.setOnClickListener(v -> save());
 
-        FormViewModel holder = new ViewModelProvider(this).get(FormViewModel.class);
+        var holder = new ViewModelProvider(this).get(FormViewModel.class);
         if (holder.form != null) {
             form = holder.form;
             bind();
@@ -243,7 +243,7 @@ public class SessionEditorFragment extends Fragment {
         var result = new Form();
         var semester = draft.semester();
         result.semester = semester;
-        Series source = seriesIndex >= 0 ? draft.series().get(seriesIndex) : null;
+        var source = seriesIndex >= 0 ? draft.series().get(seriesIndex) : null;
         result.source = source;
         if (source != null) {
             fill(result, source.details());

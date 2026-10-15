@@ -150,7 +150,7 @@ public class WheelPicker extends RecyclerView {
 
     /** Animates the value into the center row. */
     private void scrollToIndex(int index) {
-        LinearSmoothScroller scroller = new LinearSmoothScroller(getContext()) {
+        var scroller = new LinearSmoothScroller(getContext()) {
             @Override
             protected int getVerticalSnapPreference() {
                 // The top padding is two rows high, so "start" is the center row.
@@ -181,7 +181,7 @@ public class WheelPicker extends RecyclerView {
             view.setTextSize(COMPLEX_UNIT_SP, 22);
             view.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
             view.setTextColor(ContextCompat.getColor(parent.getContext(), text_primary));
-            RecyclerView.ViewHolder holder = new RecyclerView.ViewHolder(view) {
+            var holder = new RecyclerView.ViewHolder(view) {
             };
             view.setOnClickListener(v -> {
                 var position = holder.getBindingAdapterPosition();

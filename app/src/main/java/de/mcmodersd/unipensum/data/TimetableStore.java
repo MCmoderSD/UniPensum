@@ -115,18 +115,18 @@ public final class TimetableStore {
     }
 
     public static CourseContext loadCourse(SQLiteDatabase db, long courseId) {
-        Course course = require(CourseDao.get(db, courseId), "course", courseId);
-        Semester semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
+        var course = require(CourseDao.get(db, courseId), "course", courseId);
+        var semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
         return new CourseContext(course, semester, SeriesDao.listByCourse(db, courseId));
     }
 
     public static SessionContext loadSessionContext(SQLiteDatabase db, long sessionId) {
-        Session session = require(SessionDao.get(db, sessionId), "session", sessionId);
-        Series series = require(SeriesDao.get(db, session.seriesId()), "series", session.seriesId());
-        Course course = require(CourseDao.get(db, series.courseId()), "course", series.courseId());
-        Semester semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
+        var session = require(SessionDao.get(db, sessionId), "session", sessionId);
+        var series = require(SeriesDao.get(db, session.seriesId()), "series", session.seriesId());
+        var course = require(CourseDao.get(db, series.courseId()), "course", series.courseId());
+        var semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
         var lecturerId = session.details().lecturerId();
-        Lecturer lecturer = lecturerId == NO_LECTURER ? null : LecturerDao.get(db, lecturerId);
+        var lecturer = lecturerId == NO_LECTURER ? null : LecturerDao.get(db, lecturerId);
         return new SessionContext(session, series, course, semester, lecturer);
     }
 
@@ -253,7 +253,7 @@ public final class TimetableStore {
             }
             if (clean.id() == 0) return SemesterDao.insert(db, clean);
 
-            Semester old = require(SemesterDao.get(db, clean.id()), "semester", clean.id());
+            var old = require(SemesterDao.get(db, clean.id()), "semester", clean.id());
             SemesterDao.update(db, clean);
             if (!old.start().equals(clean.start()) || !old.end().equals(clean.end())) {
                 apply(
@@ -281,7 +281,7 @@ public final class TimetableStore {
      */
     public static long createCourse(SQLiteDatabase db, Course course, List<Series> series) {
         return transact(db, () -> {
-            Semester semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
+            var semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
             var courseId = CourseDao.insert(
                     db, new Course(
                             0, semester.id(), requireName(course.name()),
@@ -323,7 +323,7 @@ public final class TimetableStore {
                     insertSeries(db, stored.semester(), course.id(), draft);
                     continue;
                 }
-                Series current = require(storedById.get(draft.id()), "series", draft.id());
+                var current = require(storedById.get(draft.id()), "series", draft.id());
                 // Untouched events are skipped before their text is validated, so an old value that today's
                 // rules would refuse (a link written long ago) cannot block saving the rest of the course.
                 if (current.details().equals(draft.details()) && current.schedule().equals(draft.schedule())) continue;
@@ -390,8 +390,8 @@ public final class TimetableStore {
     }
 
     private static void apply(SQLiteDatabase db, ChangeSet changes) {
-        for (long id : changes.deletedSeriesIds) SeriesDao.delete(db, id);
-        for (long id : changes.deletedSessionIds) SessionDao.delete(db, id);
+        for (var id : changes.deletedSeriesIds) SeriesDao.delete(db, id);
+        for (var id : changes.deletedSessionIds) SessionDao.delete(db, id);
         for (var series : changes.updatedSeries) SeriesDao.update(db, series);
         for (var session : changes.updatedSessions) SessionDao.update(db, session);
         for (var session : changes.newSessions) SessionDao.insert(db, session);

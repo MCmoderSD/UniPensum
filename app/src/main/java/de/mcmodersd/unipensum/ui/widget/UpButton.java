@@ -49,7 +49,7 @@ public class UpButton extends AppCompatTextView {
 
     public void setVariant(Variant variant) {
         int fill;
-        int text = switch (variant) {
+        var text = switch (variant) {
             case SECONDARY -> {
                 fill = surface;
                 yield text_primary;

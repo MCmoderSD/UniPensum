@@ -153,11 +153,11 @@ final class BackupJson {
         private int adjusted;
 
         Parsed read(JsonReader json) throws IOException {
-            ArrayList<Lecturer> lecturers = new ArrayList<>();
-            ArrayList<Semester> semesters = new ArrayList<>();
-            ArrayList<Course> courses = new ArrayList<>();
-            ArrayList<Series> series = new ArrayList<>();
-            ArrayList<Session> sessions = new ArrayList<>();
+            var lecturers = new ArrayList<Lecturer>();
+            var semesters = new ArrayList<Semester>();
+            var courses = new ArrayList<Course>();
+            var series = new ArrayList<Series>();
+            var sessions = new ArrayList<Session>();
 
             json.beginObject();
             while (json.hasNext()) {

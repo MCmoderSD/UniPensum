@@ -15,7 +15,6 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.content.ContentValues;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -635,7 +634,7 @@ public class TimetableStoreTest {
     @Test
     public void observe_reRunsTheQueryAfterAWrite() throws Exception {
         var database = Database.inMemory(context);
-        LiveData<ArrayList<Semester>> live = database.observe(TimetableStore::listSemesters);
+        var live = database.observe(TimetableStore::listSemesters);
         var sawSemester = new CountDownLatch(1);
         Observer<ArrayList<Semester>> observer = semesters -> {
             if (semesters.size() == 1) sawSemester.countDown();

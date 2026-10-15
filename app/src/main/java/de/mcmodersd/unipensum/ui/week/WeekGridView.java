@@ -174,7 +174,7 @@ final class WeekGridView extends ViewGroup {
     }
 
     private void updateNow() {
-        NowIndicator.Position next = monday == null ? null
+        var next = monday == null ? null
                 : NowIndicator.at(monday, LocalDateTime.now(), window.startHour(), window.endHour()).orElse(null);
         if (Objects.equals(next, now)) return;
         now = next;

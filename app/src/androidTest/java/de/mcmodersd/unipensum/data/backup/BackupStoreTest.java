@@ -8,7 +8,6 @@ import static de.mcmodersd.unipensum.domain.model.SessionType.*;
 import static java.time.DayOfWeek.*;
 import static org.junit.Assert.*;
 
-import android.content.Context;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -50,7 +49,7 @@ public class BackupStoreTest {
 
     @Before
     public void openDatabases() {
-        Context context = ApplicationProvider.getApplicationContext();
+        var context = ApplicationProvider.getApplicationContext();
         helperA = new DbHelper(context, null);
         helperB = new DbHelper(context, null);
         a = helperA.getWritableDatabase();

@@ -85,7 +85,7 @@ public class RemindersTest {
 
     @Test
     public void due_holdsTheRemindersBetweenTheTwoTimes() {
-        List<Session> sessions = List.of(session(1, 5, 30), session(2, 6, 30));
+        var sessions = List.of(session(1, 5, 30), session(2, 6, 30));
 
         var due = Reminders.due(sessions, at(5, 7, 0), at(5, 7, 45));
 
@@ -95,7 +95,7 @@ public class RemindersTest {
 
     @Test
     public void due_includesTheEndAndExcludesTheStartOfTheWindow() {
-        List<Session> sessions = List.of(session(1, 5, 30));
+        var sessions = List.of(session(1, 5, 30));
 
         assertEquals(1, Reminders.due(sessions, at(5, 7, 0), at(5, 7, 30)).size());
         assertTrue(Reminders.due(sessions, at(5, 7, 30), at(5, 7, 45)).isEmpty());
@@ -108,14 +108,14 @@ public class RemindersTest {
 
     @Test
     public void due_aMissedReminderCountsWhileTheSessionIsOn() {
-        List<Session> sessions = List.of(session(1, 5, 30));
+        var sessions = List.of(session(1, 5, 30));
 
         assertEquals(1, Reminders.due(sessions, at(5, 7, 0), at(5, 9, 15)).size());
     }
 
     @Test
     public void due_aMissedReminderIsDroppedOnceTheSessionIsOver() {
-        List<Session> sessions = List.of(session(1, 5, 30));
+        var sessions = List.of(session(1, 5, 30));
 
         assertTrue(Reminders.due(sessions, at(5, 7, 0), at(5, 11, 0)).isEmpty());
         assertTrue(Reminders.due(sessions, at(4, 20, 0), at(6, 9, 0)).isEmpty());
@@ -123,7 +123,7 @@ public class RemindersTest {
 
     @Test
     public void due_skipsSessionsWithoutAReminder() {
-        List<Session> sessions = List.of(session(1, 5, NO_REMINDER));
+        var sessions = List.of(session(1, 5, NO_REMINDER));
 
         assertTrue(Reminders.due(sessions, at(5, 0, 0), at(5, 9, 0)).isEmpty());
     }
@@ -131,7 +131,7 @@ public class RemindersTest {
     @Test
     public void due_isOrderedByTimeAndThenById() {
         // 07:30, 07:50, 07:50 and 07:00, all on the same day and still on at 07:55.
-        List<Session> sessions = List.of(
+        var sessions = List.of(
                 session(3, 5, 30), session(2, 5, 10), session(1, 5, 10),
                 session(4, 5, 60)
         );
@@ -145,7 +145,7 @@ public class RemindersTest {
 
     @Test
     public void next_isTheEarliestReminderAfterNow() {
-        List<Session> sessions = List.of(session(1, 6, 30), session(2, 5, 30), session(3, 5, 0));
+        var sessions = List.of(session(1, 6, 30), session(2, 5, 30), session(3, 5, 0));
 
         assertEquals(at(5, 7, 30), Reminders.next(sessions, at(5, 7, 0)).orElseThrow());
         assertEquals(at(5, 8, 0), Reminders.next(sessions, at(5, 7, 30)).orElseThrow());
@@ -154,7 +154,7 @@ public class RemindersTest {
 
     @Test
     public void next_isEmptyWhenNothingIsToCome() {
-        List<Session> sessions = List.of(session(1, 5, 30), session(2, 6, NO_REMINDER));
+        var sessions = List.of(session(1, 5, 30), session(2, 6, NO_REMINDER));
 
         assertTrue(Reminders.next(sessions, at(5, 7, 30)).isEmpty());
         assertTrue(Reminders.next(List.of(), at(5, 7, 30)).isEmpty());
@@ -163,7 +163,7 @@ public class RemindersTest {
     @Test
     public void next_findsAReminderOnTheDayBefore() {
         var early = new SessionDetails(details().type(), 10, 70, IN_PERSON, false, null, null, 0, null, 30);
-        List<Session> sessions = List.of(new Session(1, 10, date(10, 5), early));
+        var sessions = List.of(new Session(1, 10, date(10, 5), early));
 
         assertEquals(at(4, 23, 40), Reminders.next(sessions, at(4, 20, 0)).orElseThrow());
     }
