@@ -1,7 +1,6 @@
 package de.mcmodersd.unipensum.ui.format;
 
 import static de.mcmodersd.unipensum.R.string.*;
-import static de.mcmodersd.unipensum.domain.logic.SemesterNamer.Season.WINTER;
 
 import android.content.Context;
 
@@ -16,9 +15,9 @@ public final class SemesterNames {
     public static String display(Context context, Semester semester) {
         if (semester.customName() != null) return semester.customName();
         var label = SemesterNamer.label(semester.start());
-        if (label.season() == WINTER) {
-            return context.getString(semester_winter, label.year() % 100, (label.year() + 1) % 100);
-        }
-        return context.getString(semester_summer, label.year() % 100);
+        return switch (label.season()) {
+            case WINTER -> context.getString(semester_winter, label.year() % 100, (label.year() + 1) % 100);
+            case SUMMER -> context.getString(semester_summer, label.year() % 100);
+        };
     }
 }

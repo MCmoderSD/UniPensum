@@ -268,30 +268,14 @@ public final class BackupFile {
             json.beginObject();
             while (json.hasNext()) {
                 switch (json.nextName()) {
-                    case "app":
-                        app = nextStringOrNull(json);
-                        break;
-                    case "format":
-                        format = json.nextInt();
-                        break;
-                    case "schema":
-                        schema = json.nextInt();
-                        break;
-                    case "appVersion":
-                        version = orEmpty(nextStringOrNull(json));
-                        break;
-                    case "appVersionCode":
-                        build = json.nextInt();
-                        break;
-                    case "exportedAt":
-                        exportedAt = parseInstant(nextStringOrNull(json));
-                        break;
-                    case "encryption":
-                        crypto = readEncryption(json);
-                        break;
-                    default:
-                        json.skipValue();
-                        break;
+                    case "app" -> app = nextStringOrNull(json);
+                    case "format" -> format = json.nextInt();
+                    case "schema" -> schema = json.nextInt();
+                    case "appVersion" -> version = orEmpty(nextStringOrNull(json));
+                    case "appVersionCode" -> build = json.nextInt();
+                    case "exportedAt" -> exportedAt = parseInstant(nextStringOrNull(json));
+                    case "encryption" -> crypto = readEncryption(json);
+                    default -> json.skipValue();
                 }
             }
             json.endObject();
@@ -313,24 +297,12 @@ public final class BackupFile {
         json.beginObject();
         while (json.hasNext()) {
             switch (json.nextName()) {
-                case "cipher":
-                    cipher = nextStringOrNull(json);
-                    break;
-                case "kdf":
-                    kdf = nextStringOrNull(json);
-                    break;
-                case "iterations":
-                    iterations = json.nextInt();
-                    break;
-                case "salt":
-                    salt = decode(nextStringOrNull(json));
-                    break;
-                case "iv":
-                    iv = decode(nextStringOrNull(json));
-                    break;
-                default:
-                    json.skipValue();
-                    break;
+                case "cipher" -> cipher = nextStringOrNull(json);
+                case "kdf" -> kdf = nextStringOrNull(json);
+                case "iterations" -> iterations = json.nextInt();
+                case "salt" -> salt = decode(nextStringOrNull(json));
+                case "iv" -> iv = decode(nextStringOrNull(json));
+                default -> json.skipValue();
             }
         }
         json.endObject();

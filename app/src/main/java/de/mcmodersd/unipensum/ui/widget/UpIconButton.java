@@ -87,15 +87,15 @@ public class UpIconButton extends AppCompatImageView {
     public boolean onTouchEvent(MotionEvent event) {
         if (holdAction != null && isEnabled()) {
             switch (event.getActionMasked()) {
-                case ACTION_DOWN:
+                case ACTION_DOWN -> {
                     held = false;
                     interval = FIRST_INTERVAL_MS;
                     postDelayed(repeater, ViewConfiguration.getLongPressTimeout());
-                    break;
-                case ACTION_MOVE:
+                }
+                case ACTION_MOVE -> {
                     if (!isInside(event)) removeCallbacks(repeater);
-                    break;
-                case ACTION_UP:
+                }
+                case ACTION_UP -> {
                     removeCallbacks(repeater);
                     if (held) {
                         // The hold has done the steps already, so letting go must not count as one more tap.
@@ -105,12 +105,8 @@ public class UpIconButton extends AppCompatImageView {
                         cancel.recycle();
                         return handled;
                     }
-                    break;
-                case ACTION_CANCEL:
-                    removeCallbacks(repeater);
-                    break;
-                default:
-                    break;
+                }
+                case ACTION_CANCEL -> removeCallbacks(repeater);
             }
         }
         return super.onTouchEvent(event);

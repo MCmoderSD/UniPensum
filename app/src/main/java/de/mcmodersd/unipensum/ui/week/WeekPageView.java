@@ -186,13 +186,13 @@ final class WeekPageView extends LinearLayout {
     /** Sees every touch before the children do, and takes the touch away from them once it becomes a pinch. */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        var action = event.getActionMasked();
-        if (action == ACTION_DOWN) {
-            stopReset();
-            swallowing = false;
-        } else if (action == ACTION_POINTER_DOWN) {
+        switch (event.getActionMasked()) {
+            case ACTION_DOWN -> {
+                stopReset();
+                swallowing = false;
+            }
             // A second finger may start a pinch, which the pager must not take for a swipe to the next week.
-            getParent().requestDisallowInterceptTouchEvent(true);
+            case ACTION_POINTER_DOWN -> getParent().requestDisallowInterceptTouchEvent(true);
         }
 
         var wasSwallowing = swallowing;

@@ -103,19 +103,18 @@ public class ColorSwatchPicker extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
-            case ACTION_DOWN:
+            case ACTION_DOWN -> {
                 downX = event.getX();
                 downY = event.getY();
-                return true;
-            case ACTION_UP:
+            }
+            case ACTION_UP -> {
                 if (Math.abs(event.getX() - downX) < 12 * dp && Math.abs(event.getY() - downY) < 12 * dp) {
                     pick(indexAt(event.getX(), event.getY()));
                     performClick();
                 }
-                return true;
-            default:
-                return true;
+            }
         }
+        return true;
     }
 
     private int indexAt(float x, float y) {

@@ -227,15 +227,14 @@ public final class SemesterEditorSheet extends UpSheet {
 
     private void onSave() {
         var candidate = candidate();
-        switch (SemesterRules.check(candidate, others)) {
-            case INVALID_RANGE:
-                showError(getString(semester_error_range));
-                return;
-            case OVERLAPS_OTHER:
-                showError(getString(semester_error_overlap, overlappingName(candidate)));
-                return;
-            default:
-                break;
+        var error = switch (SemesterRules.check(candidate, others)) {
+            case INVALID_RANGE -> getString(semester_error_range);
+            case OVERLAPS_OTHER -> getString(semester_error_overlap, overlappingName(candidate));
+            case OK -> null;
+        };
+        if (error != null) {
+            showError(error);
+            return;
         }
         var shortens = original != null
                 && (start.isAfter(original.start()) || end.isBefore(original.end()));

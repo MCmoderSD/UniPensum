@@ -1,6 +1,6 @@
 package de.mcmodersd.unipensum.domain.logic;
 
-import static java.time.DayOfWeek.*;
+import static java.time.DayOfWeek.MONDAY;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -27,9 +27,11 @@ public final class SemesterDefaults {
      */
     public static LocalDate lectureEnd(LocalDate start) {
         var end = start.plusWeeks(LECTURE_WEEKS).minusDays(1);
-        if (end.getDayOfWeek() == SATURDAY) return end.minusDays(1);
-        if (end.getDayOfWeek() == SUNDAY) return end.minusDays(2);
-        return end;
+        return switch (end.getDayOfWeek()) {
+            case SATURDAY -> end.minusDays(1);
+            case SUNDAY -> end.minusDays(2);
+            default -> end;
+        };
     }
 
     /**

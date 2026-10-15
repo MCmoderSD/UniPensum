@@ -77,26 +77,12 @@ public final class BackupImportSheet extends UpSheet {
     private void render(BackupImportViewModel.Step step) {
         column.removeAllViews();
         switch (step) {
-            case READING:
-            case LOADING:
-                busy(backup_reading);
-                break;
-            case IMPORTING:
-                busy(backup_importing);
-                break;
-            case PASSWORD:
-                askForPassword();
-                break;
-            case REVIEW:
-                review();
-                break;
-            case DONE:
-                finished(backup_imported, false);
-                break;
-            case ERROR:
-            default:
-                finished(model.errorMessage(), true);
-                break;
+            case READING, LOADING -> busy(backup_reading);
+            case IMPORTING -> busy(backup_importing);
+            case PASSWORD -> askForPassword();
+            case REVIEW -> review();
+            case DONE -> finished(backup_imported, false);
+            default -> finished(model.errorMessage(), true);    // ERROR
         }
     }
 

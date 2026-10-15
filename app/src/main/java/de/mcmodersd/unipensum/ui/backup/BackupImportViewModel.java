@@ -160,22 +160,13 @@ public class BackupImportViewModel extends AndroidViewModel {
 
     @StringRes
     private static int messageFor(Exception error) {
-        if (error instanceof BackupException) {
-            switch (((BackupException) error).reason()) {
-                case NOT_A_BACKUP:
-                    return backup_error_not_a_backup;
-                case DAMAGED:
-                    return backup_error_damaged;
-                case WRONG_PASSWORD:
-                    return backup_error_wrong_password;
-                case TOO_LARGE:
-                    return backup_error_too_large;
-                case UNSUPPORTED:
-                    return backup_error_unsupported;
-                default:
-                    break;
-            }
-        }
-        return backup_error_generic;
+        if (!(error instanceof BackupException backup)) return backup_error_generic;
+        return switch (backup.reason()) {
+            case NOT_A_BACKUP -> backup_error_not_a_backup;
+            case DAMAGED -> backup_error_damaged;
+            case WRONG_PASSWORD -> backup_error_wrong_password;
+            case TOO_LARGE -> backup_error_too_large;
+            case UNSUPPORTED -> backup_error_unsupported;
+        };
     }
 }

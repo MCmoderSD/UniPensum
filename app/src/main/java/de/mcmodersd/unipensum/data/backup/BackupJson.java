@@ -162,24 +162,12 @@ final class BackupJson {
             json.beginObject();
             while (json.hasNext()) {
                 switch (json.nextName()) {
-                    case "lecturers":
-                        lecturers = array(json, this::lecturer);
-                        break;
-                    case "semesters":
-                        semesters = array(json, this::semester);
-                        break;
-                    case "courses":
-                        courses = array(json, this::course);
-                        break;
-                    case "series":
-                        series = array(json, this::series);
-                        break;
-                    case "sessions":
-                        sessions = array(json, this::session);
-                        break;
-                    default:
-                        json.skipValue();           // a list a newer version added
-                        break;
+                    case "lecturers" -> lecturers = array(json, this::lecturer);
+                    case "semesters" -> semesters = array(json, this::semester);
+                    case "courses" -> courses = array(json, this::course);
+                    case "series" -> series = array(json, this::series);
+                    case "sessions" -> sessions = array(json, this::session);
+                    default -> json.skipValue();    // a list a newer version added
                 }
             }
             json.endObject();
@@ -219,19 +207,10 @@ final class BackupJson {
             while (json.hasNext()) {
                 var name = json.nextName();
                 switch (json.peek()) {
-                    case STRING:
-                    case NUMBER:
-                        fields.put(name, json.nextString());
-                        break;
-                    case BOOLEAN:
-                        fields.put(name, json.nextBoolean());
-                        break;
-                    case NULL:
-                        json.nextNull();
-                        break;
-                    default:
-                        json.skipValue();
-                        break;
+                    case STRING, NUMBER -> fields.put(name, json.nextString());
+                    case BOOLEAN -> fields.put(name, json.nextBoolean());
+                    case NULL -> json.nextNull();
+                    default -> json.skipValue();
                 }
             }
             json.endObject();
