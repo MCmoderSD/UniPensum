@@ -1,7 +1,23 @@
 package de.mcmodersd.unipensum.ui.session;
 
+import static android.text.InputType.*;
+import static android.view.View.*;
+import static de.mcmodersd.unipensum.R.id.*;
+import static de.mcmodersd.unipensum.R.layout.fragment_session_editor;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.domain.logic.Reminders.STEP_MIN;
+import static de.mcmodersd.unipensum.domain.model.EditScope.*;
+import static de.mcmodersd.unipensum.domain.model.Mode.*;
+import static de.mcmodersd.unipensum.domain.model.NameStyle.FULL_NAME;
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.*;
+import static de.mcmodersd.unipensum.domain.model.SessionType.LECTURE;
+import static de.mcmodersd.unipensum.domain.text.TextSanitizer.*;
+import static de.mcmodersd.unipensum.ui.lecturer.LecturerSheet.RESULT_LECTURER_ID;
+import static de.mcmodersd.unipensum.ui.widget.DatePickerSheet.RESULT_EPOCH_DAY;
+import static de.mcmodersd.unipensum.ui.widget.TimePickerSheet.RESULT_MINUTES;
+import static java.time.DayOfWeek.MONDAY;
+
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +44,6 @@ import de.mcmodersd.unipensum.domain.logic.SemesterRules;
 import de.mcmodersd.unipensum.domain.model.EditScope;
 import de.mcmodersd.unipensum.domain.model.Lecturer;
 import de.mcmodersd.unipensum.domain.model.Mode;
-import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.domain.model.Schedule;
 import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.domain.model.Series;
@@ -102,17 +117,17 @@ public class SessionEditorFragment extends Fragment {
 
     /** Everything the form edits; lives in a ViewModel so it survives configuration changes. */
     static final class Form {
-        SessionType type = SessionType.LECTURE;
-        DayOfWeek weekday = DayOfWeek.MONDAY;
+        SessionType type = LECTURE;
+        DayOfWeek weekday = MONDAY;
         int startMin = DEFAULT_START_MIN;
         int endMin = DEFAULT_START_MIN + DEFAULT_DURATION_MIN;
-        Mode mode = Mode.IN_PERSON;
+        Mode mode = IN_PERSON;
         boolean hybrid;
         String room = "";
         String link = "";
-        long lecturerId = SessionDetails.NO_LECTURER;
+        long lecturerId = NO_LECTURER;
         String note = "";
-        int reminderMin = Reminders.defaultFor(Mode.IN_PERSON);
+        int reminderMin = Reminders.defaultFor(IN_PERSON);
         LocalDate first;
         LocalDate last;
         /**
@@ -135,7 +150,7 @@ public class SessionEditorFragment extends Fragment {
 
     private Form form;
     private boolean seriesMode;
-    private EditScope scope = EditScope.ALL;
+    private EditScope scope = ALL;
     private long sessionId;
     private int seriesIndex;
     private CourseDraftViewModel draft;
@@ -171,7 +186,7 @@ public class SessionEditorFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_session_editor, container, false);
+        return inflater.inflate(fragment_session_editor, container, false);
     }
 
     @Override
@@ -188,10 +203,10 @@ public class SessionEditorFragment extends Fragment {
         }
 
         findViews(view);
-        view.findViewById(R.id.back).setOnClickListener(v -> Navigator.of(this).pop());
-        ((TextView) view.findViewById(R.id.bar_title)).setText(
+        view.findViewById(back).setOnClickListener(v -> Navigator.of(this).pop());
+        ((TextView) view.findViewById(bar_title)).setText(
                 seriesMode
-                        ? (seriesIndex < 0 ? R.string.event_new : R.string.event_edit) : R.string.session_edit
+                        ? (seriesIndex < 0 ? event_new : event_edit) : session_edit
         );
         saveButton.setOnClickListener(v -> save());
 
@@ -255,7 +270,7 @@ public class SessionEditorFragment extends Fragment {
         result.weekday = series.weekday();
         result.interval = series.intervalWeeks();
         result.last = series.last();
-        result.first = scope == EditScope.THIS_AND_FOLLOWING ? context.session().day() : series.first();
+        result.first = scope == THIS_AND_FOLLOWING ? context.session().day() : series.first();
         result.day = context.session().day();
         result.originalSchedule = new Schedule(result.weekday, result.first, result.last, result.interval);
         return result;
@@ -287,34 +302,34 @@ public class SessionEditorFragment extends Fragment {
     // --- views ---
 
     private void findViews(View view) {
-        formScroll = view.findViewById(R.id.form_scroll);
-        typeControl = view.findViewById(R.id.type_control);
-        weekdayControl = view.findViewById(R.id.weekday_control);
-        modeControl = view.findViewById(R.id.mode_control);
-        repeatControl = view.findViewById(R.id.repeat_control);
-        repeatStepper = view.findViewById(R.id.repeat_stepper);
-        dateRow = view.findViewById(R.id.date_row);
-        startRow = view.findViewById(R.id.start_row);
-        endRow = view.findViewById(R.id.end_row);
-        fromRow = view.findViewById(R.id.from_row);
-        untilRow = view.findViewById(R.id.until_row);
-        hybridSwitch = view.findViewById(R.id.hybrid_switch);
-        hybridRow = view.findViewById(R.id.hybrid_row);
-        roomField = view.findViewById(R.id.room_field);
-        linkField = view.findViewById(R.id.link_field);
-        lecturerRow = view.findViewById(R.id.lecturer_row);
+        formScroll = view.findViewById(form_scroll);
+        typeControl = view.findViewById(type_control);
+        weekdayControl = view.findViewById(weekday_control);
+        modeControl = view.findViewById(mode_control);
+        repeatControl = view.findViewById(repeat_control);
+        repeatStepper = view.findViewById(repeat_stepper);
+        dateRow = view.findViewById(date_row);
+        startRow = view.findViewById(start_row);
+        endRow = view.findViewById(end_row);
+        fromRow = view.findViewById(from_row);
+        untilRow = view.findViewById(until_row);
+        hybridSwitch = view.findViewById(hybrid_switch);
+        hybridRow = view.findViewById(hybrid_row);
+        roomField = view.findViewById(room_field);
+        linkField = view.findViewById(link_field);
+        lecturerRow = view.findViewById(lecturer_row);
         reminderSwitch = view.findViewById(R.id.reminder_switch);
-        reminderStepper = view.findViewById(R.id.reminder_stepper);
-        notificationsOffRow = view.findViewById(R.id.notifications_off_row);
-        noteField = view.findViewById(R.id.note_field);
-        timeError = view.findViewById(R.id.time_error);
-        scheduleError = view.findViewById(R.id.schedule_error);
-        scheduleNote = view.findViewById(R.id.schedule_note);
+        reminderStepper = view.findViewById(reminder_stepper);
+        notificationsOffRow = view.findViewById(notifications_off_row);
+        noteField = view.findViewById(note_field);
+        timeError = view.findViewById(time_error);
+        scheduleError = view.findViewById(schedule_error);
+        scheduleNote = view.findViewById(schedule_note);
         saveButton = view.findViewById(R.id.save);
     }
 
     private boolean thisOnly() {
-        return !seriesMode && scope == EditScope.THIS_ONLY;
+        return !seriesMode && scope == THIS_ONLY;
     }
 
     /** Fills the views from the form and wires the listeners; runs once the form exists. */
@@ -322,20 +337,20 @@ public class SessionEditorFragment extends Fragment {
         var root = requireView();
         var manager = getParentFragmentManager();
 
-        TextView scopeNote = root.findViewById(R.id.scope_note);
+        TextView scopeNote = root.findViewById(scope_note);
         if (seriesMode) {
-            scopeNote.setVisibility(View.GONE);
+            scopeNote.setVisibility(GONE);
         } else {
-            scopeNote.setVisibility(View.VISIBLE);
+            scopeNote.setVisibility(VISIBLE);
             scopeNote.setText(scopeText());
         }
-        root.findViewById(R.id.weekday_block).setVisibility(thisOnly() ? View.GONE : View.VISIBLE);
-        root.findViewById(R.id.period_block).setVisibility(thisOnly() ? View.GONE : View.VISIBLE);
-        dateRow.setVisibility(thisOnly() ? View.VISIBLE : View.GONE);
+        root.findViewById(weekday_block).setVisibility(thisOnly() ? GONE : VISIBLE);
+        root.findViewById(period_block).setVisibility(thisOnly() ? GONE : VISIBLE);
+        dateRow.setVisibility(thisOnly() ? VISIBLE : GONE);
 
         typeControl.setOptions(
-                getString(R.string.type_lecture), getString(R.string.type_exercise),
-                getString(R.string.type_lab), getString(R.string.type_tutorial)
+                getString(type_lecture), getString(type_exercise),
+                getString(type_lab), getString(type_tutorial)
         );
         typeControl.setSelectedIndex(form.type.ordinal());
         typeControl.setOnSelectionChangedListener(index -> form.type = SessionType.values()[index]);
@@ -349,7 +364,7 @@ public class SessionEditorFragment extends Fragment {
             updateScheduleNote();
         });
 
-        modeControl.setOptions(getString(R.string.mode_in_person), getString(R.string.mode_online));
+        modeControl.setOptions(getString(mode_in_person), getString(mode_online));
         modeControl.setSelectedIndex(form.mode.ordinal());
         modeControl.setOnSelectionChangedListener(index -> {
             var previous = form.mode;
@@ -365,19 +380,19 @@ public class SessionEditorFragment extends Fragment {
             updateModeVisibility();
         });
 
-        roomField.setMaxLength(TextSanitizer.MAX_ROOM);
+        roomField.setMaxLength(MAX_ROOM);
         roomField.setText(form.room);
         roomField.addTextWatcher(text -> form.room = text);
-        linkField.setMaxLength(TextSanitizer.MAX_LINK);
+        linkField.setMaxLength(MAX_LINK);
         linkField.setText(form.link);
-        linkField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        linkField.setInputType(TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_URI);
         linkField.addTextWatcher(text -> {
             form.link = text;
             linkField.setError(null);
         });
         lecturerRow.setOnClickListener(v -> LecturerSheet.showPicker(manager, KEY_LECTURER, form.lecturerId));
         manager.setFragmentResultListener(KEY_LECTURER, getViewLifecycleOwner(), (key, result) -> {
-            form.lecturerId = result.getLong(LecturerSheet.RESULT_LECTURER_ID);
+            form.lecturerId = result.getLong(RESULT_LECTURER_ID);
             renderLecturer();
         });
         UniPensumApp.from(requireContext()).repository().lecturers().observe(getViewLifecycleOwner(), list -> {
@@ -385,28 +400,25 @@ public class SessionEditorFragment extends Fragment {
             for (var lecturer : list) lecturers.put(lecturer.id(), lecturer);
             renderLecturer();
         });
-        reminderStepper.setRange(0, SessionDetails.MAX_REMINDER_MIN);
-        reminderStepper.setStep(Reminders.STEP_MIN);
+        reminderStepper.setRange(0, MAX_REMINDER_MIN);
+        reminderStepper.setStep(STEP_MIN);
         reminderStepper.setFormatter(minutes -> ReminderFormat.text(requireContext(), minutes));
-        var reminderOn = form.reminderMin != SessionDetails.NO_REMINDER;
+        var reminderOn = form.reminderMin != NO_REMINDER;
         reminderStepper.setValue(reminderOn ? form.reminderMin : Reminders.defaultFor(form.mode));
         reminderSwitch.setChecked(reminderOn);
         reminderSwitch.setOnCheckedChangeListener(checked -> {
-            form.reminderMin = checked ? reminderStepper.getValue() : SessionDetails.NO_REMINDER;
+            form.reminderMin = checked ? reminderStepper.getValue() : NO_REMINDER;
             updateReminderVisibility();
         });
         reminderStepper.setOnValueChangedListener(minutes -> form.reminderMin = minutes);
         notificationsOffRow.setOnClickListener(v -> NotificationAccess.openSettings(requireContext()));
 
         noteField.setMultiLine(3);
-        noteField.setMaxLength(TextSanitizer.MAX_NOTE);
+        noteField.setMaxLength(MAX_NOTE);
         noteField.setText(form.note);
         noteField.addTextWatcher(text -> form.note = text);
 
-        repeatControl.setOptions(
-                getString(R.string.repeat_weekly), getString(R.string.repeat_biweekly),
-                getString(R.string.repeat_custom)
-        );
+        repeatControl.setOptions(getString(repeat_weekly), getString(repeat_biweekly), getString(repeat_custom));
         repeatControl.setSelectedIndex(repeatIndex(form.interval));
         repeatStepper.setRange(1, 12);
         repeatStepper.setFormatter(value -> SeriesFormat.repeat(requireContext(), value));
@@ -423,49 +435,46 @@ public class SessionEditorFragment extends Fragment {
 
         startRow.setOnClickListener(v -> TimePickerSheet.show(
                 manager, KEY_START,
-                getString(R.string.field_start), form.startMin
+                getString(field_start), form.startMin
         ));
-        endRow.setOnClickListener(v -> TimePickerSheet.show(
-                manager, KEY_END,
-                getString(R.string.field_end), form.endMin
-        ));
+        endRow.setOnClickListener(v -> TimePickerSheet.show(manager, KEY_END, getString(field_end), form.endMin));
         dateRow.setOnClickListener(v -> DatePickerSheet.show(
-                manager, KEY_DAY, getString(R.string.field_date),
+                manager, KEY_DAY, getString(field_date),
                 form.day, form.semester.start(), form.semester.end(), true
         ));
         fromRow.setOnClickListener(v -> DatePickerSheet.show(
-                manager, KEY_FROM, getString(R.string.field_from),
+                manager, KEY_FROM, getString(field_from),
                 form.first, form.semester.start(), form.semester.end(), false
         ));
         untilRow.setOnClickListener(v -> DatePickerSheet.show(
-                manager, KEY_UNTIL, getString(R.string.field_until),
+                manager, KEY_UNTIL, getString(field_until),
                 form.last, form.semester.start(), form.semester.end(), false
         ));
 
         manager.setFragmentResultListener(KEY_START, getViewLifecycleOwner(), (key, result) -> {
             var duration = form.endMin > form.startMin ? form.endMin - form.startMin : DEFAULT_DURATION_MIN;
-            form.startMin = result.getInt(TimePickerSheet.RESULT_MINUTES);
+            form.startMin = result.getInt(RESULT_MINUTES);
             // Moving the start keeps the length, which is what one usually means.
-            form.endMin = Math.min(SessionDetails.MINUTES_PER_DAY - 5, form.startMin + duration);
+            form.endMin = Math.min(MINUTES_PER_DAY - 5, form.startMin + duration);
             renderValues();
         });
         manager.setFragmentResultListener(KEY_END, getViewLifecycleOwner(), (key, result) -> {
-            form.endMin = result.getInt(TimePickerSheet.RESULT_MINUTES);
+            form.endMin = result.getInt(RESULT_MINUTES);
             renderValues();
         });
         manager.setFragmentResultListener(KEY_DAY, getViewLifecycleOwner(), (key, result) -> {
-            form.day = LocalDate.ofEpochDay(result.getLong(DatePickerSheet.RESULT_EPOCH_DAY));
+            form.day = LocalDate.ofEpochDay(result.getLong(RESULT_EPOCH_DAY));
             renderValues();
         });
         manager.setFragmentResultListener(KEY_FROM, getViewLifecycleOwner(), (key, result) -> {
-            form.first = LocalDate.ofEpochDay(result.getLong(DatePickerSheet.RESULT_EPOCH_DAY));
+            form.first = LocalDate.ofEpochDay(result.getLong(RESULT_EPOCH_DAY));
             if (seriesMode && form.source == null && !form.lastTouched) {
                 form.last = lectureEnd(form.semester, form.first);
             }
             renderValues();
         });
         manager.setFragmentResultListener(KEY_UNTIL, getViewLifecycleOwner(), (key, result) -> {
-            form.last = LocalDate.ofEpochDay(result.getLong(DatePickerSheet.RESULT_EPOCH_DAY));
+            form.last = LocalDate.ofEpochDay(result.getLong(RESULT_EPOCH_DAY));
             form.lastTouched = true;
             renderValues();
         });
@@ -474,7 +483,7 @@ public class SessionEditorFragment extends Fragment {
         updateModeVisibility();
         updateRepeatVisibility();
         updateReminderVisibility();
-        formScroll.setVisibility(View.VISIBLE);
+        formScroll.setVisibility(VISIBLE);
     }
 
     /** The user may come back from the system settings where the notifications were turned on. */
@@ -486,12 +495,9 @@ public class SessionEditorFragment extends Fragment {
 
     /** The time is only there while the reminder is on, and so is the hint that notifications are off. */
     private void updateReminderVisibility() {
-        var on = form.reminderMin != SessionDetails.NO_REMINDER;
-        reminderStepper.setVisibility(on ? View.VISIBLE : View.GONE);
-        notificationsOffRow.setVisibility(
-                on && !NotificationAccess.allowed(requireContext())
-                        ? View.VISIBLE : View.GONE
-        );
+        var on = form.reminderMin != NO_REMINDER;
+        reminderStepper.setVisibility(on ? VISIBLE : GONE);
+        notificationsOffRow.setVisibility(on && !NotificationAccess.allowed(requireContext()) ? VISIBLE : GONE);
     }
 
     private static int repeatIndex(int interval) {
@@ -500,46 +506,46 @@ public class SessionEditorFragment extends Fragment {
 
     private String scopeText() {
         return switch (scope) {
-            case THIS_ONLY -> getString(R.string.scope_this_only);
-            case THIS_AND_FOLLOWING -> getString(R.string.scope_this_and_following);
-            default -> getString(R.string.scope_all);
+            case THIS_ONLY -> getString(scope_this_only);
+            case THIS_AND_FOLLOWING -> getString(scope_this_and_following);
+            default -> getString(scope_all);
         };
     }
 
     private void renderLecturer() {
         if (lecturers == null) return;
         var lecturer = lecturers.get(form.lecturerId);
-        lecturerRow.setValue(lecturer == null ? getString(R.string.lecturer_none) : lecturer.name(NameStyle.FULL_NAME));
+        lecturerRow.setValue(lecturer == null ? getString(lecturer_none) : lecturer.name(FULL_NAME));
     }
 
     /** Refreshes the rows that show picked values. */
     private void renderValues() {
         startRow.setValue(TimeFormat.time(requireContext(), form.startMin));
         endRow.setValue(TimeFormat.time(requireContext(), form.endMin));
-        timeError.setVisibility(View.GONE);
+        timeError.setVisibility(GONE);
         if (form.day != null) dateRow.setValue(TimeFormat.dateMedium(requireContext(), form.day));
         fromRow.setValue(TimeFormat.dateMedium(requireContext(), form.first));
         untilRow.setValue(TimeFormat.dateMedium(requireContext(), form.last));
-        scheduleError.setVisibility(View.GONE);
+        scheduleError.setVisibility(GONE);
         updateScheduleNote();
     }
 
     private void updateModeVisibility() {
-        var inPerson = form.mode == Mode.IN_PERSON;
-        hybridRow.setVisibility(inPerson ? View.VISIBLE : View.GONE);
-        roomField.setVisibility(inPerson ? View.VISIBLE : View.GONE);
-        linkField.setVisibility(!inPerson || form.hybrid ? View.VISIBLE : View.GONE);
+        var inPerson = form.mode == IN_PERSON;
+        hybridRow.setVisibility(inPerson ? VISIBLE : GONE);
+        roomField.setVisibility(inPerson ? VISIBLE : GONE);
+        linkField.setVisibility(!inPerson || form.hybrid ? VISIBLE : GONE);
     }
 
     private void updateRepeatVisibility() {
-        repeatStepper.setVisibility(repeatControl.getSelectedIndex() == REPEAT_CUSTOM ? View.VISIBLE : View.GONE);
+        repeatStepper.setVisibility(repeatControl.getSelectedIndex() == REPEAT_CUSTOM ? VISIBLE : GONE);
     }
 
     /** Warns that regenerated sessions lose their individual edits. */
     private void updateScheduleNote() {
         var changed = !seriesMode && !thisOnly() && form.originalSchedule != null
                 && !form.originalSchedule.equals(currentSchedule());
-        scheduleNote.setVisibility(changed ? View.VISIBLE : View.GONE);
+        scheduleNote.setVisibility(changed ? VISIBLE : GONE);
     }
 
     private Schedule currentSchedule() {
@@ -549,19 +555,19 @@ public class SessionEditorFragment extends Fragment {
     // --- saving ---
 
     private void save() {
-        timeError.setVisibility(View.GONE);
-        scheduleError.setVisibility(View.GONE);
+        timeError.setVisibility(GONE);
+        scheduleError.setVisibility(GONE);
         var valid = true;
 
         if (form.endMin <= form.startMin) {
-            timeError.setText(R.string.error_time);
-            timeError.setVisibility(View.VISIBLE);
+            timeError.setText(error_time);
+            timeError.setVisibility(VISIBLE);
             valid = false;
         }
         // The link only counts for online and hybrid events; the field is hidden otherwise.
-        var linkUsed = form.mode == Mode.ONLINE || form.hybrid;
+        var linkUsed = form.mode == ONLINE || form.hybrid;
         if (linkUsed && !TextSanitizer.isValidWebLink(form.link)) {
-            linkField.setError(getString(R.string.error_link));
+            linkField.setError(getString(error_link));
             valid = false;
         }
         Schedule schedule = null;
@@ -570,7 +576,7 @@ public class SessionEditorFragment extends Fragment {
             var problem = scheduleProblem(schedule);
             if (problem != null) {
                 scheduleError.setText(problem);
-                scheduleError.setVisibility(View.VISIBLE);
+                scheduleError.setVisibility(VISIBLE);
                 valid = false;
             }
         }
@@ -613,8 +619,8 @@ public class SessionEditorFragment extends Fragment {
                     public void onError(Exception error) {
                         if (!isAdded() || getView() == null) return;
                         saveButton.setEnabled(true);
-                        scheduleError.setText(R.string.error_save);
-                        scheduleError.setVisibility(View.VISIBLE);
+                        scheduleError.setText(error_save);
+                        scheduleError.setVisibility(VISIBLE);
                         Haptics.reject(saveButton);
                     }
                 }
@@ -626,14 +632,14 @@ public class SessionEditorFragment extends Fragment {
     private String scheduleProblem(Schedule schedule) {
         var semester = form.semester;
         return switch (SemesterRules.checkSchedule(semester, schedule)) {
-            case EMPTY_RANGE -> getString(R.string.error_period_empty);
+            case EMPTY_RANGE -> getString(error_period_empty);
             case OUTSIDE_SEMESTER -> getString(
-                    R.string.error_period_outside,
+                    error_period_outside,
                     TimeFormat.dateMedium(requireContext(), semester.start()),
                     TimeFormat.dateMedium(requireContext(), semester.end())
             );
             default ->
-                    Recurrence.occurrences(schedule).isEmpty() ? getString(R.string.error_period_no_dates) : null;
+                    Recurrence.occurrences(schedule).isEmpty() ? getString(error_period_no_dates) : null;
         };
     }
 }

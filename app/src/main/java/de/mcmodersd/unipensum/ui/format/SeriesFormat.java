@@ -1,5 +1,9 @@
 package de.mcmodersd.unipensum.ui.format;
 
+import static de.mcmodersd.unipensum.R.plurals.repeat_every_n_weeks;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.domain.model.Mode.ONLINE;
+
 import android.content.Context;
 
 import androidx.annotation.Nullable;
@@ -8,8 +12,6 @@ import java.time.DayOfWeek;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 
-import de.mcmodersd.unipensum.R;
-import de.mcmodersd.unipensum.domain.model.Mode;
 import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
 
@@ -33,8 +35,8 @@ public final class SeriesFormat {
     /** "Weekly" or "Every 3 weeks". */
     public static String repeat(Context context, int intervalWeeks) {
         return intervalWeeks == 1
-                ? context.getString(R.string.repeat_weekly)
-                : context.getResources().getQuantityString(R.plurals.repeat_every_n_weeks, intervalWeeks, intervalWeeks);
+                ? context.getString(repeat_weekly)
+                : context.getResources().getQuantityString(repeat_every_n_weeks, intervalWeeks, intervalWeeks);
     }
 
     /**
@@ -42,10 +44,10 @@ public final class SeriesFormat {
      * ("A2 | Hybrid", just "Hybrid" without a room). Empty if there is no room to show.
      */
     public static String place(Context context, SessionDetails details) {
-        if (details.mode() == Mode.ONLINE) return context.getString(R.string.mode_online);
+        if (details.mode() == ONLINE) return context.getString(mode_online);
         var room = details.room() == null ? "" : details.room();
         if (!details.hybrid()) return room;
-        var hybrid = context.getString(R.string.mode_hybrid);
+        var hybrid = context.getString(mode_hybrid);
         return room.isEmpty() ? hybrid : room + " | " + hybrid;
     }
 

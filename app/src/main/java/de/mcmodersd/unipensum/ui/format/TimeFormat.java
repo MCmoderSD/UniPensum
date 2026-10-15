@@ -1,5 +1,7 @@
 package de.mcmodersd.unipensum.ui.format;
 
+import static de.mcmodersd.unipensum.R.string.*;
+
 import android.content.Context;
 import android.text.format.DateFormat;
 
@@ -10,7 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.domain.model.SessionType;
 
 /** Locale- and 12/24h-aware formatting of times, dates and labels. */
@@ -55,10 +56,10 @@ public final class TimeFormat {
 
     public static String typeName(Context context, SessionType type) {
         return switch (type) {
-            case LECTURE -> context.getString(R.string.type_lecture);
-            case EXERCISE -> context.getString(R.string.type_exercise);
-            case LAB -> context.getString(R.string.type_lab);
-            case TUTORIAL -> context.getString(R.string.type_tutorial);
+            case LECTURE -> context.getString(type_lecture);
+            case EXERCISE -> context.getString(type_exercise);
+            case LAB -> context.getString(type_lab);
+            case TUTORIAL -> context.getString(type_tutorial);
         };
     }
 }

@@ -1,5 +1,11 @@
 package de.mcmodersd.unipensum.ui.settings;
 
+import static de.mcmodersd.unipensum.R.id.*;
+import static de.mcmodersd.unipensum.R.layout.fragment_settings;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.data.AppSettings.TimeWindow.MIN_SPAN_HOURS;
+import static de.mcmodersd.unipensum.domain.model.NameStyle.LAST_NAME;
+
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -56,46 +62,43 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        return inflater.inflate(fragment_settings, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         settings = UniPensumApp.from(requireContext()).settings();
-        ((TextView) view.findViewById(R.id.bar_title)).setText(R.string.settings_title);
-        view.findViewById(R.id.back).setOnClickListener(v -> Navigator.of(this).pop());
+        ((TextView) view.findViewById(bar_title)).setText(settings_title);
+        view.findViewById(back).setOnClickListener(v -> Navigator.of(this).pop());
 
-        bindTheme(view.findViewById(R.id.theme_control));
+        bindTheme(view.findViewById(theme_control));
         bindHours(view.findViewById(R.id.hours_start), view.findViewById(R.id.hours_end));
-        bindLecturerNames(view.findViewById(R.id.lecturer_name_control));
-        bindReminders(view.findViewById(R.id.reminders_switch), view.findViewById(R.id.notifications_row));
+        bindLecturerNames(view.findViewById(lecturer_name_control));
+        bindReminders(view.findViewById(reminders_switch), view.findViewById(notifications_row));
 
-        view.findViewById(R.id.manage_lecturers).setOnClickListener(v ->
+        view.findViewById(manage_lecturers).setOnClickListener(v ->
                 LecturerSheet.showManager(getParentFragmentManager())
         );
-        view.findViewById(R.id.manage_semesters).setOnClickListener(v ->
+        view.findViewById(manage_semesters).setOnClickListener(v ->
                 SemesterSheet.show(getParentFragmentManager())
         );
-        view.findViewById(R.id.export_backup).setOnClickListener(v ->
+        view.findViewById(export_backup).setOnClickListener(v ->
                 BackupExportSheet.show(getParentFragmentManager())
         );
         // The system's file dialog needs no permission. A backup has no registered file type, so any file
         // can be picked; what is not a backup is recognized and refused when it is opened.
-        view.findViewById(R.id.import_backup).setOnClickListener(v -> pickBackup.launch(new String[]{"*/*"}));
+        view.findViewById(import_backup).setOnClickListener(v -> pickBackup.launch(new String[]{"*/*"}));
         UpRow about = view.findViewById(R.id.about);
         about.setValue(versionName());
         // The project website has the privacy policy and the link to GitHub; it opens in the browser, which the
         // app itself never needs.
         about.setOnClickListener(v -> {
-            if (!Links.openWeb(requireContext(), getString(R.string.website_url))) Haptics.reject(v);
+            if (!Links.openWeb(requireContext(), getString(website_url))) Haptics.reject(v);
         });
     }
 
     private void bindTheme(UpSegmentedControl control) {
-        control.setOptions(
-                getString(R.string.theme_system), getString(R.string.theme_light),
-                getString(R.string.theme_dark)
-        );
+        control.setOptions(getString(theme_system), getString(theme_light), getString(theme_dark));
         control.setSelectedIndex(settings.themeMode().ordinal());
         // Changing the theme recreates the activity, which restores this screen from the back stack.
         control.setOnSelectionChangedListener(index ->
@@ -115,9 +118,9 @@ public class SettingsFragment extends Fragment {
 
     /** Nothing is rebuilt here: the grid and the sheets read the style from the settings when they draw. */
     private void bindLecturerNames(UpSegmentedControl control) {
-        control.setOptions(getString(R.string.lecturer_name_last), getString(R.string.lecturer_name_full));
+        control.setOptions(getString(lecturer_name_last), getString(lecturer_name_full));
         var current = settings.lecturerNameStyle().getValue();
-        control.setSelectedIndex(current == null ? NameStyle.LAST_NAME.ordinal() : current.ordinal());
+        control.setSelectedIndex(current == null ? LAST_NAME.ordinal() : current.ordinal());
         control.setOnSelectionChangedListener(index -> settings.setLecturerNameStyle(NameStyle.values()[index]));
     }
 
@@ -142,10 +145,7 @@ public class SettingsFragment extends Fragment {
 
     private void renderNotifications() {
         notificationsRow.setValue(
-                getString(
-                        NotificationAccess.allowed(requireContext())
-                                ? R.string.notifications_on : R.string.notifications_off
-                )
+                getString(NotificationAccess.allowed(requireContext()) ? notifications_on : notifications_off)
         );
     }
 
@@ -174,9 +174,9 @@ public class SettingsFragment extends Fragment {
 
     /** Each end can only move as far as the other leaves the minimum span. */
     private void applyHourRanges(TimeWindow window) {
-        hoursStart.setRange(0, window.endHour() - TimeWindow.MIN_SPAN_HOURS);
+        hoursStart.setRange(0, window.endHour() - MIN_SPAN_HOURS);
         hoursStart.setValue(window.startHour());
-        hoursEnd.setRange(window.startHour() + TimeWindow.MIN_SPAN_HOURS, 24);
+        hoursEnd.setRange(window.startHour() + MIN_SPAN_HOURS, 24);
         hoursEnd.setValue(window.endHour());
     }
 
@@ -184,7 +184,7 @@ public class SettingsFragment extends Fragment {
         try {
             var name = requireContext().getPackageManager()
                     .getPackageInfo(requireContext().getPackageName(), 0).versionName;
-            return getString(R.string.about_version, name);
+            return getString(about_version, name);
         } catch (PackageManager.NameNotFoundException unknown) {
             return "";
         }

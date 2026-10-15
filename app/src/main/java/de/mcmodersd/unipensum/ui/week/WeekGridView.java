@@ -1,5 +1,10 @@
 package de.mcmodersd.unipensum.ui.week;
 
+import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.View.MeasureSpec.EXACTLY;
+import static de.mcmodersd.unipensum.R.color.*;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -19,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.data.AppSettings.TimeWindow;
 import de.mcmodersd.unipensum.data.SessionView;
 import de.mcmodersd.unipensum.domain.logic.NowIndicator;
@@ -65,10 +69,10 @@ final class WeekGridView extends ViewGroup {
 
     private final GridMetrics metrics;
     private final Paint linePaint = new Paint();
-    private final Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint nowLabelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint nowLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint nowFaintPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint labelPaint = new Paint(ANTI_ALIAS_FLAG);
+    private final Paint nowLabelPaint = new Paint(ANTI_ALIAS_FLAG);
+    private final Paint nowLinePaint = new Paint(ANTI_ALIAS_FLAG);
+    private final Paint nowFaintPaint = new Paint(ANTI_ALIAS_FLAG);
     private final ArrayList<Placed> placed = new ArrayList<>();
     private final Runnable tick = () -> {
         updateNow();
@@ -86,19 +90,15 @@ final class WeekGridView extends ViewGroup {
         this.metrics = metrics;
         setWillNotDraw(false);
 
-        linePaint.setColor(ContextCompat.getColor(context, R.color.divider));
+        linePaint.setColor(ContextCompat.getColor(context, divider));
         linePaint.setStrokeWidth(Math.max(1f, getResources().getDisplayMetrics().density * 0.75f));
 
-        labelPaint.setColor(ContextCompat.getColor(context, R.color.text_secondary));
-        labelPaint.setTextSize(
-                TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()
-                )
-        );
+        labelPaint.setColor(ContextCompat.getColor(context, text_secondary));
+        labelPaint.setTextSize(TypedValue.applyDimension(COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
         labelPaint.setTextAlign(Paint.Align.RIGHT);
 
         // The marker is black on the light theme and white on the dark one, like the rest of the app.
-        var nowColor = ContextCompat.getColor(context, R.color.accent);
+        var nowColor = ContextCompat.getColor(context, accent);
         nowLabelPaint.set(labelPaint);
         nowLabelPaint.setColor(nowColor);
         nowLabelPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
@@ -247,8 +247,8 @@ final class WeekGridView extends ViewGroup {
 
             item.view.fitTo(item.bounds.width(), item.bounds.height());
             item.view.measure(
-                    MeasureSpec.makeMeasureSpec(item.bounds.width(), MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(item.bounds.height(), MeasureSpec.EXACTLY)
+                    MeasureSpec.makeMeasureSpec(item.bounds.width(), EXACTLY),
+                    MeasureSpec.makeMeasureSpec(item.bounds.height(), EXACTLY)
             );
         }
     }

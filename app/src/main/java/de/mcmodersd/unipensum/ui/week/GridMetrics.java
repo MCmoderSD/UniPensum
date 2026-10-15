@@ -1,8 +1,9 @@
 package de.mcmodersd.unipensum.ui.week;
 
+import static de.mcmodersd.unipensum.R.dimen.*;
+
 import android.content.Context;
 
-import de.mcmodersd.unipensum.R;
 
 /**
  * Every measurement of the week grid in one place. Open question 1 of the requirements (whole day on
@@ -21,13 +22,13 @@ final class GridMetrics {
 
     GridMetrics(Context context) {
         var res = context.getResources();
-        gutter = res.getDimensionPixelSize(R.dimen.grid_gutter);
-        minHourHeight = res.getDimensionPixelSize(R.dimen.grid_min_hour_height);
-        verticalPadding = res.getDimensionPixelSize(R.dimen.grid_vertical_padding);
-        blockInset = res.getDimensionPixelSize(R.dimen.grid_block_inset);
-        accentBar = res.getDimensionPixelSize(R.dimen.grid_accent_bar);
-        nowLine = res.getDimensionPixelSize(R.dimen.grid_now_line);
-        headerHeight = res.getDimensionPixelSize(R.dimen.week_header_height);
+        gutter = res.getDimensionPixelSize(grid_gutter);
+        minHourHeight = res.getDimensionPixelSize(grid_min_hour_height);
+        verticalPadding = res.getDimensionPixelSize(grid_vertical_padding);
+        blockInset = res.getDimensionPixelSize(grid_block_inset);
+        accentBar = res.getDimensionPixelSize(grid_accent_bar);
+        nowLine = res.getDimensionPixelSize(grid_now_line);
+        headerHeight = res.getDimensionPixelSize(week_header_height);
     }
 
     float columnWidth(int totalWidth) {

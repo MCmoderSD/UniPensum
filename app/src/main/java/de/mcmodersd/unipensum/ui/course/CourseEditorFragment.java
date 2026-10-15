@@ -1,7 +1,16 @@
 package de.mcmodersd.unipensum.ui.course;
 
+import static android.text.InputType.*;
+import static android.view.View.*;
+import static android.view.ViewGroup.LayoutParams.*;
+import static de.mcmodersd.unipensum.R.drawable.ic_close;
+import static de.mcmodersd.unipensum.R.id.*;
+import static de.mcmodersd.unipensum.R.layout.fragment_course_editor;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.domain.model.NameStyle.LAST_NAME;
+import static de.mcmodersd.unipensum.domain.text.TextSanitizer.*;
+
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +54,7 @@ public class CourseEditorFragment extends Fragment {
     private CourseDraftViewModel draft;
     private TimetableRepository repository;
     private final HashMap<Long, Lecturer> lecturers = new HashMap<>();
-    private NameStyle nameStyle = NameStyle.LAST_NAME;
+    private NameStyle nameStyle = LAST_NAME;
     private UpTextField nameField;
     private UpTextField moodleField;
     private LinearLayout events;
@@ -56,7 +65,7 @@ public class CourseEditorFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_course_editor, container, false);
+        return inflater.inflate(fragment_course_editor, container, false);
     }
 
     @Override
@@ -69,34 +78,33 @@ public class CourseEditorFragment extends Fragment {
         }
         repository = UniPensumApp.from(requireContext()).repository();
 
-        ((TextView) view.findViewById(R.id.bar_title))
-                .setText(draft.isNew() ? R.string.course_new : R.string.course_edit);
-        view.findViewById(R.id.back).setOnClickListener(v -> Navigator.of(this).pop());
+        ((TextView) view.findViewById(bar_title)).setText(draft.isNew() ? course_new : course_edit);
+        view.findViewById(back).setOnClickListener(v -> Navigator.of(this).pop());
 
-        nameField = view.findViewById(R.id.name_field);
-        nameField.setMaxLength(TextSanitizer.MAX_NAME);
+        nameField = view.findViewById(name_field);
+        nameField.setMaxLength(MAX_NAME);
         nameField.setText(draft.name());
         nameField.addTextWatcher(text -> {
             draft.setName(text);
             nameField.setError(null);
         });
 
-        moodleField = view.findViewById(R.id.moodle_field);
-        moodleField.setMaxLength(TextSanitizer.MAX_LINK);
-        moodleField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        moodleField = view.findViewById(moodle_field);
+        moodleField.setMaxLength(MAX_LINK);
+        moodleField.setInputType(TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_URI);
         moodleField.setText(draft.moodleLink());
         moodleField.addTextWatcher(text -> {
             draft.setMoodleLink(text);
             moodleField.setError(null);
         });
 
-        ColorSwatchPicker colors = view.findViewById(R.id.color_picker);
+        ColorSwatchPicker colors = view.findViewById(color_picker);
         colors.setSelectedColor(draft.color());
         colors.setOnColorSelectedListener(draft::setColor);
 
         events = view.findViewById(R.id.events);
-        eventsError = view.findViewById(R.id.events_error);
-        view.findViewById(R.id.add_event).setOnClickListener(v ->
+        eventsError = view.findViewById(events_error);
+        view.findViewById(add_event).setOnClickListener(v ->
                 Navigator.of(this).push(SessionEditorFragment.forSeries(-1))
         );
         renderEvents();
@@ -126,11 +134,11 @@ public class CourseEditorFragment extends Fragment {
         saveButton.setOnClickListener(v -> save());
 
         UpButton delete = view.findViewById(R.id.delete);
-        delete.setVisibility(draft.isNew() ? View.GONE : View.VISIBLE);
+        delete.setVisibility(draft.isNew() ? GONE : VISIBLE);
         delete.setOnClickListener(v -> ConfirmSheet.show(
                 getParentFragmentManager(), KEY_DELETE,
-                getString(R.string.course_delete_title), getString(R.string.course_delete_message),
-                getString(R.string.action_delete), true
+                getString(course_delete_title), getString(course_delete_message),
+                getString(action_delete), true
         ));
         getParentFragmentManager().setFragmentResultListener(
                 KEY_DELETE, getViewLifecycleOwner(),
@@ -140,7 +148,7 @@ public class CourseEditorFragment extends Fragment {
 
     private void renderEvents() {
         events.removeAllViews();
-        eventsError.setVisibility(View.GONE);
+        eventsError.setVisibility(GONE);
         var dp = getResources().getDisplayMetrics().density;
         var series = draft.series();
         for (var i = 0; i < series.size(); i++) {
@@ -155,14 +163,12 @@ public class CourseEditorFragment extends Fragment {
                             lecturer == null ? null : lecturer.name(nameStyle)
                     )
             );
-            row.setAction(R.drawable.ic_close, getString(R.string.event_remove), v -> {
+            row.setAction(ic_close, getString(event_remove), v -> {
                 draft.series().remove(index);
                 renderEvents();
             });
             row.setOnClickListener(v -> Navigator.of(this).push(SessionEditorFragment.forSeries(index)));
-            var params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            );
+            var params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
             params.bottomMargin = Math.round(8 * dp);
             events.addView(row, params);
         }
@@ -170,19 +176,19 @@ public class CourseEditorFragment extends Fragment {
 
     private void save() {
         // What is stored is the cleaned text, so a name of only blanks or invisible characters counts as empty.
-        var name = TextSanitizer.line(draft.name(), TextSanitizer.MAX_NAME);
+        var name = TextSanitizer.line(draft.name(), MAX_NAME);
         var valid = true;
         if (name.isEmpty()) {
-            nameField.setError(getString(R.string.course_error_name));
+            nameField.setError(getString(course_error_name));
             valid = false;
         }
         if (!TextSanitizer.isValidWebLink(draft.moodleLink())) {
-            moodleField.setError(getString(R.string.error_link));
+            moodleField.setError(getString(error_link));
             valid = false;
         }
         if (draft.isNew() && draft.series().isEmpty()) {
-            eventsError.setText(R.string.course_error_events);
-            eventsError.setVisibility(View.VISIBLE);
+            eventsError.setText(course_error_events);
+            eventsError.setVisibility(VISIBLE);
             valid = false;
         }
         if (!valid) {
@@ -221,8 +227,8 @@ public class CourseEditorFragment extends Fragment {
         public void onError(Exception error) {
             if (!isAdded() || getView() == null) return;
             saveButton.setEnabled(true);
-            eventsError.setText(R.string.course_error_save);
-            eventsError.setVisibility(View.VISIBLE);
+            eventsError.setText(course_error_save);
+            eventsError.setVisibility(VISIBLE);
             Haptics.reject(saveButton);
         }
     }

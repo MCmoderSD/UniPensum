@@ -1,5 +1,9 @@
 package de.mcmodersd.unipensum.ui.week;
 
+import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static de.mcmodersd.unipensum.R.color.*;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -15,7 +19,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
 
 /** Weekday names and dates above the grid. The current day is marked with a filled circle. */
@@ -24,9 +27,9 @@ import de.mcmodersd.unipensum.ui.format.TimeFormat;
 final class WeekHeaderView extends View {
 
     private final GridMetrics metrics;
-    private final Paint weekdayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint numberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint weekdayPaint = new Paint(ANTI_ALIAS_FLAG);
+    private final Paint numberPaint = new Paint(ANTI_ALIAS_FLAG);
+    private final Paint circlePaint = new Paint(ANTI_ALIAS_FLAG);
     private final int primary;
     private final int onAccent;
 
@@ -36,10 +39,10 @@ final class WeekHeaderView extends View {
     WeekHeaderView(Context context, GridMetrics metrics) {
         super(context);
         this.metrics = metrics;
-        primary = ContextCompat.getColor(context, R.color.text_primary);
-        onAccent = ContextCompat.getColor(context, R.color.text_on_accent);
+        primary = ContextCompat.getColor(context, text_primary);
+        onAccent = ContextCompat.getColor(context, text_on_accent);
 
-        weekdayPaint.setColor(ContextCompat.getColor(context, R.color.text_secondary));
+        weekdayPaint.setColor(ContextCompat.getColor(context, text_secondary));
         weekdayPaint.setTextSize(sp(11));
         weekdayPaint.setTextAlign(Paint.Align.CENTER);
         weekdayPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
@@ -49,12 +52,12 @@ final class WeekHeaderView extends View {
         numberPaint.setTextAlign(Paint.Align.CENTER);
         numberPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
 
-        circlePaint.setColor(ContextCompat.getColor(context, R.color.accent));
+        circlePaint.setColor(ContextCompat.getColor(context, accent));
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
     }
 
     private float sp(float value) {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, getResources().getDisplayMetrics());
+        return TypedValue.applyDimension(COMPLEX_UNIT_SP, value, getResources().getDisplayMetrics());
     }
 
     void bind(LocalDate monday, LocalDate today) {

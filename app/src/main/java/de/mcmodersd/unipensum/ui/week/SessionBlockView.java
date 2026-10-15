@@ -1,5 +1,16 @@
 package de.mcmodersd.unipensum.ui.week;
 
+import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+import static android.graphics.text.LineBreaker.BREAK_STRATEGY_HIGH_QUALITY;
+import static android.text.Layout.HYPHENATION_FREQUENCY_FULL;
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.Gravity.TOP;
+import static android.view.View.MeasureSpec.*;
+import static android.view.ViewGroup.LayoutParams.*;
+import static de.mcmodersd.unipensum.R.color.*;
+import static de.mcmodersd.unipensum.R.dimen.radius_block;
+import static de.mcmodersd.unipensum.R.string.session_description;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -7,18 +18,13 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.text.LineBreaker;
-import android.text.Layout;
 import android.text.TextUtils;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.data.SessionView;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.ui.format.CourseColors;
@@ -43,7 +49,7 @@ final class SessionBlockView extends LinearLayout {
     private final TextView place;
     private final TextView type;
     private final TextView lecturer;
-    private final Paint barPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint barPaint = new Paint(ANTI_ALIAS_FLAG);
     private final RectF barRect = new RectF();
     private final int barWidth;
     private final float radius;
@@ -55,7 +61,7 @@ final class SessionBlockView extends LinearLayout {
                      boolean overlapping) {
         super(context);
         this.barWidth = metrics.accentBar;
-        this.radius = getResources().getDimension(R.dimen.radius_block);
+        this.radius = getResources().getDimension(radius_block);
         this.dp = getResources().getDisplayMetrics().density;
 
         var accent = CourseColors.resolve(context, session.color());
@@ -70,15 +76,15 @@ final class SessionBlockView extends LinearLayout {
         setBackground(background);
         setWillNotDraw(false);
         setOrientation(VERTICAL);
-        setGravity(Gravity.TOP);
+        setGravity(TOP);
         setClickable(true);
         setFocusable(true);
 
         var details = session.session().details();
         title = line(context, true, session.courseName());
         // Two sessions side by side leave very little width; hyphenate instead of breaking inside a word.
-        title.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_FULL);
-        title.setBreakStrategy(LineBreaker.BREAK_STRATEGY_HIGH_QUALITY);
+        title.setHyphenationFrequency(HYPHENATION_FREQUENCY_FULL);
+        title.setBreakStrategy(BREAK_STRATEGY_HIGH_QUALITY);
         time = line(
                 context, false, TimeFormat.time(context, details.startMin()) + BREAKABLE_DASH
                         + TimeFormat.time(context, details.endMin())
@@ -89,7 +95,7 @@ final class SessionBlockView extends LinearLayout {
 
         setContentDescription(
                 context.getString(
-                        R.string.session_description,
+                        session_description,
                         session.courseName(),
                         TimeFormat.typeName(context, details.type()),
                         TimeFormat.time(context, details.startMin()),
@@ -113,9 +119,9 @@ final class SessionBlockView extends LinearLayout {
                 barWidth + Math.round((narrow ? 2 : 4) * dp), Math.round(3 * dp),
                 Math.round((narrow ? 1 : 3) * dp), Math.round(3 * dp)
         );
-        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, narrow ? 9.5f : 11.5f);
+        title.setTextSize(COMPLEX_UNIT_SP, narrow ? 9.5f : 11.5f);
         for (var detail : new TextView[]{time, place, type, lecturer}) {
-            detail.setTextSize(TypedValue.COMPLEX_UNIT_SP, narrow ? 9f : 10f);
+            detail.setTextSize(COMPLEX_UNIT_SP, narrow ? 9f : 10f);
         }
 
         var contentWidth = Math.max(0, widthPx - getPaddingLeft() - getPaddingRight());
@@ -138,8 +144,8 @@ final class SessionBlockView extends LinearLayout {
             view.setVisibility(GONE);
             return 0;
         }
-        var widthSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
-        var heightSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        var widthSpec = MeasureSpec.makeMeasureSpec(width, EXACTLY);
+        var heightSpec = MeasureSpec.makeMeasureSpec(0, UNSPECIFIED);
         for (var lines = maxLines; lines >= 1; lines--) {
             view.setMaxLines(lines);
             view.measure(widthSpec, heightSpec);
@@ -174,11 +180,11 @@ final class SessionBlockView extends LinearLayout {
     private TextView line(Context context, boolean primary, String text) {
         var view = new TextView(context);
         view.setText(text);
-        view.setTextColor(ContextCompat.getColor(context, primary ? R.color.text_primary : R.color.text_secondary));
+        view.setTextColor(ContextCompat.getColor(context, primary ? text_primary : text_secondary));
         view.setEllipsize(TextUtils.TruncateAt.END);
         view.setIncludeFontPadding(false);
         view.setTypeface(Typeface.create(primary ? "sans-serif-medium" : "sans-serif", Typeface.NORMAL));
-        addView(view, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        addView(view, new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
         return view;
     }
 }

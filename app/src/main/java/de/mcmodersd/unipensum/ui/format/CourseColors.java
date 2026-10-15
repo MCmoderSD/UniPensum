@@ -1,12 +1,13 @@
 package de.mcmodersd.unipensum.ui.format;
 
+import static de.mcmodersd.unipensum.R.color.*;
+
 import android.content.Context;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.core.content.ContextCompat;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.domain.model.CourseColor;
 
 /** Resolves the preset keys to the light or dark color of the current configuration. */
@@ -22,17 +23,17 @@ public final class CourseColors {
     @ColorRes
     private static int resource(CourseColor color) {
         return switch (color) {
-            case RED -> R.color.course_red;
-            case ORANGE -> R.color.course_orange;
-            case YELLOW -> R.color.course_yellow;
-            case GREEN -> R.color.course_green;
-            case TEAL -> R.color.course_teal;
-            case BLUE -> R.color.course_blue;
-            case VIOLET -> R.color.course_violet;
-            case PINK -> R.color.course_pink;
-            case GRAPHITE -> R.color.course_graphite;
-            case GRAY -> R.color.course_gray;
-            case SILVER -> R.color.course_silver;
+            case RED -> course_red;
+            case ORANGE -> course_orange;
+            case YELLOW -> course_yellow;
+            case GREEN -> course_green;
+            case TEAL -> course_teal;
+            case BLUE -> course_blue;
+            case VIOLET -> course_violet;
+            case PINK -> course_pink;
+            case GRAPHITE -> course_graphite;
+            case GRAY -> course_gray;
+            case SILVER -> course_silver;
         };
     }
 }

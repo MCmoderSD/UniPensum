@@ -1,23 +1,26 @@
 package de.mcmodersd.unipensum.ui.lecturer;
 
+import static android.text.InputType.*;
+import static android.util.Patterns.EMAIL_ADDRESS;
+import static android.view.ViewGroup.LayoutParams.*;
+import static android.widget.LinearLayout.VERTICAL;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.domain.text.TextSanitizer.*;
+import static de.mcmodersd.unipensum.ui.widget.UpButton.Variant.DESTRUCTIVE;
+
 import android.content.Context;
 import android.os.Bundle;
-import android.text.InputType;
-import android.util.Patterns;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
 import de.mcmodersd.unipensum.data.TimetableRepository;
 import de.mcmodersd.unipensum.data.db.Database;
 import de.mcmodersd.unipensum.domain.model.Lecturer;
-import de.mcmodersd.unipensum.domain.text.TextSanitizer;
 import de.mcmodersd.unipensum.ui.widget.ConfirmSheet;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
 import de.mcmodersd.unipensum.ui.widget.UpButton;
@@ -68,7 +71,7 @@ public final class LecturerEditorSheet extends UpSheet {
 
     @Override
     protected CharSequence title(@NonNull Context context) {
-        return context.getString(requireArguments().getLong(ARG_ID) == 0 ? R.string.lecturer_new : R.string.lecturer_edit);
+        return context.getString(requireArguments().getLong(ARG_ID) == 0 ? lecturer_new : lecturer_edit);
     }
 
     @Override
@@ -81,48 +84,45 @@ public final class LecturerEditorSheet extends UpSheet {
         var source = savedInstanceState != null ? savedInstanceState : requireArguments();
 
         var column = new LinearLayout(context);
-        column.setOrientation(LinearLayout.VERTICAL);
+        column.setOrientation(VERTICAL);
 
         firstNameField = field(
-                context, R.string.lecturer_first_name,
-                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS | InputType.TYPE_TEXT_VARIATION_PERSON_NAME,
-                TextSanitizer.MAX_NAME, source.getString(ARG_FIRST_NAME)
+                context, lecturer_first_name,
+                TYPE_CLASS_TEXT | TYPE_TEXT_FLAG_CAP_WORDS | TYPE_TEXT_VARIATION_PERSON_NAME,
+                MAX_NAME, source.getString(ARG_FIRST_NAME)
         );
         column.addView(firstNameField, spaced(dp, 0, 12));
 
         lastNameField = field(
-                context, R.string.lecturer_last_name,
-                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS | InputType.TYPE_TEXT_VARIATION_PERSON_NAME,
-                TextSanitizer.MAX_NAME, source.getString(ARG_LAST_NAME)
+                context, lecturer_last_name,
+                TYPE_CLASS_TEXT | TYPE_TEXT_FLAG_CAP_WORDS | TYPE_TEXT_VARIATION_PERSON_NAME,
+                MAX_NAME, source.getString(ARG_LAST_NAME)
         );
         column.addView(lastNameField, spaced(dp, 0, 12));
 
         emailField = field(
-                context, R.string.lecturer_email,
-                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
-                TextSanitizer.MAX_EMAIL, source.getString(ARG_EMAIL)
+                context, lecturer_email,
+                TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+                MAX_EMAIL, source.getString(ARG_EMAIL)
         );
         column.addView(emailField, spaced(dp, 0, 12));
 
-        phoneField = field(
-                context, R.string.lecturer_phone, InputType.TYPE_CLASS_PHONE,
-                TextSanitizer.MAX_PHONE, source.getString(ARG_PHONE)
-        );
+        phoneField = field(context, lecturer_phone, TYPE_CLASS_PHONE, MAX_PHONE, source.getString(ARG_PHONE));
         column.addView(phoneField, spaced(dp, 0, 0));
 
         saveButton = new UpButton(context);
-        saveButton.setText(R.string.action_save);
+        saveButton.setText(action_save);
         saveButton.setOnClickListener(v -> onSave());
         column.addView(saveButton, spaced(dp, 16, 0));
 
         if (id != 0) {
             var delete = new UpButton(context);
-            delete.setText(R.string.action_delete);
-            delete.setVariant(UpButton.Variant.DESTRUCTIVE);
+            delete.setText(action_delete);
+            delete.setVariant(DESTRUCTIVE);
             delete.setOnClickListener(v -> ConfirmSheet.show(
                     getParentFragmentManager(), KEY_DELETE,
-                    getString(R.string.lecturer_delete_title), getString(R.string.lecturer_delete_message),
-                    getString(R.string.action_delete), true
+                    getString(lecturer_delete_title), getString(lecturer_delete_message),
+                    getString(action_delete), true
             ));
             column.addView(delete, spaced(dp, 8, 0));
         }
@@ -165,11 +165,11 @@ public final class LecturerEditorSheet extends UpSheet {
 
         var valid = true;
         if (candidate.lastName().isEmpty()) {
-            lastNameField.setError(getString(R.string.lecturer_error_last_name));
+            lastNameField.setError(getString(lecturer_error_last_name));
             valid = false;
         }
-        if (candidate.email() != null && !Patterns.EMAIL_ADDRESS.matcher(candidate.email()).matches()) {
-            emailField.setError(getString(R.string.lecturer_error_email));
+        if (candidate.email() != null && !EMAIL_ADDRESS.matcher(candidate.email()).matches()) {
+            emailField.setError(getString(lecturer_error_email));
             valid = false;
         }
         if (!valid) {
@@ -196,7 +196,7 @@ public final class LecturerEditorSheet extends UpSheet {
             public void onError(Exception error) {
                 if (!isAdded()) return;
                 saveButton.setEnabled(true);
-                lastNameField.setError(getString(R.string.lecturer_error_save));
+                lastNameField.setError(getString(lecturer_error_save));
                 Haptics.reject(saveButton);
             }
         });
@@ -211,15 +211,13 @@ public final class LecturerEditorSheet extends UpSheet {
 
             @Override
             public void onError(Exception error) {
-                if (isAdded()) lastNameField.setError(getString(R.string.lecturer_error_save));
+                if (isAdded()) lastNameField.setError(getString(lecturer_error_save));
             }
         });
     }
 
     private static LinearLayout.LayoutParams spaced(float dp, int topDp, int bottomDp) {
-        var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+        var params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;

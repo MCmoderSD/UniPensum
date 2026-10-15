@@ -1,5 +1,12 @@
 package de.mcmodersd.unipensum.ui.course;
 
+import static android.view.View.*;
+import static android.view.ViewGroup.LayoutParams.*;
+import static de.mcmodersd.unipensum.R.id.*;
+import static de.mcmodersd.unipensum.R.layout.fragment_courses;
+import static de.mcmodersd.unipensum.R.plurals.event_count;
+import static de.mcmodersd.unipensum.R.string.courses_title;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +55,7 @@ public class CoursesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_courses, container, false);
+        return inflater.inflate(fragment_courses, container, false);
     }
 
     @Override
@@ -56,11 +63,11 @@ public class CoursesFragment extends Fragment {
         repository = UniPensumApp.from(requireContext()).repository();
         draft = new ViewModelProvider(requireActivity()).get(CourseDraftViewModel.class);
         list = view.findViewById(R.id.courses);
-        emptyView = view.findViewById(R.id.courses_empty);
+        emptyView = view.findViewById(courses_empty);
 
-        TextView title = view.findViewById(R.id.bar_title);
-        title.setText(R.string.courses_title);
-        view.findViewById(R.id.back).setOnClickListener(v -> Navigator.of(this).pop());
+        TextView title = view.findViewById(bar_title);
+        title.setText(courses_title);
+        view.findViewById(back).setOnClickListener(v -> Navigator.of(this).pop());
 
         var semesterId = requireArguments().getLong(ARG_SEMESTER_ID);
         repository.loadSemester(semesterId, new Database.Callback<>() {
@@ -77,7 +84,7 @@ public class CoursesFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.new_course).setOnClickListener(v -> {
+        view.findViewById(new_course).setOnClickListener(v -> {
             if (semester == null) return;
             draft.startNew(semester);
             Navigator.of(this).push(new CourseEditorFragment());
@@ -91,7 +98,7 @@ public class CoursesFragment extends Fragment {
         });
         repository.courses(semesterId).observe(getViewLifecycleOwner(), courses -> {
             list.removeAllViews();
-            emptyView.setVisibility(courses.isEmpty() ? View.VISIBLE : View.GONE);
+            emptyView.setVisibility(courses.isEmpty() ? VISIBLE : GONE);
             for (var entry : courses) list.addView(row(entry));
         });
     }
@@ -101,12 +108,7 @@ public class CoursesFragment extends Fragment {
         var dp = getResources().getDisplayMetrics().density;
         var row = new UpRow(context);
         row.setTitle(entry.course().name());
-        row.setSubtitle(
-                getResources().getQuantityString(
-                        R.plurals.event_count,
-                        entry.series().size(), entry.series().size()
-                )
-        );
+        row.setSubtitle(getResources().getQuantityString(event_count, entry.series().size(), entry.series().size()));
         row.setLeadingColor(CourseColors.resolve(context, entry.course().color()));
         row.setChevronVisible(true);
         row.setOnClickListener(v -> repository.loadCourse(entry.course().id(), new Database.Callback<>() {
@@ -122,9 +124,7 @@ public class CoursesFragment extends Fragment {
                 if (isAdded()) Haptics.reject(v);
             }
         }));
-        var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+        var params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         params.bottomMargin = Math.round(8 * dp);
         row.setLayoutParams(params);
         return row;

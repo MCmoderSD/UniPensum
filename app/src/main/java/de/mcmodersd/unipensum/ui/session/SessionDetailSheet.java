@@ -1,22 +1,27 @@
 package de.mcmodersd.unipensum.ui.session;
 
+import static android.view.ViewGroup.LayoutParams.*;
+import static android.widget.LinearLayout.VERTICAL;
+import static de.mcmodersd.unipensum.R.drawable.*;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.domain.model.Mode.IN_PERSON;
+import static de.mcmodersd.unipensum.domain.model.NameStyle.FULL_NAME;
+import static de.mcmodersd.unipensum.ui.session.ScopeSheet.RESULT_SCOPE;
+import static de.mcmodersd.unipensum.ui.widget.UpButton.Variant.*;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
 import de.mcmodersd.unipensum.data.SessionContext;
 import de.mcmodersd.unipensum.data.db.Database;
 import de.mcmodersd.unipensum.domain.model.EditScope;
-import de.mcmodersd.unipensum.domain.model.Mode;
-import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.ui.Links;
 import de.mcmodersd.unipensum.ui.Navigator;
 import de.mcmodersd.unipensum.ui.format.ReminderFormat;
@@ -68,7 +73,7 @@ public final class SessionDetailSheet extends UpSheet {
     @Override
     protected View createContent(@Nullable Bundle savedInstanceState) {
         column = new LinearLayout(requireContext());
-        column.setOrientation(LinearLayout.VERTICAL);
+        column.setOrientation(VERTICAL);
         return column;
     }
 
@@ -77,14 +82,14 @@ public final class SessionDetailSheet extends UpSheet {
         super.onViewCreated(view, savedInstanceState);
         var manager = getParentFragmentManager();
         manager.setFragmentResultListener(KEY_EDIT_SCOPE, getViewLifecycleOwner(), (key, result) -> {
-            var scope = EditScope.valueOf(result.getString(ScopeSheet.RESULT_SCOPE));
+            var scope = EditScope.valueOf(result.getString(RESULT_SCOPE));
             var navigator = (Navigator) requireActivity();
             var sessionId = requireArguments().getLong(ARG_SESSION_ID);
             dismiss();
             navigator.open(SessionEditorFragment.forSession(sessionId, scope));
         });
         manager.setFragmentResultListener(KEY_DELETE_SCOPE, getViewLifecycleOwner(), (key, result) ->
-                delete(EditScope.valueOf(result.getString(ScopeSheet.RESULT_SCOPE)))
+                delete(EditScope.valueOf(result.getString(RESULT_SCOPE)))
         );
 
         UniPensumApp.from(requireContext()).repository().loadSessionContext(
@@ -123,44 +128,29 @@ public final class SessionDetailSheet extends UpSheet {
 
         // "Online" and "A2 | Hybrid" already name the format; a room on its own gets "In person" below it.
         var place = SeriesFormat.place(app, details);
-        var plainInPerson = details.mode() == Mode.IN_PERSON && !details.hybrid();
+        var plainInPerson = details.mode() == IN_PERSON && !details.hybrid();
         if (place.isEmpty()) {
-            column.addView(info(app, dp, getString(R.string.mode_in_person), null));
+            column.addView(info(app, dp, getString(mode_in_person), null));
         } else {
-            column.addView(info(app, dp, place, plainInPerson ? getString(R.string.mode_in_person) : null));
+            column.addView(info(app, dp, place, plainInPerson ? getString(mode_in_person) : null));
         }
 
         var lecturer = context.lecturer();
         if (lecturer != null) {
             // The large view always spells the name out; the setting only shortens it in the grid and lists.
-            column.addView(info(app, dp, lecturer.name(NameStyle.FULL_NAME), getString(R.string.field_lecturer)));
+            column.addView(info(app, dp, lecturer.name(FULL_NAME), getString(field_lecturer)));
             if (lecturer.email() != null) {
-                column.addView(
-                        contact(
-                                app, dp, R.drawable.ic_mail, lecturer.email(),
-                                getString(R.string.lecturer_email), Links::mail
-                        )
-                );
+                column.addView(contact(app, dp, ic_mail, lecturer.email(), getString(lecturer_email), Links::mail));
             }
             if (lecturer.phone() != null) {
-                column.addView(
-                        contact(
-                                app, dp, R.drawable.ic_phone, lecturer.phone(),
-                                getString(R.string.lecturer_phone), Links::dial
-                        )
-                );
+                column.addView(contact(app, dp, ic_phone, lecturer.phone(), getString(lecturer_phone), Links::dial));
             }
         }
         if (details.hasReminder()) {
-            column.addView(
-                    info(
-                            app, dp, ReminderFormat.text(app, details.reminderMin()),
-                            getString(R.string.field_reminder)
-                    )
-            );
+            column.addView(info(app, dp, ReminderFormat.text(app, details.reminderMin()), getString(field_reminder)));
         }
         if (details.note() != null) {
-            column.addView(info(app, dp, details.note(), getString(R.string.field_note)));
+            column.addView(info(app, dp, details.note(), getString(field_note)));
         }
 
         setFooter(actions(app, dp, context));
@@ -172,7 +162,7 @@ public final class SessionDetailSheet extends UpSheet {
         var moodle = context.course().moodleLink();
 
         var actions = new LinearLayout(app);
-        actions.setOrientation(LinearLayout.VERTICAL);
+        actions.setOrientation(VERTICAL);
 
         if (meeting != null || moodle != null) {
             var links = new LinearLayout(app);
@@ -180,7 +170,7 @@ public final class SessionDetailSheet extends UpSheet {
             if (meeting != null) {
                 links.addView(
                         button(
-                                app, R.string.action_open_meeting, UpButton.Variant.PRIMARY,
+                                app, action_open_meeting, PRIMARY,
                                 v -> open(v, meeting)
                         ), weighted(dp, links.getChildCount() > 0)
                 );
@@ -188,7 +178,7 @@ public final class SessionDetailSheet extends UpSheet {
             if (moodle != null) {
                 links.addView(
                         button(
-                                app, R.string.action_open_moodle, UpButton.Variant.SECONDARY,
+                                app, action_open_moodle, SECONDARY,
                                 v -> open(v, moodle)
                         ), weighted(dp, links.getChildCount() > 0)
                 );
@@ -201,20 +191,20 @@ public final class SessionDetailSheet extends UpSheet {
         // The first button of the sheet is the filled one: the meeting if there is one, else Edit.
         manage.addView(
                 button(
-                        app, R.string.action_edit,
-                        meeting != null ? UpButton.Variant.SECONDARY : UpButton.Variant.PRIMARY,
+                        app, action_edit,
+                        meeting != null ? SECONDARY : PRIMARY,
                         v -> ScopeSheet.show(
                                 getParentFragmentManager(), KEY_EDIT_SCOPE,
-                                getString(R.string.scope_edit_title), context.session().day()
+                                getString(scope_edit_title), context.session().day()
                         )
                 ), weighted(dp, false)
         );
         manage.addView(
                 button(
-                        app, R.string.action_delete, UpButton.Variant.DESTRUCTIVE,
+                        app, action_delete, DESTRUCTIVE,
                         v -> ScopeSheet.show(
                                 getParentFragmentManager(), KEY_DELETE_SCOPE,
-                                getString(R.string.scope_delete_title), context.session().day()
+                                getString(scope_delete_title), context.session().day()
                         )
                 ), weighted(dp, true)
         );
@@ -277,15 +267,13 @@ public final class SessionDetailSheet extends UpSheet {
      * which matters when a label wraps (large font sizes).
      */
     private static LinearLayout.LayoutParams weighted(float dp, boolean gapBefore) {
-        var params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+        var params = new LinearLayout.LayoutParams(0, MATCH_PARENT, 1f);
         if (gapBefore) params.setMarginStart(Math.round(8 * dp));
         return params;
     }
 
     private static LinearLayout.LayoutParams rowParams(float dp, int bottomDp) {
-        var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+        var params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;
     }

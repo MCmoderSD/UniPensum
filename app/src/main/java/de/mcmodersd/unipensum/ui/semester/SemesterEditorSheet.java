@@ -1,10 +1,18 @@
 package de.mcmodersd.unipensum.ui.semester;
 
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.View.*;
+import static android.view.ViewGroup.LayoutParams.*;
+import static android.widget.LinearLayout.VERTICAL;
+import static de.mcmodersd.unipensum.R.color.danger;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.domain.text.TextSanitizer.MAX_NAME;
+import static de.mcmodersd.unipensum.ui.widget.DatePickerSheet.RESULT_EPOCH_DAY;
+import static de.mcmodersd.unipensum.ui.widget.UpButton.Variant.DESTRUCTIVE;
+
 import android.content.Context;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,7 +25,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
 import de.mcmodersd.unipensum.data.TimetableRepository;
 import de.mcmodersd.unipensum.data.db.Database;
@@ -94,7 +101,7 @@ public final class SemesterEditorSheet extends UpSheet {
 
     @Override
     protected CharSequence title(@NonNull Context context) {
-        return context.getString(requireArguments().getLong(ARG_ID) == 0 ? R.string.semester_new : R.string.semester_edit);
+        return context.getString(requireArguments().getLong(ARG_ID) == 0 ? semester_new : semester_edit);
     }
 
     @Override
@@ -116,41 +123,41 @@ public final class SemesterEditorSheet extends UpSheet {
         );
 
         var column = new LinearLayout(context);
-        column.setOrientation(LinearLayout.VERTICAL);
+        column.setOrientation(VERTICAL);
 
         startRow = new UpRow(context);
-        startRow.setTitle(getString(R.string.semester_start));
+        startRow.setTitle(getString(semester_start));
         startRow.setChevronVisible(true);
         startRow.setOnClickListener(v -> DatePickerSheet.show(
                 getParentFragmentManager(), KEY_START,
-                getString(R.string.semester_start), start, null, null, false
+                getString(semester_start), start, null, null, false
         ));
         column.addView(startRow, spaced(dp, 8));
 
         endRow = new UpRow(context);
-        endRow.setTitle(getString(R.string.semester_end));
+        endRow.setTitle(getString(semester_end));
         endRow.setChevronVisible(true);
         endRow.setOnClickListener(v -> DatePickerSheet.show(
                 getParentFragmentManager(), KEY_END,
-                getString(R.string.semester_end), end, null, null, false
+                getString(semester_end), end, null, null, false
         ));
         column.addView(endRow, spaced(dp, 16));
 
         nameField = new UpTextField(context);
-        nameField.setLabel(getString(R.string.semester_name_label));
-        nameField.setMaxLength(TextSanitizer.MAX_NAME);
+        nameField.setLabel(getString(semester_name_label));
+        nameField.setMaxLength(MAX_NAME);
         if (name != null) nameField.setText(name);
         column.addView(nameField, spaced(dp, 8));
 
         errorView = new TextView(context);
-        errorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        errorView.setTextColor(ContextCompat.getColor(context, R.color.danger));
+        errorView.setTextSize(COMPLEX_UNIT_SP, 14);
+        errorView.setTextColor(ContextCompat.getColor(context, danger));
         errorView.setPadding(Math.round(4 * dp), Math.round(4 * dp), 0, Math.round(4 * dp));
-        errorView.setVisibility(View.GONE);
+        errorView.setVisibility(GONE);
         column.addView(errorView);
 
         saveButton = new UpButton(context);
-        saveButton.setText(R.string.action_save);
+        saveButton.setText(action_save);
         saveButton.setOnClickListener(v -> onSave());
         var saveParams = spaced(dp, 0);
         saveParams.topMargin = Math.round(12 * dp);
@@ -158,12 +165,12 @@ public final class SemesterEditorSheet extends UpSheet {
 
         if (id != 0) {
             var delete = new UpButton(context);
-            delete.setText(R.string.action_delete);
-            delete.setVariant(UpButton.Variant.DESTRUCTIVE);
+            delete.setText(action_delete);
+            delete.setVariant(DESTRUCTIVE);
             delete.setOnClickListener(v -> ConfirmSheet.show(
                     getParentFragmentManager(), KEY_DELETE,
-                    getString(R.string.semester_delete_title), getString(R.string.semester_delete_message),
-                    getString(R.string.action_delete), true
+                    getString(semester_delete_title), getString(semester_delete_message),
+                    getString(action_delete), true
             ));
             var deleteParams = spaced(dp, 0);
             deleteParams.topMargin = Math.round(8 * dp);
@@ -179,12 +186,12 @@ public final class SemesterEditorSheet extends UpSheet {
         super.onViewCreated(view, savedInstanceState);
         var manager = getParentFragmentManager();
         manager.setFragmentResultListener(KEY_START, getViewLifecycleOwner(), (key, result) -> {
-            start = LocalDate.ofEpochDay(result.getLong(DatePickerSheet.RESULT_EPOCH_DAY));
+            start = LocalDate.ofEpochDay(result.getLong(RESULT_EPOCH_DAY));
             if (id == 0 && !endTouched) end = SemesterDefaults.lectureEnd(start);
             refresh();
         });
         manager.setFragmentResultListener(KEY_END, getViewLifecycleOwner(), (key, result) -> {
-            end = LocalDate.ofEpochDay(result.getLong(DatePickerSheet.RESULT_EPOCH_DAY));
+            end = LocalDate.ofEpochDay(result.getLong(RESULT_EPOCH_DAY));
             endTouched = true;
             refresh();
         });
@@ -211,21 +218,21 @@ public final class SemesterEditorSheet extends UpSheet {
         startRow.setValue(TimeFormat.dateMedium(context, start));
         endRow.setValue(TimeFormat.dateMedium(context, end));
         nameField.setHint(SemesterNames.display(context, new Semester(0, start, end, null)));
-        errorView.setVisibility(View.GONE);
+        errorView.setVisibility(GONE);
     }
 
     private Semester candidate() {
-        return new Semester(id, start, end, TextSanitizer.lineOrNull(nameField.getText(), TextSanitizer.MAX_NAME));
+        return new Semester(id, start, end, TextSanitizer.lineOrNull(nameField.getText(), MAX_NAME));
     }
 
     private void onSave() {
         var candidate = candidate();
         switch (SemesterRules.check(candidate, others)) {
             case INVALID_RANGE:
-                showError(getString(R.string.semester_error_range));
+                showError(getString(semester_error_range));
                 return;
             case OVERLAPS_OTHER:
-                showError(getString(R.string.semester_error_overlap, overlappingName(candidate)));
+                showError(getString(semester_error_overlap, overlappingName(candidate)));
                 return;
             default:
                 break;
@@ -235,8 +242,8 @@ public final class SemesterEditorSheet extends UpSheet {
         if (shortens) {
             ConfirmSheet.show(
                     getParentFragmentManager(), KEY_SHORTEN,
-                    getString(R.string.semester_shorten_title), getString(R.string.semester_shorten_message),
-                    getString(R.string.action_shorten), true
+                    getString(semester_shorten_title), getString(semester_shorten_message),
+                    getString(action_shorten), true
             );
         } else {
             save();
@@ -257,7 +264,7 @@ public final class SemesterEditorSheet extends UpSheet {
             public void onError(Exception error) {
                 if (!isAdded()) return;
                 saveButton.setEnabled(true);
-                showError(getString(R.string.semester_error_save));
+                showError(getString(semester_error_save));
             }
         });
     }
@@ -271,7 +278,7 @@ public final class SemesterEditorSheet extends UpSheet {
 
             @Override
             public void onError(Exception error) {
-                if (isAdded()) showError(getString(R.string.semester_error_save));
+                if (isAdded()) showError(getString(semester_error_save));
             }
         });
     }
@@ -288,14 +295,12 @@ public final class SemesterEditorSheet extends UpSheet {
 
     private void showError(String message) {
         errorView.setText(message);
-        errorView.setVisibility(View.VISIBLE);
+        errorView.setVisibility(VISIBLE);
         Haptics.reject(saveButton);
     }
 
     private static LinearLayout.LayoutParams spaced(float dp, int bottomDp) {
-        var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+        var params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;
     }

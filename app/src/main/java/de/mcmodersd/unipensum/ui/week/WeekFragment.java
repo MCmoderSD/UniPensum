@@ -1,7 +1,14 @@
 package de.mcmodersd.unipensum.ui.week;
 
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.TIRAMISU;
+import static android.view.View.*;
+import static de.mcmodersd.unipensum.R.id.*;
+import static de.mcmodersd.unipensum.R.layout.fragment_week;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.ui.semester.SemesterSheet.*;
+
 import android.Manifest;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,7 +74,7 @@ public class WeekFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_week, container, false);
+        return inflater.inflate(fragment_week, container, false);
     }
 
     @Override
@@ -75,10 +82,10 @@ public class WeekFragment extends Fragment {
         title = view.findViewById(R.id.title);
         subtitle = view.findViewById(R.id.subtitle);
         empty = view.findViewById(R.id.empty);
-        addCourse = view.findViewById(R.id.add_course);
-        openCourses = view.findViewById(R.id.open_courses);
+        addCourse = view.findViewById(add_course);
+        openCourses = view.findViewById(open_courses);
         pager = view.findViewById(R.id.pager);
-        zoomIndicator = view.findViewById(R.id.zoom_indicator);
+        zoomIndicator = view.findViewById(zoom_indicator);
 
         viewModel = new ViewModelProvider(this).get(WeekViewModel.class);
         var adapter = new WeekPagerAdapter();
@@ -118,16 +125,16 @@ public class WeekFragment extends Fragment {
         });
         addCourse.setOnClickListener(v -> openNewCourse());
         openCourses.setOnClickListener(v -> openCourses());
-        view.findViewById(R.id.open_settings).setOnClickListener(v ->
+        view.findViewById(open_settings).setOnClickListener(v ->
                 Navigator.of(this).toggle(new SettingsFragment())
         );
-        view.findViewById(R.id.create_semester).setOnClickListener(v ->
+        view.findViewById(create_semester).setOnClickListener(v ->
                 SemesterEditorSheet.show(getParentFragmentManager(), null, timetable.semesters())
         );
         getParentFragmentManager().setFragmentResultListener(
-                SemesterSheet.REQUEST_JUMP, getViewLifecycleOwner(),
+                REQUEST_JUMP, getViewLifecycleOwner(),
                 (key, result) -> pager.setCurrentItem(
-                        Weeks.positionOf(LocalDate.ofEpochDay(result.getLong(SemesterSheet.RESULT_EPOCH_DAY))), false
+                        Weeks.positionOf(LocalDate.ofEpochDay(result.getLong(RESULT_EPOCH_DAY))), false
                 )
         );
 
@@ -138,10 +145,10 @@ public class WeekFragment extends Fragment {
             adapter.setTimetable(loaded);
             askForNotificationsOnce(loaded);
             var noSemesters = loaded.semesters().isEmpty();
-            empty.setVisibility(noSemesters ? View.VISIBLE : View.GONE);
-            pager.setVisibility(noSemesters ? View.INVISIBLE : View.VISIBLE);
-            addCourse.setVisibility(noSemesters ? View.GONE : View.VISIBLE);
-            openCourses.setVisibility(noSemesters ? View.GONE : View.VISIBLE);
+            empty.setVisibility(noSemesters ? VISIBLE : GONE);
+            pager.setVisibility(noSemesters ? INVISIBLE : VISIBLE);
+            addCourse.setVisibility(noSemesters ? GONE : VISIBLE);
+            openCourses.setVisibility(noSemesters ? GONE : VISIBLE);
             updateHeader(pager.getCurrentItem());
         });
         updateHeader(pager.getCurrentItem());
@@ -154,10 +161,10 @@ public class WeekFragment extends Fragment {
     private void showZoom(float zoom) {
         var percent = NumberFormat.getPercentInstance().format(zoom);
         zoomIndicator.setText(percent);
-        zoomIndicator.setContentDescription(getString(R.string.zoom_reset_description, percent));
+        zoomIndicator.setContentDescription(getString(zoom_reset_description, percent));
         zoomIndicator.removeCallbacks(hideZoom);
         zoomIndicator.animate().cancel();
-        zoomIndicator.setVisibility(View.VISIBLE);
+        zoomIndicator.setVisibility(VISIBLE);
         zoomIndicator.setAlpha(1f);
         if (zoom <= ZoomMetrics.MIN) zoomIndicator.postDelayed(hideZoom, ZOOM_INDICATOR_MS);
     }
@@ -170,8 +177,7 @@ public class WeekFragment extends Fragment {
     }
 
     private void fadeOutZoom() {
-        zoomIndicator.animate().alpha(0f).setDuration(250)
-                .withEndAction(() -> zoomIndicator.setVisibility(View.INVISIBLE));
+        zoomIndicator.animate().alpha(0f).setDuration(250).withEndAction(() -> zoomIndicator.setVisibility(INVISIBLE));
     }
 
     /**
@@ -189,13 +195,13 @@ public class WeekFragment extends Fragment {
         settings.setNotificationsAsked();
         ConfirmSheet.show(
                 getParentFragmentManager(), KEY_NOTIFICATIONS,
-                getString(R.string.reminder_permission_title), getString(R.string.reminder_permission_message),
-                getString(R.string.reminder_permission_allow), false
+                getString(reminder_permission_title), getString(reminder_permission_message),
+                getString(reminder_permission_allow), false
         );
     }
 
     private void allowNotifications() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (SDK_INT >= TIRAMISU) {
             askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS);
         } else {
             // Before Android 13 the notifications are on until the user turns them off in the settings.
@@ -236,12 +242,12 @@ public class WeekFragment extends Fragment {
         } else {
             title.setText(
                     timetable == null || timetable.semesters().isEmpty()
-                            ? getString(R.string.app_name) : getString(R.string.no_semester)
+                            ? getString(app_name) : getString(no_semester)
             );
         }
         subtitle.setText(
                 getString(
-                        R.string.week_subtitle,
+                        week_subtitle,
                         TimeFormat.dateShort(requireContext(), monday),
                         TimeFormat.dateShort(requireContext(), friday),
                         Weeks.isoWeekNumber(monday)

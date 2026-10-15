@@ -1,5 +1,9 @@
 package de.mcmodersd.unipensum.ui.week;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static de.mcmodersd.unipensum.domain.logic.Weeks.PAGE_COUNT;
+import static de.mcmodersd.unipensum.domain.model.NameStyle.LAST_NAME;
+
 import android.annotation.SuppressLint;
 import android.view.ViewGroup;
 
@@ -31,7 +35,7 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     private final ArrayList<WeekPageView> attached = new ArrayList<>();
     private Timetable timetable;
     private TimeWindow window = TimeWindow.DEFAULT;
-    private NameStyle nameStyle = NameStyle.LAST_NAME;
+    private NameStyle nameStyle = LAST_NAME;
     private WeekGridView.OnSessionClickListener clickListener;
     private OnZoomChangedListener zoomListener;
     private int scrollY;
@@ -75,11 +79,7 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     @Override
     public PageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         var page = new WeekPageView(parent.getContext(), new GridMetrics(parent.getContext()));
-        page.setLayoutParams(
-                new RecyclerView.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
-                )
-        );
+        page.setLayoutParams(new RecyclerView.LayoutParams(MATCH_PARENT, MATCH_PARENT));
         page.setScrollListener(this::onPageScrolled);
         page.setZoomListener(this::onPageZoomed);
         return new PageHolder(page);
@@ -94,7 +94,7 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
 
     @Override
     public int getItemCount() {
-        return Weeks.PAGE_COUNT;
+        return PAGE_COUNT;
     }
 
     @Override

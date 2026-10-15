@@ -1,12 +1,18 @@
 package de.mcmodersd.unipensum.ui.backup;
 
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.Gravity.CENTER_VERTICAL;
+import static android.view.View.*;
+import static android.view.ViewGroup.LayoutParams.*;
+import static android.widget.LinearLayout.VERTICAL;
+import static de.mcmodersd.unipensum.R.color.*;
+import static de.mcmodersd.unipensum.R.plurals.backup_error_password_short;
+import static de.mcmodersd.unipensum.R.string.*;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -20,7 +26,6 @@ import androidx.fragment.app.FragmentManager;
 
 import java.util.Arrays;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
 import de.mcmodersd.unipensum.data.db.Database;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
@@ -65,7 +70,7 @@ public final class BackupExportSheet extends UpSheet {
 
     @Override
     protected CharSequence title(@NonNull Context context) {
-        return context.getString(R.string.backup_export_title);
+        return context.getString(backup_export_title);
     }
 
     @Override
@@ -74,57 +79,54 @@ public final class BackupExportSheet extends UpSheet {
         var dp = getResources().getDisplayMetrics().density;
 
         var column = new LinearLayout(context);
-        column.setOrientation(LinearLayout.VERTICAL);
+        column.setOrientation(VERTICAL);
 
         // The form: explanation, password switch, password fields, button.
         var formColumn = new LinearLayout(context);
-        formColumn.setOrientation(LinearLayout.VERTICAL);
+        formColumn.setOrientation(VERTICAL);
         form = formColumn;
 
-        formColumn.addView(
-                text(context, R.string.backup_export_description, 16, R.color.text_secondary),
-                spaced(dp, 0, 16)
-        );
+        formColumn.addView(text(context, backup_export_description, 16, text_secondary), spaced(dp, 0, 16));
 
         var switchRow = new LinearLayout(context);
-        switchRow.setGravity(Gravity.CENTER_VERTICAL);
+        switchRow.setGravity(CENTER_VERTICAL);
         switchRow.setMinimumHeight(Math.round(48 * dp));
         switchRow.setPadding(Math.round(4 * dp), 0, Math.round(4 * dp), 0);
-        var switchLabel = text(context, R.string.backup_protect, 16, R.color.text_primary);
-        switchRow.addView(switchLabel, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        var switchLabel = text(context, backup_protect, 16, text_primary);
+        switchRow.addView(switchLabel, new LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f));
         protect = new UpSwitch(context);
-        protect.setContentDescription(getString(R.string.backup_protect));
+        protect.setContentDescription(getString(backup_protect));
         switchRow.addView(protect);
         formColumn.addView(switchRow, spaced(dp, 0, 8));
 
         var block = new LinearLayout(context);
-        block.setOrientation(LinearLayout.VERTICAL);
-        block.setVisibility(View.GONE);
-        password = passwordField(context, R.string.backup_password);
+        block.setOrientation(VERTICAL);
+        block.setVisibility(GONE);
+        password = passwordField(context, backup_password);
         block.addView(password, spaced(dp, 0, 12));
-        repeat = passwordField(context, R.string.backup_password_repeat);
+        repeat = passwordField(context, backup_password_repeat);
         block.addView(repeat, spaced(dp, 0, 8));
-        var hint = text(context, R.string.backup_password_hint, 13, R.color.text_secondary);
+        var hint = text(context, backup_password_hint, 13, text_secondary);
         hint.setPadding(Math.round(4 * dp), 0, Math.round(4 * dp), 0);
         block.addView(hint, spaced(dp, 0, 8));
         formColumn.addView(block, spaced(dp, 0, 0));
-        protect.setOnCheckedChangeListener(checked -> block.setVisibility(checked ? View.VISIBLE : View.GONE));
+        protect.setOnCheckedChangeListener(checked -> block.setVisibility(checked ? VISIBLE : GONE));
 
         exportButton = new UpButton(context);
-        exportButton.setText(R.string.backup_action_export);
+        exportButton.setText(backup_action_export);
         exportButton.setOnClickListener(v -> onExport());
         formColumn.addView(exportButton, spaced(dp, 12, 0));
         column.addView(formColumn);
 
         // The outcome: a message and a button, shown instead of the form.
-        status = text(context, R.string.backup_exporting, 16, R.color.text_primary);
+        status = text(context, backup_exporting, 16, text_primary);
         status.setPadding(Math.round(4 * dp), Math.round(8 * dp), Math.round(4 * dp), Math.round(16 * dp));
-        status.setVisibility(View.GONE);
+        status.setVisibility(GONE);
         column.addView(status);
         close = new UpButton(context);
-        close.setText(R.string.action_done);
+        close.setText(action_done);
         close.setOnClickListener(v -> dismiss());
-        close.setVisibility(View.GONE);
+        close.setVisibility(GONE);
         column.addView(close, spaced(dp, 0, 0));
         return column;
     }
@@ -153,14 +155,14 @@ public final class BackupExportSheet extends UpSheet {
             if (chars.length < MIN_PASSWORD_LENGTH) {
                 password.setError(
                         getResources().getQuantityString(
-                                R.plurals.backup_error_password_short,
+                                backup_error_password_short,
                                 MIN_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH
                         )
                 );
                 valid = false;
             }
             if (!Arrays.equals(chars, again)) {
-                repeat.setError(getString(R.string.backup_error_password_mismatch));
+                repeat.setError(getString(backup_error_password_mismatch));
                 valid = false;
             }
             clear(again);
@@ -188,7 +190,7 @@ public final class BackupExportSheet extends UpSheet {
         }
         if (!mine) {
             clear(chars);
-            if (target != null) showOutcome(R.string.backup_export_interrupted, true);
+            if (target != null) showOutcome(backup_export_interrupted, true);
             return;
         }
         exportButton.setEnabled(true);
@@ -197,39 +199,39 @@ public final class BackupExportSheet extends UpSheet {
             return;
         }
 
-        form.setVisibility(View.GONE);
-        status.setText(R.string.backup_exporting);
-        status.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary));
-        status.setVisibility(View.VISIBLE);
+        form.setVisibility(GONE);
+        status.setText(backup_exporting);
+        status.setTextColor(ContextCompat.getColor(requireContext(), text_primary));
+        status.setVisibility(VISIBLE);
         UniPensumApp.from(requireContext()).backups().export(target, chars, new Database.Callback<>() {
             @Override
             public void onSuccess(Void result) {
                 if (getView() == null) return;
                 Haptics.confirm(status);
-                showOutcome(R.string.backup_exported, false);
+                showOutcome(backup_exported, false);
             }
 
             @Override
             public void onError(Exception error) {
                 if (getView() == null) return;
                 Haptics.reject(status);
-                showOutcome(R.string.backup_export_failed, true);
+                showOutcome(backup_export_failed, true);
             }
         });
     }
 
     private void showOutcome(@StringRes int message, boolean error) {
-        form.setVisibility(View.GONE);
+        form.setVisibility(GONE);
         status.setText(message);
-        status.setTextColor(ContextCompat.getColor(requireContext(), error ? R.color.danger : R.color.text_primary));
-        status.setVisibility(View.VISIBLE);
-        close.setVisibility(View.VISIBLE);
+        status.setTextColor(ContextCompat.getColor(requireContext(), error ? danger : text_primary));
+        status.setVisibility(VISIBLE);
+        close.setVisibility(VISIBLE);
     }
 
     private TextView text(Context context, @StringRes int resource, float sp, int colorRes) {
         var view = new TextView(context);
         view.setText(resource);
-        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
+        view.setTextSize(COMPLEX_UNIT_SP, sp);
         view.setTextColor(ContextCompat.getColor(context, colorRes));
         return view;
     }
@@ -239,9 +241,7 @@ public final class BackupExportSheet extends UpSheet {
     }
 
     private static LinearLayout.LayoutParams spaced(float dp, int topDp, int bottomDp) {
-        var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+        var params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         params.topMargin = Math.round(topDp * dp);
         params.bottomMargin = Math.round(bottomDp * dp);
         return params;

@@ -1,10 +1,15 @@
 package de.mcmodersd.unipensum.ui.semester;
 
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.ViewGroup.LayoutParams.*;
+import static android.widget.LinearLayout.VERTICAL;
+import static de.mcmodersd.unipensum.R.color.text_secondary;
+import static de.mcmodersd.unipensum.R.drawable.ic_edit;
+import static de.mcmodersd.unipensum.R.string.*;
+
 import android.content.Context;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,7 +21,6 @@ import androidx.fragment.app.FragmentManager;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
 import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.ui.format.SemesterNames;
@@ -43,7 +47,7 @@ public final class SemesterSheet extends UpSheet {
 
     @Override
     protected CharSequence title(@NonNull Context context) {
-        return context.getString(R.string.semesters_title);
+        return context.getString(semesters_title);
     }
 
     @Override
@@ -52,22 +56,16 @@ public final class SemesterSheet extends UpSheet {
         var dp = getResources().getDisplayMetrics().density;
 
         var column = new LinearLayout(context);
-        column.setOrientation(LinearLayout.VERTICAL);
+        column.setOrientation(VERTICAL);
 
         list = new LinearLayout(context);
-        list.setOrientation(LinearLayout.VERTICAL);
-        column.addView(
-                list, new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-        );
+        list.setOrientation(VERTICAL);
+        column.addView(list, new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 
         var create = new UpButton(context);
-        create.setText(R.string.semester_new);
+        create.setText(semester_new);
         create.setOnClickListener(v -> SemesterEditorSheet.show(getParentFragmentManager(), null, current));
-        var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+        var params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         params.topMargin = Math.round(12 * dp);
         column.addView(create, params);
         return column;
@@ -88,9 +86,9 @@ public final class SemesterSheet extends UpSheet {
 
         if (semesters.isEmpty()) {
             var empty = new TextView(context);
-            empty.setText(R.string.semesters_empty);
-            empty.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-            empty.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+            empty.setText(semesters_empty);
+            empty.setTextSize(COMPLEX_UNIT_SP, 16);
+            empty.setTextColor(ContextCompat.getColor(context, text_secondary));
             empty.setPadding(Math.round(8 * dp), Math.round(4 * dp), 0, Math.round(4 * dp));
             list.addView(empty);
             return;
@@ -105,7 +103,7 @@ public final class SemesterSheet extends UpSheet {
                     TimeFormat.dateMedium(context, semester.start()) + " – "
                             + TimeFormat.dateMedium(context, semester.end())
             );
-            row.setAction(R.drawable.ic_edit, getString(R.string.action_edit), v ->
+            row.setAction(ic_edit, getString(action_edit), v ->
                     SemesterEditorSheet.show(getParentFragmentManager(), semester, semesters)
             );
             row.setOnClickListener(v -> {
@@ -114,9 +112,7 @@ public final class SemesterSheet extends UpSheet {
                 getParentFragmentManager().setFragmentResult(REQUEST_JUMP, result);
                 dismiss();
             });
-            var params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            );
+            var params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
             params.bottomMargin = Math.round(8 * dp);
             list.addView(row, params);
         }

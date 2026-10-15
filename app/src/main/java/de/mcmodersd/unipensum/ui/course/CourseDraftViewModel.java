@@ -1,5 +1,7 @@
 package de.mcmodersd.unipensum.ui.course;
 
+import static de.mcmodersd.unipensum.domain.model.CourseColor.BLUE;
+
 import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ public class CourseDraftViewModel extends ViewModel {
     private long courseId;
     private Semester semester;
     private String name = "";
-    private CourseColor color = CourseColor.BLUE;
+    private CourseColor color = BLUE;
     private String moodleLink = "";
     private final ArrayList<Series> series = new ArrayList<>();
 
@@ -27,7 +29,7 @@ public class CourseDraftViewModel extends ViewModel {
         this.courseId = 0;
         this.semester = semester;
         this.name = "";
-        this.color = CourseColor.BLUE;
+        this.color = BLUE;
         this.moodleLink = "";
         this.series.clear();
     }

@@ -1,5 +1,9 @@
 package de.mcmodersd.unipensum.ui.backup;
 
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.data.backup.BackupException.Reason.WRONG_PASSWORD;
+import static de.mcmodersd.unipensum.ui.backup.BackupImportViewModel.Step.*;
+
 import android.app.Application;
 import android.net.Uri;
 
@@ -10,7 +14,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.UniPensumApp;
 import de.mcmodersd.unipensum.data.backup.BackupException;
 import de.mcmodersd.unipensum.data.backup.BackupFile;
@@ -47,7 +50,7 @@ public class BackupImportViewModel extends AndroidViewModel {
     private BackupCleaner.Result loaded;
     private boolean wrongPassword;
     @StringRes
-    private int errorMessage = R.string.backup_error_generic;
+    private int errorMessage = backup_error_generic;
     private boolean started;
 
     public BackupImportViewModel(@NonNull Application application) {
@@ -88,12 +91,12 @@ public class BackupImportViewModel extends AndroidViewModel {
     public void start(Uri source) {
         if (started) return;
         started = true;
-        step.setValue(Step.READING);
+        step.setValue(READING);
         backups.open(source, new Database.Callback<>() {
             @Override
             public void onSuccess(BackupFile.Opened result) {
                 opened = result;
-                if (result.isEncrypted()) step.setValue(Step.PASSWORD);
+                if (result.isEncrypted()) step.setValue(PASSWORD);
                 else load(null);
             }
 
@@ -110,20 +113,20 @@ public class BackupImportViewModel extends AndroidViewModel {
     }
 
     private void load(@Nullable char[] password) {
-        step.setValue(Step.LOADING);
+        step.setValue(LOADING);
         backups.load(opened, password, new Database.Callback<>() {
             @Override
             public void onSuccess(BackupCleaner.Result result) {
                 loaded = result;
-                step.setValue(Step.REVIEW);
+                step.setValue(REVIEW);
             }
 
             @Override
             public void onError(Exception error) {
                 if (error instanceof BackupException
-                        && ((BackupException) error).reason() == BackupException.Reason.WRONG_PASSWORD) {
+                        && ((BackupException) error).reason() == WRONG_PASSWORD) {
                     wrongPassword = true;
-                    step.setValue(Step.PASSWORD);
+                    step.setValue(PASSWORD);
                 } else {
                     fail(error);
                 }
@@ -133,26 +136,26 @@ public class BackupImportViewModel extends AndroidViewModel {
 
     /** The user confirmed: replaces all data. Does nothing before {@link Step#REVIEW}. */
     public void confirm() {
-        if (loaded == null || step.getValue() != Step.REVIEW) return;
-        step.setValue(Step.IMPORTING);
+        if (loaded == null || step.getValue() != REVIEW) return;
+        step.setValue(IMPORTING);
         backups.replaceAll(loaded.data(), new Database.Callback<>() {
             @Override
             public void onSuccess(Void result) {
-                step.setValue(Step.DONE);
+                step.setValue(DONE);
             }
 
             @Override
             public void onError(Exception error) {
                 // The replacement is one transaction, so the old data is still all there.
-                errorMessage = R.string.backup_import_failed;
-                step.setValue(Step.ERROR);
+                errorMessage = backup_import_failed;
+                step.setValue(ERROR);
             }
         });
     }
 
     private void fail(Exception error) {
         errorMessage = messageFor(error);
-        step.setValue(Step.ERROR);
+        step.setValue(ERROR);
     }
 
     @StringRes
@@ -160,19 +163,19 @@ public class BackupImportViewModel extends AndroidViewModel {
         if (error instanceof BackupException) {
             switch (((BackupException) error).reason()) {
                 case NOT_A_BACKUP:
-                    return R.string.backup_error_not_a_backup;
+                    return backup_error_not_a_backup;
                 case DAMAGED:
-                    return R.string.backup_error_damaged;
+                    return backup_error_damaged;
                 case WRONG_PASSWORD:
-                    return R.string.backup_error_wrong_password;
+                    return backup_error_wrong_password;
                 case TOO_LARGE:
-                    return R.string.backup_error_too_large;
+                    return backup_error_too_large;
                 case UNSUPPORTED:
-                    return R.string.backup_error_unsupported;
+                    return backup_error_unsupported;
                 default:
                     break;
             }
         }
-        return R.string.backup_error_generic;
+        return backup_error_generic;
     }
 }

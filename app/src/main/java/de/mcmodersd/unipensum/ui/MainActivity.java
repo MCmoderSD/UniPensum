@@ -1,8 +1,16 @@
 package de.mcmodersd.unipensum.ui;
 
+import static android.content.pm.ActivityInfo.*;
+import static androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
+import static de.mcmodersd.unipensum.R.animator.*;
+import static de.mcmodersd.unipensum.R.drawable.*;
+import static de.mcmodersd.unipensum.R.id.container;
+import static de.mcmodersd.unipensum.R.layout.activity_main;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.debug.DebugSeeder.EXTRA_SEED;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -48,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         lockPhonesToPortrait();
-        setContentView(R.layout.activity_main);
+        setContentView(activity_main);
 
         pane = findViewById(R.id.pane);
         View side = findViewById(R.id.side);
@@ -74,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         if (savedInstanceState == null) {
             seedIfAsked(getIntent());
             manager.beginTransaction()
-                    .replace(R.id.container, new WeekFragment())
+                    .replace(container, new WeekFragment())
                     .commit();
             openSessionOfIntent(getIntent());
         }
@@ -94,8 +102,8 @@ public class MainActivity extends AppCompatActivity implements Navigator {
      * taken from the intent, so it applies once, also when the app was already open (a new intent then).
      */
     private void seedIfAsked(Intent intent) {
-        if (!intent.getBooleanExtra(DebugSeeder.EXTRA_SEED, false)) return;
-        intent.removeExtra(DebugSeeder.EXTRA_SEED);
+        if (!intent.getBooleanExtra(EXTRA_SEED, false)) return;
+        intent.removeExtra(EXTRA_SEED);
         DebugSeeder.seed(this, intent);
     }
 
@@ -124,10 +132,7 @@ public class MainActivity extends AppCompatActivity implements Navigator {
     @SuppressLint("SourceLockedOrientationActivity")
     private void lockPhonesToPortrait() {
         var tablet = getResources().getConfiguration().smallestScreenWidthDp >= TABLET_MIN_SMALLEST_WIDTH_DP;
-        setRequestedOrientation(
-                tablet
-                        ? ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        );
+        setRequestedOrientation(tablet ? SCREEN_ORIENTATION_UNSPECIFIED : SCREEN_ORIENTATION_PORTRAIT);
     }
 
     @Override
@@ -142,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements Navigator {
 
     @Override
     public void open(Fragment fragment) {
-        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getSupportFragmentManager().popBackStack(null, POP_BACK_STACK_INCLUSIVE);
         show(fragment, true);
     }
 
@@ -169,12 +174,9 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         var transaction = getSupportFragmentManager().beginTransaction().setReorderingAllowed(true);
         if (firstPage && pane.isSplit()) {
             // The pane slides in and out by itself; the page only has to stay put while it does.
-            transaction.setCustomAnimations(0, 0, 0, R.animator.pane_hold);
+            transaction.setCustomAnimations(0, 0, 0, pane_hold);
         } else {
-            transaction.setCustomAnimations(
-                    R.animator.screen_enter, R.animator.screen_exit,
-                    R.animator.screen_pop_enter, R.animator.screen_pop_exit
-            );
+            transaction.setCustomAnimations(screen_enter, screen_exit, screen_pop_enter, screen_pop_exit);
         }
         transaction.replace(R.id.side, fragment, firstPage ? FIRST_PAGE : null).addToBackStack(null).commit();
     }
@@ -188,8 +190,8 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         ImageView back = view == null ? null : view.findViewById(R.id.back);
         if (back == null) return;
         var closes = pane.isSplit() && FIRST_PAGE.equals(page.getTag());
-        back.setImageResource(closes ? R.drawable.ic_close : R.drawable.ic_chevron_left);
-        back.setContentDescription(getString(closes ? R.string.action_close : R.string.action_back));
+        back.setImageResource(closes ? ic_close : ic_chevron_left);
+        back.setContentDescription(getString(closes ? action_close : action_back));
     }
 
     private final class CloseIcon extends FragmentManager.FragmentLifecycleCallbacks {

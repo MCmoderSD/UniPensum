@@ -1,5 +1,8 @@
 package de.mcmodersd.unipensum.ui.week;
 
+import static android.view.MotionEvent.*;
+import static android.view.ViewGroup.LayoutParams.*;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
@@ -69,15 +72,15 @@ final class WeekPageView extends LinearLayout {
         setOrientation(VERTICAL);
 
         header = new WeekHeaderView(context, metrics);
-        addView(header, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        addView(header, new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 
         scroll = new ScrollView(context);
         scroll.setFillViewport(true);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setOverScrollMode(OVER_SCROLL_NEVER);
         grid = new WeekGridView(context, metrics);
-        scroll.addView(grid, new ScrollView.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        addView(scroll, new LayoutParams(LayoutParams.MATCH_PARENT, 0, 1f));
+        scroll.addView(grid, new ScrollView.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+        addView(scroll, new LayoutParams(MATCH_PARENT, 0, 1f));
 
         pinch = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
             @Override
@@ -184,10 +187,10 @@ final class WeekPageView extends LinearLayout {
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         var action = event.getActionMasked();
-        if (action == MotionEvent.ACTION_DOWN) {
+        if (action == ACTION_DOWN) {
             stopReset();
             swallowing = false;
-        } else if (action == MotionEvent.ACTION_POINTER_DOWN) {
+        } else if (action == ACTION_POINTER_DOWN) {
             // A second finger may start a pinch, which the pager must not take for a swipe to the next week.
             getParent().requestDisallowInterceptTouchEvent(true);
         }
@@ -200,7 +203,7 @@ final class WeekPageView extends LinearLayout {
         if (!wasSwallowing) {
             // The scroll the first finger started ends here, without a fling.
             var cancel = MotionEvent.obtain(event);
-            cancel.setAction(MotionEvent.ACTION_CANCEL);
+            cancel.setAction(ACTION_CANCEL);
             super.dispatchTouchEvent(cancel);
             cancel.recycle();
         }

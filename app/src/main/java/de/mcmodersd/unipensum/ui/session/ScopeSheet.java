@@ -1,9 +1,13 @@
 package de.mcmodersd.unipensum.ui.session;
 
+import static android.view.ViewGroup.LayoutParams.*;
+import static android.widget.LinearLayout.VERTICAL;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.domain.model.EditScope.*;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -13,7 +17,6 @@ import androidx.fragment.app.FragmentManager;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.domain.model.EditScope;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
 import de.mcmodersd.unipensum.ui.widget.UpRow;
@@ -56,15 +59,10 @@ public final class ScopeSheet extends UpSheet {
         var date = TimeFormat.dateMedium(context, day);
 
         var column = new LinearLayout(context);
-        column.setOrientation(LinearLayout.VERTICAL);
-        column.addView(row(context, dp, EditScope.THIS_ONLY, R.string.scope_this_only, date));
-        column.addView(
-                row(
-                        context, dp, EditScope.THIS_AND_FOLLOWING, R.string.scope_this_and_following,
-                        getString(R.string.scope_from, date)
-                )
-        );
-        column.addView(row(context, dp, EditScope.ALL, R.string.scope_all, null));
+        column.setOrientation(VERTICAL);
+        column.addView(row(context, dp, THIS_ONLY, scope_this_only, date));
+        column.addView(row(context, dp, THIS_AND_FOLLOWING, scope_this_and_following, getString(scope_from, date)));
+        column.addView(row(context, dp, ALL, scope_all, null));
         return column;
     }
 
@@ -79,9 +77,7 @@ public final class ScopeSheet extends UpSheet {
             getParentFragmentManager().setFragmentResult(Objects.requireNonNull(requireArguments().getString(ARG_KEY)), result);
             dismiss();
         });
-        var params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+        var params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         params.bottomMargin = Math.round(8 * dp);
         row.setLayoutParams(params);
         return row;
