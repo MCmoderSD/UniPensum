@@ -1,5 +1,6 @@
 package de.mcmodersd.unipensum;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class PrivacyPolicyTest {
         var found = 0;
         while (permissions.find()) {
             found++;
-            var name = permissions.group(1);
+            var name = requireNonNull(permissions.group(1));
             assertTrue("The privacy policy does not name " + name, policy.contains(name));
         }
         assertTrue("The manifest has no permissions to check", found > 0);
@@ -43,7 +44,7 @@ public class PrivacyPolicyTest {
         var canonical = CANONICAL.matcher(Files.readString(START_PAGE));
         assertTrue("The app has no website_url", link.find());
         assertTrue("The start page has no canonical link", canonical.find());
-        assertEquals(canonical.group(1), link.group(1).trim());
+        assertEquals(canonical.group(1), requireNonNull(link.group(1)).trim());
     }
 
     @Test

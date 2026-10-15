@@ -204,6 +204,7 @@ public final class DebugSeeder {
         );
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static SessionDetails note(SessionDetails details, String note) {
         return new SessionDetails(
                 details.type(), details.startMin(), details.endMin(), details.mode(), details.hybrid(),
@@ -211,6 +212,7 @@ public final class DebugSeeder {
         );
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static SessionDetails reminder(SessionDetails details, int minutes) {
         return new SessionDetails(
                 details.type(), details.startMin(), details.endMin(), details.mode(), details.hybrid(),

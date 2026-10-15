@@ -1,6 +1,5 @@
 package de.mcmodersd.unipensum.ui.widget;
 
-import static android.text.InputType.TYPE_CLASS_NUMBER;
 import static android.util.TypedValue.COMPLEX_UNIT_SP;
 import static android.view.Gravity.*;
 import static android.view.View.*;
