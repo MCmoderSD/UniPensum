@@ -30,7 +30,6 @@ public class UniPensumApp extends Application {
         settings = new AppSettings(this);
         settings.applyTheme();
         ReminderNotifier.createChannel(this);
-        // The next reminder follows the data: whatever is saved or imported moves or removes the alarm.
         database.setWriteListener(() -> ReminderScheduler.update(this, false, null));
     }
 
