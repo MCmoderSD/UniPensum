@@ -1,5 +1,13 @@
 package de.mcmodersd.unipensum.reminder;
 
+import static android.app.Notification.CATEGORY_EVENT;
+import static android.app.NotificationManager.IMPORTANCE_HIGH;
+import static android.app.PendingIntent.*;
+import static android.content.Intent.*;
+import static de.mcmodersd.unipensum.R.drawable.ic_notification;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.ui.MainActivity.EXTRA_SESSION_ID;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,7 +21,6 @@ import androidx.annotation.Nullable;
 import java.time.ZoneId;
 import java.util.ArrayList;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.data.ReminderView;
 import de.mcmodersd.unipensum.domain.logic.Reminders;
 import de.mcmodersd.unipensum.domain.text.TextSanitizer;
@@ -35,11 +42,8 @@ public final class ReminderNotifier {
 
     /** Idempotent. The user can change sound and priority of the channel in the system settings. */
     public static void createChannel(Context context) {
-        var channel = new NotificationChannel(
-                CHANNEL_ID,
-                context.getString(R.string.reminder_channel_name), NotificationManager.IMPORTANCE_HIGH
-        );
-        channel.setDescription(context.getString(R.string.reminder_channel_description));
+        var channel = new NotificationChannel(CHANNEL_ID, context.getString(reminder_channel_name), IMPORTANCE_HIGH);
+        channel.setDescription(context.getString(reminder_channel_description));
         context.getSystemService(NotificationManager.class).createNotificationChannel(channel);
     }
 
@@ -60,10 +64,10 @@ public final class ReminderNotifier {
         var id = idOf(view.session().id());
 
         var builder = new Notification.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification)
+                .setSmallIcon(ic_notification)
                 .setContentTitle(view.courseName())
                 .setContentText(String.join(" · ", parts))
-                .setCategory(Notification.CATEGORY_EVENT)
+                .setCategory(CATEGORY_EVENT)
                 .setWhen(startMillis)
                 .setShowWhen(true)
                 .setAutoCancel(true)
@@ -71,10 +75,10 @@ public final class ReminderNotifier {
                 .setContentIntent(openEvent(context, view.session().id(), id));
 
         if (details.link() != null) {
-            builder.addAction(action(context, id, 1, context.getString(R.string.action_open_meeting), details.link()));
+            builder.addAction(action(context, id, 1, context.getString(action_open_meeting), details.link()));
         }
         if (view.moodleLink() != null) {
-            builder.addAction(action(context, id, 2, context.getString(R.string.action_open_moodle), view.moodleLink()));
+            builder.addAction(action(context, id, 2, context.getString(action_open_moodle), view.moodleLink()));
         }
         context.getSystemService(NotificationManager.class).notify(TAG, id, builder.build());
     }
@@ -86,12 +90,9 @@ public final class ReminderNotifier {
 
     private static PendingIntent openEvent(Context context, long sessionId, int id) {
         var intent = new Intent(context, MainActivity.class)
-                .putExtra(MainActivity.EXTRA_SESSION_ID, sessionId)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        return PendingIntent.getActivity(
-                context, id, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
+                .putExtra(EXTRA_SESSION_ID, sessionId)
+                .addFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_SINGLE_TOP);
+        return PendingIntent.getActivity(context, id, intent, FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE);
     }
 
     /** A button that opens a web link. The link was checked when it was saved, and is checked again here. */
@@ -102,12 +103,9 @@ public final class ReminderNotifier {
         } catch (IllegalArgumentException notAWebLink) {
             url = null;
         }
-        var intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url == null ? "about:blank" : url))
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        var pending = PendingIntent.getActivity(
-                context, id * 4 + slot, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
+        var intent = new Intent(ACTION_VIEW, Uri.parse(url == null ? "about:blank" : url))
+                .addFlags(FLAG_ACTIVITY_NEW_TASK);
+        var pending = PendingIntent.getActivity(context, id * 4 + slot, intent, FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE);
         return new Notification.Action.Builder(null, title, pending).build();
     }
 }

@@ -1,5 +1,10 @@
 package de.mcmodersd.unipensum.reminder;
 
+import static android.app.AlarmManager.RTC_WAKEUP;
+import static android.app.PendingIntent.*;
+import static android.content.Context.MODE_PRIVATE;
+import static de.mcmodersd.unipensum.reminder.ReminderReceiver.ACTION_ALARM;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -75,7 +80,7 @@ public final class ReminderScheduler {
 
     private static void plan(Context context, ArrayList<ReminderView> views, boolean showDue, long nowMillis,
                              LocalDateTime now, ZoneId zone) {
-        var state = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        var state = context.getSharedPreferences(PREFS, MODE_PRIVATE);
         var lastRun = state.getLong(KEY_LAST_RUN, 0);
         // The first run has no past: nothing that was due before the app was installed is shown.
         var after = lastRun == 0 ? now : LocalDateTime.ofInstant(Instant.ofEpochMilli(lastRun), zone);
@@ -105,18 +110,15 @@ public final class ReminderScheduler {
         if (triggerMillis == null) {
             alarms.cancel(pending);
         } else if (alarms.canScheduleExactAlarms()) {
-            alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerMillis, pending);
+            alarms.setExactAndAllowWhileIdle(RTC_WAKEUP, triggerMillis, pending);
         } else {
             // Without the permission to be exact, the system may be a few minutes late, but still keeps the alarm.
-            alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerMillis, pending);
+            alarms.setAndAllowWhileIdle(RTC_WAKEUP, triggerMillis, pending);
         }
     }
 
     private static PendingIntent alarmIntent(Context context) {
-        var intent = new Intent(context, ReminderReceiver.class).setAction(ReminderReceiver.ACTION_ALARM);
-        return PendingIntent.getBroadcast(
-                context, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
+        var intent = new Intent(context, ReminderReceiver.class).setAction(ACTION_ALARM);
+        return PendingIntent.getBroadcast(context, 0, intent, FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE);
     }
 }

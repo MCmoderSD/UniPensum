@@ -1,6 +1,8 @@
 package de.mcmodersd.unipensum.reminder;
 
-import android.app.AlarmManager;
+import static android.app.AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED;
+import static android.content.Intent.*;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,9 +28,9 @@ public final class ReminderReceiver extends BroadcastReceiver {
     private static boolean isKnown(String action) {
         if (action == null) return false;
         return switch (action) {
-            case ACTION_ALARM, Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_TIME_CHANGED,
-                 Intent.ACTION_TIMEZONE_CHANGED, Intent.ACTION_MY_PACKAGE_REPLACED,
-                 AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> true;
+            case ACTION_ALARM, ACTION_BOOT_COMPLETED, ACTION_TIME_CHANGED,
+                 ACTION_TIMEZONE_CHANGED, ACTION_MY_PACKAGE_REPLACED,
+                 ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> true;
             default -> false;
         };
     }
