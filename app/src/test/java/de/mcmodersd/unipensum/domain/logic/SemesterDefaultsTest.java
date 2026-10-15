@@ -1,11 +1,10 @@
 package de.mcmodersd.unipensum.domain.logic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static java.time.DayOfWeek.*;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -19,10 +18,10 @@ public class SemesterDefaultsTest {
         var period = SemesterDefaults.suggest(LocalDate.of(2026, 10, 4), List.of());
 
         assertEquals(LocalDate.of(2026, 10, 5), period.start());
-        assertEquals(DayOfWeek.MONDAY, period.start().getDayOfWeek());
+        assertEquals(MONDAY, period.start().getDayOfWeek());
         // 16 weeks, ending on the Friday of the last one.
         assertEquals(LocalDate.of(2027, 1, 22), period.end());
-        assertEquals(DayOfWeek.FRIDAY, period.end().getDayOfWeek());
+        assertEquals(FRIDAY, period.end().getDayOfWeek());
     }
 
     @Test
@@ -55,7 +54,7 @@ public class SemesterDefaultsTest {
 
         var end = SemesterDefaults.lectureEnd(start);
 
-        assertEquals(DayOfWeek.FRIDAY, end.getDayOfWeek());
+        assertEquals(FRIDAY, end.getDayOfWeek());
         assertEquals(15, ChronoUnit.WEEKS.between(start, end));       // 15 full weeks plus the days of the 16th
         assertEquals(LocalDate.of(2027, 1, 22), end);
     }
@@ -72,7 +71,7 @@ public class SemesterDefaultsTest {
         for (var i = 0; i < 400; i++) {
             var end = SemesterDefaults.lectureEnd(start.plusDays(i));
             var day = end.getDayOfWeek();
-            assertTrue("Weekend end for start " + start.plusDays(i), day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY);
+            assertTrue("Weekend end for start " + start.plusDays(i), day != SATURDAY && day != SUNDAY);
             // Never longer than 16 weeks, and the weekend move costs at most two days.
             var days = ChronoUnit.DAYS.between(start.plusDays(i), end) + 1;
             assertTrue(days <= 16 * 7 && days >= 16 * 7 - 2);

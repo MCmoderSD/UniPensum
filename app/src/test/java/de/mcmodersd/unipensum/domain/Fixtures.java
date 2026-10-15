@@ -1,17 +1,19 @@
 package de.mcmodersd.unipensum.domain;
 
+import static de.mcmodersd.unipensum.domain.model.Mode.IN_PERSON;
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.NO_REMINDER;
+import static de.mcmodersd.unipensum.domain.model.SessionType.LECTURE;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 import de.mcmodersd.unipensum.domain.logic.Recurrence;
-import de.mcmodersd.unipensum.domain.model.Mode;
 import de.mcmodersd.unipensum.domain.model.Schedule;
 import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.model.Session;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
-import de.mcmodersd.unipensum.domain.model.SessionType;
 
 public final class Fixtures {
 
@@ -30,10 +32,7 @@ public final class Fixtures {
 
     /** Lecture, 08:00 to 11:00, in person, room A1, lecturer {@link #LECTURER}. */
     public static SessionDetails details() {
-        return new SessionDetails(
-                SessionType.LECTURE, 8 * 60, 11 * 60, Mode.IN_PERSON, false,
-                "A1", null, LECTURER, null, SessionDetails.NO_REMINDER
-        );
+        return new SessionDetails(LECTURE, 8 * 60, 11 * 60, IN_PERSON, false, "A1", null, LECTURER, null, NO_REMINDER);
     }
 
     public static SessionDetails withRoom(SessionDetails d, String room) {

@@ -1,17 +1,11 @@
 package de.mcmodersd.unipensum.domain.logic;
 
-import static de.mcmodersd.unipensum.domain.Fixtures.SEMESTER;
-import static de.mcmodersd.unipensum.domain.Fixtures.date;
-import static de.mcmodersd.unipensum.domain.Fixtures.series;
-import static de.mcmodersd.unipensum.domain.Fixtures.sessionsOf;
-import static de.mcmodersd.unipensum.domain.Fixtures.weekly;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static de.mcmodersd.unipensum.domain.Fixtures.*;
+import static java.time.DayOfWeek.*;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,21 +73,18 @@ public class SemesterRulesTest {
 
     @Test
     public void checkSchedule_distinguishesCases() {
-        assertEquals(
-                ScheduleCheck.OK,
-                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(10, 5), date(2, 12)))
-        );
+        assertEquals(ScheduleCheck.OK, SemesterRules.checkSchedule(SEMESTER, weekly(MONDAY, date(10, 5), date(2, 12))));
         assertEquals(
                 ScheduleCheck.EMPTY_RANGE,
-                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(11, 2), date(10, 5)))
+                SemesterRules.checkSchedule(SEMESTER, weekly(MONDAY, date(11, 2), date(10, 5)))
         );
         assertEquals(
                 ScheduleCheck.OUTSIDE_SEMESTER,
-                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(9, 28), date(11, 2)))
+                SemesterRules.checkSchedule(SEMESTER, weekly(MONDAY, date(9, 28), date(11, 2)))
         );
         assertEquals(
                 ScheduleCheck.OUTSIDE_SEMESTER,
-                SemesterRules.checkSchedule(SEMESTER, weekly(DayOfWeek.MONDAY, date(10, 5), date(2, 15)))
+                SemesterRules.checkSchedule(SEMESTER, weekly(MONDAY, date(10, 5), date(2, 15)))
         );
     }
 
@@ -115,7 +106,7 @@ public class SemesterRulesTest {
     @Test
     public void resize_shorteningTheEnd_clipsSeriesAndDeletesLaterSessions() {
         var updated = semester(1, date(10, 5), date(10, 30));                    // ends Friday
-        var series = series(10, weekly(DayOfWeek.MONDAY, date(10, 5), date(11, 13)));
+        var series = series(10, weekly(MONDAY, date(10, 5), date(11, 13)));
         var sessions = allSessions(series);                                 // Oct 5 ... Nov 9
 
         var changes = SemesterRules.resize(OLD, updated, List.of(series), sessions);
@@ -130,8 +121,8 @@ public class SemesterRulesTest {
     @Test
     public void resize_extendingTheEnd_prolongsSeriesThatRanToTheOldEnd() {
         var updated = semester(1, date(10, 5), date(11, 27));
-        var running = series(10, weekly(DayOfWeek.MONDAY, date(10, 5), date(11, 13)));
-        var ended = series(20, weekly(DayOfWeek.TUESDAY, date(10, 5), date(10, 27)));
+        var running = series(10, weekly(MONDAY, date(10, 5), date(11, 13)));
+        var ended = series(20, weekly(TUESDAY, date(10, 5), date(10, 27)));
         var sessions = allSessions(running, ended);
 
         var changes = SemesterRules.resize(OLD, updated, List.of(running, ended), sessions);
@@ -149,7 +140,7 @@ public class SemesterRulesTest {
     @Test
     public void resize_extendingTheEnd_keepsPhaseOfBiweeklySeries() {
         var updated = semester(1, date(10, 5), date(11, 27));
-        var biweekly = series(10, new Schedule(DayOfWeek.THURSDAY, date(10, 5), date(11, 13), 2));
+        var biweekly = series(10, new Schedule(THURSDAY, date(10, 5), date(11, 13), 2));
         var sessions = allSessions(biweekly);                               // Oct 8, 22, Nov 5
 
         var changes = SemesterRules.resize(OLD, updated, List.of(biweekly), sessions);
@@ -161,8 +152,8 @@ public class SemesterRulesTest {
     @Test
     public void resize_shorteningTheStart_movesFirstDayAndDeletesEarlierSessions() {
         var updated = semester(1, date(10, 19), date(11, 13));
-        var weekly = series(10, weekly(DayOfWeek.MONDAY, date(10, 5), date(11, 13)));
-        var biweekly = series(20, new Schedule(DayOfWeek.THURSDAY, date(10, 5), date(11, 13), 2));
+        var weekly = series(10, weekly(MONDAY, date(10, 5), date(11, 13)));
+        var biweekly = series(20, new Schedule(THURSDAY, date(10, 5), date(11, 13), 2));
         var sessions = allSessions(weekly, biweekly);
 
         var changes = SemesterRules.resize(OLD, updated, List.of(weekly, biweekly), sessions);
@@ -177,7 +168,7 @@ public class SemesterRulesTest {
     @Test
     public void resize_seriesLeftWithoutAnyOccurrence_isDeleted() {
         var updated = semester(1, date(10, 19), date(11, 13));
-        var early = series(10, weekly(DayOfWeek.MONDAY, date(10, 5), date(10, 12)));
+        var early = series(10, weekly(MONDAY, date(10, 5), date(10, 12)));
         var sessions = allSessions(early);
 
         var changes = SemesterRules.resize(OLD, updated, List.of(early), sessions);
@@ -191,7 +182,7 @@ public class SemesterRulesTest {
     @Test
     public void resize_extendingTheStart_leavesSeriesUntouched() {
         var updated = semester(1, date(9, 28), date(11, 13));
-        var series = series(10, weekly(DayOfWeek.MONDAY, date(10, 5), date(11, 13)));
+        var series = series(10, weekly(MONDAY, date(10, 5), date(11, 13)));
 
         var changes = SemesterRules.resize(OLD, updated, List.of(series), allSessions(series));
 
@@ -200,7 +191,7 @@ public class SemesterRulesTest {
 
     @Test
     public void resize_unchangedPeriod_changesNothing() {
-        var series = series(10, weekly(DayOfWeek.MONDAY, date(10, 5), date(11, 13)));
+        var series = series(10, weekly(MONDAY, date(10, 5), date(11, 13)));
 
         var changes = SemesterRules.resize(OLD, OLD, List.of(series), allSessions(series));
 

@@ -1,23 +1,13 @@
 package de.mcmodersd.unipensum.domain.logic;
 
-import static de.mcmodersd.unipensum.domain.Fixtures.SEMESTER;
-import static de.mcmodersd.unipensum.domain.Fixtures.byId;
-import static de.mcmodersd.unipensum.domain.Fixtures.date;
-import static de.mcmodersd.unipensum.domain.Fixtures.details;
-import static de.mcmodersd.unipensum.domain.Fixtures.series;
-import static de.mcmodersd.unipensum.domain.Fixtures.sessionsOf;
-import static de.mcmodersd.unipensum.domain.Fixtures.weekly;
-import static de.mcmodersd.unipensum.domain.Fixtures.withLecturer;
-import static de.mcmodersd.unipensum.domain.Fixtures.withNote;
-import static de.mcmodersd.unipensum.domain.Fixtures.withRoom;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static de.mcmodersd.unipensum.domain.Fixtures.*;
+import static de.mcmodersd.unipensum.domain.model.EditScope.*;
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.*;
+import static java.time.DayOfWeek.*;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +23,7 @@ import de.mcmodersd.unipensum.domain.model.SessionDetails;
  */
 public class SeriesEditorTest {
 
-    private final Series series = series(10, weekly(DayOfWeek.MONDAY, date(10, 5), date(11, 2)));
+    private final Series series = series(10, weekly(MONDAY, date(10, 5), date(11, 2)));
     private final ArrayList<Session> sessions = sessionsOf(series, 101);
 
     private ChangeSet edit(long sessionId, EditScope scope, SessionDetails details, Schedule schedule) {
@@ -49,7 +39,7 @@ public class SeriesEditorTest {
     public void editThisOnly_changesJustThatSession() {
         var changed = withRoom(details(), "B2");
 
-        var changes = edit(103, EditScope.THIS_ONLY, changed, series.schedule());
+        var changes = edit(103, THIS_ONLY, changed, series.schedule());
 
         assertEquals(1, changes.updatedSessions.size());
         assertEquals(new Session(103, 10, date(10, 19), changed), changes.updatedSessions.get(0));
@@ -61,7 +51,7 @@ public class SeriesEditorTest {
     @Test
     public void editThisOnly_canMoveToAnotherWeekday() {
         var changes = SeriesEditor.edit(
-                SEMESTER, series, sessions, 103, EditScope.THIS_ONLY,
+                SEMESTER, series, sessions, 103, THIS_ONLY,
                 details(), date(10, 21), series.schedule()
         );
 
@@ -70,18 +60,18 @@ public class SeriesEditorTest {
 
     @Test
     public void editThisOnly_withoutAnyChange_isEmpty() {
-        assertTrue(edit(103, EditScope.THIS_ONLY, details(), series.schedule()).isEmpty());
+        assertTrue(edit(103, THIS_ONLY, details(), series.schedule()).isEmpty());
     }
 
     @Test
     public void editThisOnly_rejectsWeekendAndDatesOutsideTheSemester() {
         assertThrows(IllegalArgumentException.class, () -> SeriesEditor.edit(
                 SEMESTER, series, sessions, 103,
-                EditScope.THIS_ONLY, details(), date(10, 24), series.schedule()
+                THIS_ONLY, details(), date(10, 24), series.schedule()
         ));          // Saturday
         assertThrows(IllegalArgumentException.class, () -> SeriesEditor.edit(
                 SEMESTER, series, sessions, 103,
-                EditScope.THIS_ONLY, details(), date(10, 2), series.schedule()
+                THIS_ONLY, details(), date(10, 2), series.schedule()
         ));           // before the semester
     }
 
@@ -93,7 +83,7 @@ public class SeriesEditorTest {
 
     @Test
     public void editThisOnly_changesTheReminderOfThatSessionOnly() {
-        var changes = edit(103, EditScope.THIS_ONLY, withReminder(10), series.schedule());
+        var changes = edit(103, THIS_ONLY, withReminder(10), series.schedule());
 
         assertEquals(1, changes.updatedSessions.size());
         assertEquals(10, changes.updatedSessions.get(0).details().reminderMin());
@@ -102,7 +92,7 @@ public class SeriesEditorTest {
 
     @Test
     public void editAll_carriesTheReminderToEverySessionAndTheSeries() {
-        var changes = edit(103, EditScope.ALL, withReminder(10), series.schedule());
+        var changes = edit(103, ALL, withReminder(10), series.schedule());
 
         assertEquals(10, changes.updatedSeries.get(0).details().reminderMin());
         assertEquals(5, changes.updatedSessions.size());
@@ -113,7 +103,7 @@ public class SeriesEditorTest {
     public void editAll_keepsASessionThatHasAReminderOfItsOwn() {
         sessions.set(2, sessions.get(2).withDetails(withReminder(60)));
 
-        var changes = edit(101, EditScope.ALL, withRoom(details(), "B2"), series.schedule());
+        var changes = edit(101, ALL, withRoom(details(), "B2"), series.schedule());
 
         assertEquals(60, byId(changes.updatedSessions, 103).details().reminderMin());
         assertEquals("B2", byId(changes.updatedSessions, 103).details().room());
@@ -125,8 +115,8 @@ public class SeriesEditorTest {
         var remindedSessions = sessionsOf(reminded, 101);
 
         var changes = SeriesEditor.edit(
-                SEMESTER, reminded, remindedSessions, 101, EditScope.ALL,
-                withReminder(SessionDetails.NO_REMINDER), date(10, 5), reminded.schedule()
+                SEMESTER, reminded, remindedSessions, 101, ALL,
+                withReminder(NO_REMINDER), date(10, 5), reminded.schedule()
         );
 
         assertEquals(5, changes.updatedSessions.size());
@@ -136,7 +126,7 @@ public class SeriesEditorTest {
 
     @Test
     public void editFollowing_carriesTheReminderFromThatSessionOn() {
-        var changes = edit(103, EditScope.THIS_AND_FOLLOWING, withReminder(15), series.schedule());
+        var changes = edit(103, THIS_AND_FOLLOWING, withReminder(15), series.schedule());
 
         var created = changes.newSeries.get(0);
         assertEquals(15, created.series().details().reminderMin());
@@ -150,7 +140,7 @@ public class SeriesEditorTest {
     public void editAll_carriesChangedFieldToTemplateAndEverySession() {
         var changed = withRoom(details(), "B2");
 
-        var changes = edit(103, EditScope.ALL, changed, series.schedule());
+        var changes = edit(103, ALL, changed, series.schedule());
 
         assertEquals(changed, changes.updatedSeries.get(0).details());
         assertEquals(5, changes.updatedSessions.size());
@@ -163,7 +153,7 @@ public class SeriesEditorTest {
     public void editAll_keepsIndividualDeviationsInOtherFields() {
         sessions.set(2, sessions.get(2).withDetails(withNote(details(), "bring laptop")));
 
-        var changes = edit(101, EditScope.ALL, withRoom(details(), "B2"), series.schedule());
+        var changes = edit(101, ALL, withRoom(details(), "B2"), series.schedule());
 
         var third = byId(changes.updatedSessions, 103);
         assertEquals("B2", third.details().room());
@@ -174,7 +164,7 @@ public class SeriesEditorTest {
     public void editAll_changedLecturer_reachesEverySessionAndKeepsOtherDeviations() {
         sessions.set(2, sessions.get(2).withDetails(withNote(details(), "bring laptop")));
 
-        var changes = edit(101, EditScope.ALL, withLecturer(details(), 9), series.schedule());
+        var changes = edit(101, ALL, withLecturer(details(), 9), series.schedule());
 
         assertEquals(9, changes.updatedSeries.get(0).details().lecturerId());
         assertEquals(5, changes.updatedSessions.size());
@@ -186,7 +176,7 @@ public class SeriesEditorTest {
     public void editAll_otherField_keepsALecturerSetOnOneSession() {
         sessions.set(2, sessions.get(2).withDetails(withLecturer(details(), 9)));
 
-        var changes = edit(101, EditScope.ALL, withRoom(details(), "B2"), series.schedule());
+        var changes = edit(101, ALL, withRoom(details(), "B2"), series.schedule());
 
         var third = byId(changes.updatedSessions, 103);
         assertEquals("B2", third.details().room());
@@ -195,21 +185,18 @@ public class SeriesEditorTest {
 
     @Test
     public void editThisOnly_removingTheLecturer_touchesOnlyThatSession() {
-        var changes = edit(
-                103, EditScope.THIS_ONLY,
-                withLecturer(details(), SessionDetails.NO_LECTURER), series.schedule()
-        );
+        var changes = edit(103, THIS_ONLY, withLecturer(details(), NO_LECTURER), series.schedule());
 
         assertEquals(1, changes.updatedSessions.size());
-        assertEquals(SessionDetails.NO_LECTURER, changes.updatedSessions.get(0).details().lecturerId());
+        assertEquals(NO_LECTURER, changes.updatedSessions.get(0).details().lecturerId());
         assertTrue(changes.updatedSeries.isEmpty());
     }
 
     @Test
     public void editAll_changedSchedule_regeneratesSessions() {
-        var biweekly = new Schedule(DayOfWeek.MONDAY, date(10, 5), date(11, 2), 2);
+        var biweekly = new Schedule(MONDAY, date(10, 5), date(11, 2), 2);
 
-        var changes = edit(103, EditScope.ALL, details(), biweekly);
+        var changes = edit(103, ALL, details(), biweekly);
 
         assertEquals(biweekly, changes.updatedSeries.get(0).schedule());
         assertEquals(List.of(101L, 102L, 103L, 104L, 105L), changes.deletedSessionIds);
@@ -223,8 +210,8 @@ public class SeriesEditorTest {
 
     @Test
     public void editAll_scheduleOutsideTheSemester_isRejected() {
-        var tooEarly = weekly(DayOfWeek.MONDAY, date(9, 28), date(11, 2));
-        assertThrows(IllegalArgumentException.class, () -> edit(103, EditScope.ALL, details(), tooEarly));
+        var tooEarly = weekly(MONDAY, date(9, 28), date(11, 2));
+        assertThrows(IllegalArgumentException.class, () -> edit(103, ALL, details(), tooEarly));
     }
 
     // --- edit: series template (course editor) ---
@@ -251,7 +238,7 @@ public class SeriesEditorTest {
 
     @Test
     public void editSeries_changedSchedule_regeneratesSessions() {
-        var tuesdays = new Schedule(DayOfWeek.TUESDAY, date(10, 5), date(11, 2), 1);
+        var tuesdays = new Schedule(TUESDAY, date(10, 5), date(11, 2), 1);
 
         var changes = SeriesEditor.editSeries(SEMESTER, series, sessions, series.details(), tuesdays);
 
@@ -268,7 +255,7 @@ public class SeriesEditorTest {
     public void editFollowing_splitsTheSeriesAtTheSession() {
         var changed = withRoom(details(), "B2");
 
-        var changes = edit(103, EditScope.THIS_AND_FOLLOWING, changed, series.schedule());
+        var changes = edit(103, THIS_AND_FOLLOWING, changed, series.schedule());
 
         // The old series stops the day before.
         assertEquals(1, changes.updatedSeries.size());
@@ -295,7 +282,7 @@ public class SeriesEditorTest {
 
     @Test
     public void editFollowing_onTheFirstSession_behavesLikeEditingTheWholeSeries() {
-        var changes = edit(101, EditScope.THIS_AND_FOLLOWING, withRoom(details(), "B2"), series.schedule());
+        var changes = edit(101, THIS_AND_FOLLOWING, withRoom(details(), "B2"), series.schedule());
 
         assertTrue(changes.newSeries.isEmpty());
         assertEquals(5, changes.updatedSessions.size());
@@ -304,9 +291,9 @@ public class SeriesEditorTest {
 
     @Test
     public void editFollowing_withChangedRhythm_regeneratesTheFollowingSessions() {
-        var biweekly = new Schedule(DayOfWeek.MONDAY, date(10, 5), date(11, 2), 2);
+        var biweekly = new Schedule(MONDAY, date(10, 5), date(11, 2), 2);
 
-        var changes = edit(103, EditScope.THIS_AND_FOLLOWING, details(), biweekly);
+        var changes = edit(103, THIS_AND_FOLLOWING, details(), biweekly);
 
         assertEquals(date(10, 18), changes.updatedSeries.get(0).schedule().last());
         assertEquals(List.of(103L, 104L, 105L), changes.deletedSessionIds);
@@ -319,12 +306,12 @@ public class SeriesEditorTest {
 
     @Test
     public void editFollowing_afterAnIndividualMove_keepsThePhaseOfTheChain() {
-        var biweekly = series(20, new Schedule(DayOfWeek.THURSDAY, date(10, 5), date(11, 19), 2));
+        var biweekly = series(20, new Schedule(THURSDAY, date(10, 5), date(11, 19), 2));
         var chain = new ArrayList<>(sessionsOf(biweekly, 201));       // Oct 8, 22, Nov 5, 19
         chain.set(2, chain.get(2).withDay(date(11, 6)));                         // Nov 5 moved to Friday
 
         var changes = SeriesEditor.edit(
-                SEMESTER, biweekly, chain, 203, EditScope.THIS_AND_FOLLOWING,
+                SEMESTER, biweekly, chain, 203, THIS_AND_FOLLOWING,
                 withRoom(details(), "B2"), date(11, 6), biweekly.schedule()
         );
 
@@ -339,7 +326,7 @@ public class SeriesEditorTest {
 
     @Test
     public void deleteThisOnly_removesOneSession() {
-        var changes = SeriesEditor.delete(series, sessions, 103, EditScope.THIS_ONLY);
+        var changes = SeriesEditor.delete(series, sessions, 103, THIS_ONLY);
 
         assertEquals(List.of(103L), changes.deletedSessionIds);
         assertTrue(changes.deletedSeriesIds.isEmpty());
@@ -348,7 +335,7 @@ public class SeriesEditorTest {
 
     @Test
     public void deleteAll_removesTheSeries() {
-        var changes = SeriesEditor.delete(series, sessions, 103, EditScope.ALL);
+        var changes = SeriesEditor.delete(series, sessions, 103, ALL);
 
         assertEquals(List.of(10L), changes.deletedSeriesIds);
         assertTrue(changes.deletedSessionIds.isEmpty());
@@ -356,7 +343,7 @@ public class SeriesEditorTest {
 
     @Test
     public void deleteFollowing_removesLaterSessionsAndEndsTheSeriesTheDayBefore() {
-        var changes = SeriesEditor.delete(series, sessions, 103, EditScope.THIS_AND_FOLLOWING);
+        var changes = SeriesEditor.delete(series, sessions, 103, THIS_AND_FOLLOWING);
 
         assertEquals(List.of(103L, 104L, 105L), changes.deletedSessionIds);
         assertEquals(date(10, 18), changes.updatedSeries.get(0).schedule().last());
@@ -365,7 +352,7 @@ public class SeriesEditorTest {
 
     @Test
     public void deleteFollowing_onTheFirstSession_removesTheWholeSeries() {
-        var changes = SeriesEditor.delete(series, sessions, 101, EditScope.THIS_AND_FOLLOWING);
+        var changes = SeriesEditor.delete(series, sessions, 101, THIS_AND_FOLLOWING);
 
         assertEquals(List.of(10L), changes.deletedSeriesIds);
         assertTrue(changes.deletedSessionIds.isEmpty());
@@ -377,20 +364,17 @@ public class SeriesEditorTest {
         // Session 101 was moved behind session 103 and therefore counts as following it.
         sessions.set(0, sessions.get(0).withDay(date(10, 21)));
 
-        var changes = SeriesEditor.delete(series, sessions, 103, EditScope.THIS_AND_FOLLOWING);
+        var changes = SeriesEditor.delete(series, sessions, 103, THIS_AND_FOLLOWING);
 
         assertEquals(List.of(103L, 101L, 104L, 105L), changes.deletedSessionIds);
     }
 
     @Test
     public void unknownSession_isRejected() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> SeriesEditor.delete(series, sessions, 999, EditScope.THIS_ONLY)
-        );
+        assertThrows(IllegalArgumentException.class, () -> SeriesEditor.delete(series, sessions, 999, THIS_ONLY));
         assertThrows(IllegalArgumentException.class, () -> SeriesEditor.edit(
                 SEMESTER, series, sessions, 999,
-                EditScope.ALL, details(), date(10, 5), series.schedule()
+                ALL, details(), date(10, 5), series.schedule()
         ));
     }
 }

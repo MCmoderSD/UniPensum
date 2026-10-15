@@ -1,9 +1,12 @@
 package de.mcmodersd.unipensum.data.backup;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static de.mcmodersd.unipensum.domain.model.CourseColor.TEAL;
+import static de.mcmodersd.unipensum.domain.model.EditScope.*;
+import static de.mcmodersd.unipensum.domain.model.Mode.*;
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.NO_REMINDER;
+import static de.mcmodersd.unipensum.domain.model.SessionType.*;
+import static java.time.DayOfWeek.*;
+import static org.junit.Assert.*;
 
 import android.content.Context;
 import android.database.DatabaseUtils;
@@ -17,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,15 +30,11 @@ import de.mcmodersd.unipensum.data.db.DbHelper;
 import de.mcmodersd.unipensum.domain.backup.BackupCleaner;
 import de.mcmodersd.unipensum.domain.backup.BackupData;
 import de.mcmodersd.unipensum.domain.model.Course;
-import de.mcmodersd.unipensum.domain.model.CourseColor;
-import de.mcmodersd.unipensum.domain.model.EditScope;
 import de.mcmodersd.unipensum.domain.model.Lecturer;
-import de.mcmodersd.unipensum.domain.model.Mode;
 import de.mcmodersd.unipensum.domain.model.Schedule;
 import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
-import de.mcmodersd.unipensum.domain.model.SessionType;
 
 /** The database side of a backup: what is exported, and replacing everything with it. */
 @RunWith(AndroidJUnit4.class)
@@ -71,26 +69,26 @@ public class BackupStoreTest {
         var koch = TimetableStore.saveLecturer(db, new Lecturer(0, "", "Prof. Koch", null, null));
         var semester = TimetableStore.saveSemester(db, new Semester(0, START, END, "Winter term"));
         var lecture = new SessionDetails(
-                SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
-                "A1", "https://meet.example/x", weber, "bring laptop", SessionDetails.NO_REMINDER
+                LECTURE, 480, 675, IN_PERSON, true,
+                "A1", "https://meet.example/x", weber, "bring laptop", NO_REMINDER
         );
         var exercise = new SessionDetails(
-                SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
-                null, "https://meet.example/y", koch, null, SessionDetails.NO_REMINDER
+                EXERCISE, 600, 700, ONLINE, false,
+                null, "https://meet.example/y", koch, null, NO_REMINDER
         );
         TimetableStore.createCourse(
-                db, new Course(0, semester, courseName, CourseColor.TEAL, "https://moodle.example/c"),
+                db, new Course(0, semester, courseName, TEAL, "https://moodle.example/c"),
                 List.of(
-                        new Series(0, 0, lecture, new Schedule(DayOfWeek.MONDAY, START, END, 1)),
-                        new Series(0, 0, exercise, new Schedule(DayOfWeek.THURSDAY, START, END, 2))
+                        new Series(0, 0, lecture, new Schedule(MONDAY, START, END, 1)),
+                        new Series(0, 0, exercise, new Schedule(THURSDAY, START, END, 2))
                 )
         );
         var third = TimetableStore.loadTimetable(db).on(START.plusWeeks(2)).get(0).session();
         var moved = new SessionDetails(
-                SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
-                "B7", "https://meet.example/x", weber, "bring laptop", SessionDetails.NO_REMINDER
+                LECTURE, 480, 675, IN_PERSON, true,
+                "B7", "https://meet.example/x", weber, "bring laptop", NO_REMINDER
         );
-        TimetableStore.editSession(db, third.id(), EditScope.THIS_ONLY, moved, START.plusWeeks(2).plusDays(1), null);
+        TimetableStore.editSession(db, third.id(), THIS_ONLY, moved, START.plusWeeks(2).plusDays(1), null);
     }
 
     /**
@@ -205,7 +203,7 @@ public class BackupStoreTest {
         var before = DatabaseUtils.queryNumEntries(b, "session");
 
         var monday = TimetableStore.loadTimetable(b).on(START).get(0).session();
-        TimetableStore.deleteSession(b, monday.id(), EditScope.ALL);
+        TimetableStore.deleteSession(b, monday.id(), ALL);
 
         assertTrue(DatabaseUtils.queryNumEntries(b, "session") < before);
         assertEquals(1, DatabaseUtils.queryNumEntries(b, "series"));

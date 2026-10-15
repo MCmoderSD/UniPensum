@@ -1,10 +1,13 @@
 package de.mcmodersd.unipensum.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static de.mcmodersd.unipensum.domain.model.CourseColor.*;
+import static de.mcmodersd.unipensum.domain.model.EditScope.*;
+import static de.mcmodersd.unipensum.domain.model.Mode.*;
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.*;
+import static de.mcmodersd.unipensum.domain.model.SessionType.*;
+import static java.time.DayOfWeek.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.*;
 
 import android.content.Context;
 import android.database.DatabaseUtils;
@@ -28,21 +31,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import de.mcmodersd.unipensum.data.db.Database;
 import de.mcmodersd.unipensum.data.db.DbHelper;
 import de.mcmodersd.unipensum.domain.model.Course;
-import de.mcmodersd.unipensum.domain.model.CourseColor;
-import de.mcmodersd.unipensum.domain.model.EditScope;
 import de.mcmodersd.unipensum.domain.model.Lecturer;
-import de.mcmodersd.unipensum.domain.model.Mode;
 import de.mcmodersd.unipensum.domain.model.Schedule;
 import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
-import de.mcmodersd.unipensum.domain.model.SessionType;
 
 @RunWith(AndroidJUnit4.class)
 public class TimetableStoreTest {
@@ -75,8 +73,8 @@ public class TimetableStoreTest {
 
     private SessionDetails lecture() {
         return new SessionDetails(
-                SessionType.LECTURE, 8 * 60, 11 * 60, Mode.IN_PERSON, false,
-                "A1", null, lecturerId, null, SessionDetails.NO_REMINDER
+                LECTURE, 8 * 60, 11 * 60, IN_PERSON, false,
+                "A1", null, lecturerId, null, NO_REMINDER
         );
     }
 
@@ -89,7 +87,7 @@ public class TimetableStoreTest {
     }
 
     private long course(long semesterId, Series... series) {
-        return TimetableStore.createCourse(db, new Course(0, semesterId, "Math", CourseColor.BLUE, null), List.of(series));
+        return TimetableStore.createCourse(db, new Course(0, semesterId, "Math", BLUE, null), List.of(series));
     }
 
     private long rows(String table) {
@@ -103,18 +101,14 @@ public class TimetableStoreTest {
     @Test
     public void createCourse_generatesSessionsForEverySeries() {
         var semesterId = semester(START, END);
-        course(
-                semesterId,
-                series(lecture(), DayOfWeek.MONDAY, START, END, 1),
-                series(lecture(), DayOfWeek.THURSDAY, START, END, 2)
-        );
+        course(semesterId, series(lecture(), MONDAY, START, END, 1), series(lecture(), THURSDAY, START, END, 2));
 
         // 19 Mondays plus 10 Thursdays in every second week.
         assertEquals(29, rows("session"));
         var timetable = TimetableStore.loadTimetable(db);
         assertEquals(1, timetable.on(date(10, 5)).size());
         assertEquals("Math", timetable.on(date(10, 5)).get(0).courseName());
-        assertEquals(CourseColor.BLUE, timetable.on(date(10, 5)).get(0).color());
+        assertEquals(BLUE, timetable.on(date(10, 5)).get(0).color());
         assertEquals(1, timetable.on(date(10, 8)).size());
         assertTrue(timetable.on(date(10, 15)).isEmpty());
         assertEquals(1, timetable.on(date(10, 22)).size());
@@ -124,15 +118,15 @@ public class TimetableStoreTest {
     public void series_roundTripsEveryField() {
         var semesterId = semester(START, END);
         var hybrid = new SessionDetails(
-                SessionType.TUTORIAL, 13 * 60 + 15, 14 * 60 + 45,
-                Mode.IN_PERSON, true, "B 2.04", "https://meet.example/room", lecturerId, "Bring laptop", SessionDetails.NO_REMINDER
+                TUTORIAL, 13 * 60 + 15, 14 * 60 + 45,
+                IN_PERSON, true, "B 2.04", "https://meet.example/room", lecturerId, "Bring laptop", NO_REMINDER
         );
-        course(semesterId, series(hybrid, DayOfWeek.WEDNESDAY, date(10, 7), date(12, 16), 3));
+        course(semesterId, series(hybrid, WEDNESDAY, date(10, 7), date(12, 16), 3));
 
         var stored = TimetableStore.listCourses(db, semesterId).get(0).series().get(0);
 
         assertEquals(hybrid, stored.details());
-        assertEquals(new Schedule(DayOfWeek.WEDNESDAY, date(10, 7), date(12, 16), 3), stored.schedule());
+        assertEquals(new Schedule(WEDNESDAY, date(10, 7), date(12, 16), 3), stored.schedule());
     }
 
     @Test
@@ -140,9 +134,9 @@ public class TimetableStoreTest {
         var semesterId = semester(START, END);
         course(
                 semesterId,
-                series(lecture().withReminder(45), DayOfWeek.MONDAY, START, date(10, 12), 1),
-                series(lecture().withReminder(0), DayOfWeek.TUESDAY, START, date(10, 12), 1),
-                series(lecture(), DayOfWeek.WEDNESDAY, START, date(10, 12), 1)
+                series(lecture().withReminder(45), MONDAY, START, date(10, 12), 1),
+                series(lecture().withReminder(0), TUESDAY, START, date(10, 12), 1),
+                series(lecture(), WEDNESDAY, START, date(10, 12), 1)
         );
 
         var stored = TimetableStore.listCourses(db, semesterId).get(0).series();
@@ -150,24 +144,24 @@ public class TimetableStoreTest {
 
         assertEquals(45, stored.get(0).details().reminderMin());
         assertEquals(0, stored.get(1).details().reminderMin());
-        assertEquals(SessionDetails.NO_REMINDER, stored.get(2).details().reminderMin());
+        assertEquals(NO_REMINDER, stored.get(2).details().reminderMin());
         assertEquals(45, timetable.on(date(10, 5)).get(0).session().details().reminderMin());
         assertEquals(0, timetable.on(date(10, 6)).get(0).session().details().reminderMin());
-        assertEquals(SessionDetails.NO_REMINDER, timetable.on(date(10, 7)).get(0).session().details().reminderMin());
+        assertEquals(NO_REMINDER, timetable.on(date(10, 7)).get(0).session().details().reminderMin());
     }
 
     @Test
     public void reminder_isBroughtIntoItsRangeWhenSaved() {
         var semesterId = semester(START, END);
         course(
-                semesterId, series(lecture().withReminder(5_000), DayOfWeek.MONDAY, START, START, 1),
-                series(lecture().withReminder(-20), DayOfWeek.TUESDAY, START, date(10, 6), 1)
+                semesterId, series(lecture().withReminder(5_000), MONDAY, START, START, 1),
+                series(lecture().withReminder(-20), TUESDAY, START, date(10, 6), 1)
         );
 
         var stored = TimetableStore.listCourses(db, semesterId).get(0).series();
 
-        assertEquals(SessionDetails.MAX_REMINDER_MIN, stored.get(0).details().reminderMin());
-        assertEquals(SessionDetails.NO_REMINDER, stored.get(1).details().reminderMin());
+        assertEquals(MAX_REMINDER_MIN, stored.get(0).details().reminderMin());
+        assertEquals(NO_REMINDER, stored.get(1).details().reminderMin());
     }
 
     @Test
@@ -175,12 +169,12 @@ public class TimetableStoreTest {
         var semesterId = semester(START, END);
         course(
                 semesterId,
-                series(lecture().withReminder(30), DayOfWeek.MONDAY, START, date(10, 19), 1),
-                series(lecture(), DayOfWeek.THURSDAY, START, date(10, 19), 1)
+                series(lecture().withReminder(30), MONDAY, START, date(10, 19), 1),
+                series(lecture(), THURSDAY, START, date(10, 19), 1)
         );
         TimetableStore.createCourse(
-                db, new Course(0, semesterId, "Physics", CourseColor.RED, "https://moodle.example/p"),
-                List.of(series(lecture().withReminder(5), DayOfWeek.TUESDAY, date(10, 13), date(10, 13), 1))
+                db, new Course(0, semesterId, "Physics", RED, "https://moodle.example/p"),
+                List.of(series(lecture().withReminder(5), TUESDAY, date(10, 13), date(10, 13), 1))
         );
 
         var reminders = TimetableStore.loadReminders(db, date(10, 12));
@@ -200,11 +194,11 @@ public class TimetableStoreTest {
     @Test
     public void editSession_changesTheReminderWithinItsScope() {
         var semesterId = semester(START, END);
-        course(semesterId, series(lecture().withReminder(30), DayOfWeek.MONDAY, START, date(10, 26), 1));
-        var schedule = new Schedule(DayOfWeek.MONDAY, START, date(10, 26), 1);
+        course(semesterId, series(lecture().withReminder(30), MONDAY, START, date(10, 26), 1));
+        var schedule = new Schedule(MONDAY, START, date(10, 26), 1);
 
         TimetableStore.editSession(
-                db, sessionIdOn(date(10, 12)), EditScope.THIS_ONLY,
+                db, sessionIdOn(date(10, 12)), THIS_ONLY,
                 lecture().withReminder(10), date(10, 12), null
         );
         assertEquals(10, reminderOn(date(10, 12)));
@@ -212,13 +206,13 @@ public class TimetableStoreTest {
         assertEquals(30, reminderOn(date(10, 19)));
 
         TimetableStore.editSession(
-                db, sessionIdOn(date(10, 19)), EditScope.THIS_AND_FOLLOWING,
-                lecture().withReminder(SessionDetails.NO_REMINDER), date(10, 19), schedule
+                db, sessionIdOn(date(10, 19)), THIS_AND_FOLLOWING,
+                lecture().withReminder(NO_REMINDER), date(10, 19), schedule
         );
         assertEquals(30, reminderOn(date(10, 5)));
         assertEquals(10, reminderOn(date(10, 12)));
-        assertEquals(SessionDetails.NO_REMINDER, reminderOn(date(10, 19)));
-        assertEquals(SessionDetails.NO_REMINDER, reminderOn(date(10, 26)));
+        assertEquals(NO_REMINDER, reminderOn(date(10, 19)));
+        assertEquals(NO_REMINDER, reminderOn(date(10, 26)));
     }
 
     private int reminderOn(LocalDate day) {
@@ -229,32 +223,29 @@ public class TimetableStoreTest {
     public void createCourse_normalizesDetailsForTheChosenMode() {
         var semesterId = semester(START, END);
         var online = new SessionDetails(
-                SessionType.LECTURE, 600, 700, Mode.ONLINE, true,
-                "Leftover room", "https://meet.example/x", SessionDetails.NO_LECTURER, "", SessionDetails.NO_REMINDER
+                LECTURE, 600, 700, ONLINE, true,
+                "Leftover room", "https://meet.example/x", NO_LECTURER, "", NO_REMINDER
         );
-        course(semesterId, series(online, DayOfWeek.FRIDAY, date(10, 9), date(10, 9), 1));
+        course(semesterId, series(online, FRIDAY, date(10, 9), date(10, 9), 1));
 
         var stored = TimetableStore.listCourses(db, semesterId).get(0).series().get(0).details();
 
         assertNull(stored.room());
         assertFalse(stored.hybrid());
         assertEquals("https://meet.example/x", stored.link());
-        assertEquals(SessionDetails.NO_LECTURER, stored.lecturerId());
+        assertEquals(NO_LECTURER, stored.lecturerId());
         assertNull(stored.note());
     }
 
     @Test
     public void createCourse_dropsALecturerThatNoLongerExists() {
         var semesterId = semester(START, END);
-        var gone = new SessionDetails(
-                SessionType.LECTURE, 600, 700, Mode.IN_PERSON, false,
-                "A1", null, 4711, null, SessionDetails.NO_REMINDER
-        );
+        var gone = new SessionDetails(LECTURE, 600, 700, IN_PERSON, false, "A1", null, 4711, null, NO_REMINDER);
 
-        course(semesterId, series(gone, DayOfWeek.FRIDAY, date(10, 9), date(10, 9), 1));
+        course(semesterId, series(gone, FRIDAY, date(10, 9), date(10, 9), 1));
 
         assertEquals(
-                SessionDetails.NO_LECTURER,
+                NO_LECTURER,
                 TimetableStore.listCourses(db, semesterId).get(0).series().get(0).details().lecturerId()
         );
         assertEquals(1, rows("session"));
@@ -309,7 +300,7 @@ public class TimetableStoreTest {
     @Test
     public void timetableAndSessionContext_carryTheLecturer() {
         var semesterId = semester(START, END);
-        course(semesterId, series(lecture(), DayOfWeek.MONDAY, START, date(10, 12), 1));
+        course(semesterId, series(lecture(), MONDAY, START, date(10, 12), 1));
 
         var view = TimetableStore.loadTimetable(db).on(date(10, 5)).get(0);
         var context = TimetableStore.loadSessionContext(db, view.session().id());
@@ -321,11 +312,8 @@ public class TimetableStoreTest {
     @Test
     public void sessionWithoutALecturer_hasNone() {
         var semesterId = semester(START, END);
-        var none = new SessionDetails(
-                SessionType.LECTURE, 600, 700, Mode.IN_PERSON, false,
-                "A1", null, SessionDetails.NO_LECTURER, null, SessionDetails.NO_REMINDER
-        );
-        course(semesterId, series(none, DayOfWeek.MONDAY, START, START, 1));
+        var none = new SessionDetails(LECTURE, 600, 700, IN_PERSON, false, "A1", null, NO_LECTURER, null, NO_REMINDER);
+        course(semesterId, series(none, MONDAY, START, START, 1));
 
         var view = TimetableStore.loadTimetable(db).on(START).get(0);
 
@@ -336,7 +324,7 @@ public class TimetableStoreTest {
     @Test
     public void deleteLecturer_leavesTheirSessionsWithoutOne() {
         var semesterId = semester(START, END);
-        course(semesterId, series(lecture(), DayOfWeek.MONDAY, START, date(10, 12), 1));
+        course(semesterId, series(lecture(), MONDAY, START, date(10, 12), 1));
         assertEquals(2, rows("session"));
 
         TimetableStore.deleteLecturer(db, lecturerId);
@@ -344,33 +332,30 @@ public class TimetableStoreTest {
         assertEquals(2, rows("session"));
         assertEquals(1, rows("series"));
         assertEquals(
-                SessionDetails.NO_LECTURER,
+                NO_LECTURER,
                 TimetableStore.listCourses(db, semesterId).get(0).series().get(0).details().lecturerId()
         );
         assertNull(TimetableStore.loadTimetable(db).on(START).get(0).lecturer());
-        assertEquals(
-                SessionDetails.NO_LECTURER,
-                TimetableStore.loadTimetable(db).on(START).get(0).session().details().lecturerId()
-        );
+        assertEquals(NO_LECTURER, TimetableStore.loadTimetable(db).on(START).get(0).session().details().lecturerId());
     }
 
     @Test
     public void editSession_changingTheLecturer_reachesTheWholeSeriesOrOneSession() {
         var semesterId = semester(START, END);
-        var schedule = new Schedule(DayOfWeek.MONDAY, START, date(10, 26), 1);
+        var schedule = new Schedule(MONDAY, START, date(10, 26), 1);
         course(semesterId, new Series(0, 0, lecture(), schedule));
         var other = TimetableStore.saveLecturer(db, new Lecturer(0, "Max", "Other", null, null));
         var withOther = new SessionDetails(
-                SessionType.LECTURE, 8 * 60, 11 * 60, Mode.IN_PERSON, false,
-                "A1", null, other, null, SessionDetails.NO_REMINDER
+                LECTURE, 8 * 60, 11 * 60, IN_PERSON, false,
+                "A1", null, other, null, NO_REMINDER
         );
 
-        TimetableStore.editSession(db, sessionIdOn(date(10, 12)), EditScope.THIS_ONLY, withOther, date(10, 12), null);
+        TimetableStore.editSession(db, sessionIdOn(date(10, 12)), THIS_ONLY, withOther, date(10, 12), null);
         var timetable = TimetableStore.loadTimetable(db);
         assertEquals("Other", timetable.on(date(10, 12)).get(0).lecturer().lastName());
         assertEquals("Example", timetable.on(date(10, 5)).get(0).lecturer().lastName());
 
-        TimetableStore.editSession(db, sessionIdOn(date(10, 5)), EditScope.ALL, withOther, null, schedule);
+        TimetableStore.editSession(db, sessionIdOn(date(10, 5)), ALL, withOther, null, schedule);
         timetable = TimetableStore.loadTimetable(db);
         for (var day : new int[]{5, 12, 19, 26}) {
             assertEquals("Other", timetable.on(date(10, day)).get(0).lecturer().lastName());
@@ -384,14 +369,14 @@ public class TimetableStoreTest {
     public void createCourse_cleansTheNameTheLinksAndTheNotes() {
         var semesterId = semester(START, END);
         var dirty = new SessionDetails(
-                SessionType.LECTURE, 600, 700, Mode.ONLINE, false,
-                null, " meet.example/x ", lecturerId, "  a \r\n\r\n\r\n b​ ", SessionDetails.NO_REMINDER
+                LECTURE, 600, 700, ONLINE, false,
+                null, " meet.example/x ", lecturerId, "  a \r\n\r\n\r\n b​ ", NO_REMINDER
         );
 
         var courseId = TimetableStore.createCourse(
                 db,
-                new Course(0, semesterId, "  Math​ \t II ", CourseColor.BLUE, " moodle.example/c/1 "),
-                List.of(series(dirty, DayOfWeek.FRIDAY, date(10, 9), date(10, 9), 1))
+                new Course(0, semesterId, "  Math​ \t II ", BLUE, " moodle.example/c/1 "),
+                List.of(series(dirty, FRIDAY, date(10, 9), date(10, 9), 1))
         );
 
         var stored = TimetableStore.loadCourse(db, courseId);
@@ -407,16 +392,16 @@ public class TimetableStoreTest {
 
         assertThrows(IllegalArgumentException.class, () -> TimetableStore.createCourse(
                 db,
-                new Course(0, semesterId, "Math", CourseColor.BLUE, "javascript:alert(1)"),
-                List.of(series(lecture(), DayOfWeek.MONDAY, START, START, 1))
+                new Course(0, semesterId, "Math", BLUE, "javascript:alert(1)"),
+                List.of(series(lecture(), MONDAY, START, START, 1))
         ));
         var badMeeting = new SessionDetails(
-                SessionType.LECTURE, 600, 700, Mode.ONLINE, false,
-                null, "ftp://files.example/x", lecturerId, null, SessionDetails.NO_REMINDER
+                LECTURE, 600, 700, ONLINE, false,
+                null, "ftp://files.example/x", lecturerId, null, NO_REMINDER
         );
         assertThrows(IllegalArgumentException.class, () -> course(
                 semesterId,
-                series(badMeeting, DayOfWeek.MONDAY, START, START, 1)
+                series(badMeeting, MONDAY, START, START, 1)
         ));
 
         assertEquals(0, rows("course"));
@@ -428,8 +413,8 @@ public class TimetableStoreTest {
         var semesterId = semester(START, END);
         assertThrows(IllegalArgumentException.class, () -> TimetableStore.createCourse(
                 db,
-                new Course(0, semesterId, " ​‮\t ", CourseColor.BLUE, null),
-                List.of(series(lecture(), DayOfWeek.MONDAY, START, START, 1))
+                new Course(0, semesterId, " ​‮\t ", BLUE, null),
+                List.of(series(lecture(), MONDAY, START, START, 1))
         ));
         assertEquals(0, rows("course"));
     }
@@ -447,18 +432,15 @@ public class TimetableStoreTest {
     public void saveCourse_doesNotRejectAnUntouchedEventBecauseOfAnOldLink() {
         var semesterId = semester(START, END);
         var online = new SessionDetails(
-                SessionType.LECTURE, 600, 700, Mode.ONLINE, false,
-                null, "https://meet.example/x", lecturerId, null, SessionDetails.NO_REMINDER
+                LECTURE, 600, 700, ONLINE, false,
+                null, "https://meet.example/x", lecturerId, null, NO_REMINDER
         );
-        var courseId = course(semesterId, series(online, DayOfWeek.MONDAY, START, date(10, 12), 1));
+        var courseId = course(semesterId, series(online, MONDAY, START, date(10, 12), 1));
         // A link an earlier version accepted and today's rules would refuse.
         db.execSQL("UPDATE series SET link = 'ftp://old.example/x'");
         var stored = TimetableStore.loadCourse(db, courseId);
 
-        TimetableStore.saveCourse(
-                db, new Course(courseId, semesterId, "Renamed", CourseColor.TEAL, null),
-                stored.series()
-        );
+        TimetableStore.saveCourse(db, new Course(courseId, semesterId, "Renamed", TEAL, null), stored.series());
 
         var reloaded = TimetableStore.loadCourse(db, courseId);
         assertEquals("Renamed", reloaded.course().name());
@@ -472,19 +454,19 @@ public class TimetableStoreTest {
         var semesterId = semester(START, END);
         var courseId = TimetableStore.createCourse(
                 db,
-                new Course(0, semesterId, "Math", CourseColor.BLUE, "  https://moodle.example/c/1 "),
-                List.of(series(lecture(), DayOfWeek.MONDAY, START, START, 1))
+                new Course(0, semesterId, "Math", BLUE, "  https://moodle.example/c/1 "),
+                List.of(series(lecture(), MONDAY, START, START, 1))
         );
         assertEquals("https://moodle.example/c/1", TimetableStore.loadCourse(db, courseId).course().moodleLink());
 
         TimetableStore.saveCourse(
-                db, new Course(courseId, semesterId, "Math", CourseColor.BLUE, "https://moodle.example/c/2"),
+                db, new Course(courseId, semesterId, "Math", BLUE, "https://moodle.example/c/2"),
                 TimetableStore.loadCourse(db, courseId).series()
         );
         assertEquals("https://moodle.example/c/2", TimetableStore.loadCourse(db, courseId).course().moodleLink());
 
         TimetableStore.saveCourse(
-                db, new Course(courseId, semesterId, "Math", CourseColor.BLUE, "   "),
+                db, new Course(courseId, semesterId, "Math", BLUE, "   "),
                 TimetableStore.loadCourse(db, courseId).series()
         );
         assertNull(TimetableStore.loadCourse(db, courseId).course().moodleLink());
@@ -495,7 +477,7 @@ public class TimetableStoreTest {
         var semesterId = semester(START, END);
         assertThrows(IllegalArgumentException.class, () -> course(
                 semesterId,
-                series(lecture(), DayOfWeek.MONDAY, date(9, 28), date(10, 26), 1)
+                series(lecture(), MONDAY, date(9, 28), date(10, 26), 1)
         ));
         // The whole transaction rolled back, not even the course remains.
         assertEquals(0, rows("course"));
@@ -514,7 +496,7 @@ public class TimetableStoreTest {
     @Test
     public void saveSemester_shorteningClipsSeries_extendingProlongsThem() {
         var semesterId = semester(START, date(11, 13));
-        course(semesterId, series(lecture(), DayOfWeek.MONDAY, START, date(11, 13), 1));
+        course(semesterId, series(lecture(), MONDAY, START, date(11, 13), 1));
         assertEquals(6, rows("session"));
 
         TimetableStore.saveSemester(db, new Semester(semesterId, START, date(10, 30), null));
@@ -529,7 +511,7 @@ public class TimetableStoreTest {
     @Test
     public void deleteSemester_cascadesToEverythingBelow() {
         var semesterId = semester(START, END);
-        course(semesterId, series(lecture(), DayOfWeek.MONDAY, START, END, 1));
+        course(semesterId, series(lecture(), MONDAY, START, END, 1));
 
         TimetableStore.deleteSemester(db, semesterId);
 
@@ -541,15 +523,15 @@ public class TimetableStoreTest {
     @Test
     public void editSession_thisAndFollowing_splitsTheSeriesInTheDatabase() {
         var semesterId = semester(START, END);
-        var schedule = new Schedule(DayOfWeek.MONDAY, START, date(11, 2), 1);
+        var schedule = new Schedule(MONDAY, START, date(11, 2), 1);
         course(semesterId, new Series(0, 0, lecture(), schedule));
         var third = sessionIdOn(date(10, 19));
         var moved = new SessionDetails(
-                SessionType.LECTURE, 8 * 60, 11 * 60, Mode.IN_PERSON, false,
-                "B2", null, lecturerId, null, SessionDetails.NO_REMINDER
+                LECTURE, 8 * 60, 11 * 60, IN_PERSON, false,
+                "B2", null, lecturerId, null, NO_REMINDER
         );
 
-        TimetableStore.editSession(db, third, EditScope.THIS_AND_FOLLOWING, moved, date(10, 19), schedule);
+        TimetableStore.editSession(db, third, THIS_AND_FOLLOWING, moved, date(10, 19), schedule);
 
         var series = TimetableStore.listCourses(db, semesterId).get(0).series();
         assertEquals(2, series.size());
@@ -568,10 +550,10 @@ public class TimetableStoreTest {
     @Test
     public void editSession_thisOnly_movesJustOneSession() {
         var semesterId = semester(START, END);
-        var schedule = new Schedule(DayOfWeek.MONDAY, START, date(10, 26), 1);
+        var schedule = new Schedule(MONDAY, START, date(10, 26), 1);
         course(semesterId, new Series(0, 0, lecture(), schedule));
 
-        TimetableStore.editSession(db, sessionIdOn(date(10, 12)), EditScope.THIS_ONLY, lecture(), date(10, 14), null);
+        TimetableStore.editSession(db, sessionIdOn(date(10, 12)), THIS_ONLY, lecture(), date(10, 14), null);
 
         var timetable = TimetableStore.loadTimetable(db);
         assertTrue(timetable.on(date(10, 12)).isEmpty());
@@ -583,17 +565,17 @@ public class TimetableStoreTest {
     @Test
     public void deleteSession_scopes() {
         var semesterId = semester(START, END);
-        var schedule = new Schedule(DayOfWeek.MONDAY, START, date(11, 2), 1);
+        var schedule = new Schedule(MONDAY, START, date(11, 2), 1);
         course(semesterId, new Series(0, 0, lecture(), schedule));
 
-        TimetableStore.deleteSession(db, sessionIdOn(date(10, 12)), EditScope.THIS_ONLY);
+        TimetableStore.deleteSession(db, sessionIdOn(date(10, 12)), THIS_ONLY);
         assertEquals(4, rows("session"));
 
-        TimetableStore.deleteSession(db, sessionIdOn(date(10, 26)), EditScope.THIS_AND_FOLLOWING);
+        TimetableStore.deleteSession(db, sessionIdOn(date(10, 26)), THIS_AND_FOLLOWING);
         assertEquals(2, rows("session"));
         assertEquals(date(10, 25), TimetableStore.listCourses(db, semesterId).get(0).series().get(0).schedule().last());
 
-        TimetableStore.deleteSession(db, sessionIdOn(date(10, 5)), EditScope.ALL);
+        TimetableStore.deleteSession(db, sessionIdOn(date(10, 5)), ALL);
         assertEquals(0, rows("session"));
         assertEquals(0, rows("series"));
         assertEquals(1, rows("course"));
@@ -604,29 +586,29 @@ public class TimetableStoreTest {
         var semesterId = semester(START, END);
         var courseId = course(
                 semesterId,
-                series(lecture(), DayOfWeek.MONDAY, START, date(10, 26), 1),
-                series(lecture(), DayOfWeek.THURSDAY, START, date(10, 26), 1)
+                series(lecture(), MONDAY, START, date(10, 26), 1),
+                series(lecture(), THURSDAY, START, date(10, 26), 1)
         );
         var stored = TimetableStore.loadCourse(db, courseId).series();
         assertEquals(7, rows("session"));        // 4 Mondays and 3 Thursdays
 
         var monday = stored.get(0);
         var newRoom = new SessionDetails(
-                SessionType.LECTURE, 8 * 60, 11 * 60, Mode.IN_PERSON, false,
-                "B2", null, lecturerId, null, SessionDetails.NO_REMINDER
+                LECTURE, 8 * 60, 11 * 60, IN_PERSON, false,
+                "B2", null, lecturerId, null, NO_REMINDER
         );
         var changedMonday = new Series(monday.id(), courseId, newRoom, monday.schedule());
-        var added = series(lecture(), DayOfWeek.FRIDAY, START, date(10, 9), 1);
+        var added = series(lecture(), FRIDAY, START, date(10, 9), 1);
         // The Thursday series is left out, so it is removed.
 
         TimetableStore.saveCourse(
-                db, new Course(courseId, semesterId, "  Algebra ", CourseColor.TEAL, null),
+                db, new Course(courseId, semesterId, "  Algebra ", TEAL, null),
                 List.of(changedMonday, added)
         );
 
         var reloaded = TimetableStore.loadCourse(db, courseId);
         assertEquals("Algebra", reloaded.course().name());
-        assertEquals(CourseColor.TEAL, reloaded.course().color());
+        assertEquals(TEAL, reloaded.course().color());
         assertEquals(2, reloaded.series().size());
         // 4 Mondays with the new room plus one Friday; the 3 Thursdays are gone.
         assertEquals(5, rows("session"));
@@ -662,7 +644,7 @@ public class TimetableStoreTest {
 
         database.write(writable -> TimetableStore.saveSemester(writable, new Semester(0, START, END, null)), null);
 
-        assertTrue("Expected the live query to deliver the new semester", sawSemester.await(5, TimeUnit.SECONDS));
+        assertTrue("Expected the live query to deliver the new semester", sawSemester.await(5, SECONDS));
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> live.removeObserver(observer));
     }
 }

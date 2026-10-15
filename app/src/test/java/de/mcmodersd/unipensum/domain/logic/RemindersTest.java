@@ -1,16 +1,15 @@
 package de.mcmodersd.unipensum.domain.logic;
 
-import static de.mcmodersd.unipensum.domain.Fixtures.date;
-import static de.mcmodersd.unipensum.domain.Fixtures.details;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static de.mcmodersd.unipensum.domain.Fixtures.*;
+import static de.mcmodersd.unipensum.domain.model.Mode.*;
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.NO_REMINDER;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import de.mcmodersd.unipensum.domain.model.Mode;
 import de.mcmodersd.unipensum.domain.model.Session;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
 
@@ -29,30 +28,27 @@ public class RemindersTest {
 
     @Test
     public void defaultFor_isShorterForAnOnlyOnlineEvent() {
-        assertEquals(30, Reminders.defaultFor(Mode.IN_PERSON));
-        assertEquals(5, Reminders.defaultFor(Mode.ONLINE));
+        assertEquals(30, Reminders.defaultFor(IN_PERSON));
+        assertEquals(5, Reminders.defaultFor(ONLINE));
     }
 
     @Test
     public void afterModeChange_movesTheDefaultAlong() {
-        assertEquals(5, Reminders.afterModeChange(30, Mode.IN_PERSON, Mode.ONLINE));
-        assertEquals(30, Reminders.afterModeChange(5, Mode.ONLINE, Mode.IN_PERSON));
+        assertEquals(5, Reminders.afterModeChange(30, IN_PERSON, ONLINE));
+        assertEquals(30, Reminders.afterModeChange(5, ONLINE, IN_PERSON));
     }
 
     @Test
     public void afterModeChange_keepsATimeTheUserChose() {
-        assertEquals(45, Reminders.afterModeChange(45, Mode.IN_PERSON, Mode.ONLINE));
-        assertEquals(10, Reminders.afterModeChange(10, Mode.ONLINE, Mode.IN_PERSON));
+        assertEquals(45, Reminders.afterModeChange(45, IN_PERSON, ONLINE));
+        assertEquals(10, Reminders.afterModeChange(10, ONLINE, IN_PERSON));
         // 5 is the default online, but a chosen 5 on site is not the default of that format.
-        assertEquals(5, Reminders.afterModeChange(5, Mode.IN_PERSON, Mode.ONLINE));
+        assertEquals(5, Reminders.afterModeChange(5, IN_PERSON, ONLINE));
     }
 
     @Test
     public void afterModeChange_keepsNoReminder() {
-        assertEquals(
-                SessionDetails.NO_REMINDER,
-                Reminders.afterModeChange(SessionDetails.NO_REMINDER, Mode.IN_PERSON, Mode.ONLINE)
-        );
+        assertEquals(NO_REMINDER, Reminders.afterModeChange(NO_REMINDER, IN_PERSON, ONLINE));
     }
 
     // --- one reminder ---
@@ -73,12 +69,12 @@ public class RemindersTest {
 
     @Test
     public void of_withoutAReminder_isEmpty() {
-        assertTrue(Reminders.of(session(1, 5, SessionDetails.NO_REMINDER)).isEmpty());
+        assertTrue(Reminders.of(session(1, 5, NO_REMINDER)).isEmpty());
     }
 
     @Test
     public void of_forAnEarlySession_fallsOnTheDayBefore() {
-        var early = new SessionDetails(details().type(), 10, 70, Mode.IN_PERSON, false, null, null, 0, null, 30);
+        var early = new SessionDetails(details().type(), 10, 70, IN_PERSON, false, null, null, 0, null, 30);
 
         var due = Reminders.of(new Session(1, 10, date(10, 5), early)).orElseThrow();
 
@@ -127,7 +123,7 @@ public class RemindersTest {
 
     @Test
     public void due_skipsSessionsWithoutAReminder() {
-        List<Session> sessions = List.of(session(1, 5, SessionDetails.NO_REMINDER));
+        List<Session> sessions = List.of(session(1, 5, NO_REMINDER));
 
         assertTrue(Reminders.due(sessions, at(5, 0, 0), at(5, 9, 0)).isEmpty());
     }
@@ -158,7 +154,7 @@ public class RemindersTest {
 
     @Test
     public void next_isEmptyWhenNothingIsToCome() {
-        List<Session> sessions = List.of(session(1, 5, 30), session(2, 6, SessionDetails.NO_REMINDER));
+        List<Session> sessions = List.of(session(1, 5, 30), session(2, 6, NO_REMINDER));
 
         assertTrue(Reminders.next(sessions, at(5, 7, 30)).isEmpty());
         assertTrue(Reminders.next(List.of(), at(5, 7, 30)).isEmpty());
@@ -166,7 +162,7 @@ public class RemindersTest {
 
     @Test
     public void next_findsAReminderOnTheDayBefore() {
-        var early = new SessionDetails(details().type(), 10, 70, Mode.IN_PERSON, false, null, null, 0, null, 30);
+        var early = new SessionDetails(details().type(), 10, 70, IN_PERSON, false, null, null, 0, null, 30);
         List<Session> sessions = List.of(new Session(1, 10, date(10, 5), early));
 
         assertEquals(at(4, 23, 40), Reminders.next(sessions, at(4, 20, 0)).orElseThrow());

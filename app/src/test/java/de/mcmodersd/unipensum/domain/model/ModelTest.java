@@ -1,32 +1,29 @@
 package de.mcmodersd.unipensum.domain.model;
 
 import static de.mcmodersd.unipensum.domain.Fixtures.date;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static de.mcmodersd.unipensum.domain.model.Mode.*;
+import static de.mcmodersd.unipensum.domain.model.NameStyle.*;
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.*;
+import static de.mcmodersd.unipensum.domain.model.SessionType.*;
+import static java.time.DayOfWeek.*;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import java.time.DayOfWeek;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class ModelTest {
 
     private static SessionDetails details(Mode mode, boolean hybrid, String room, String link) {
-        return new SessionDetails(SessionType.LECTURE, 480, 570, mode, hybrid, room, link, 0, "", SessionDetails.NO_REMINDER);
+        return new SessionDetails(LECTURE, 480, 570, mode, hybrid, room, link, 0, "", NO_REMINDER);
     }
 
     @Test
     public void schedule_rejectsWeekend() {
+        assertThrows(IllegalArgumentException.class, () -> new Schedule(SATURDAY, date(10, 5), date(11, 2), 1));
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new Schedule(DayOfWeek.SATURDAY, date(10, 5), date(11, 2), 1)
-        );
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> new Schedule(DayOfWeek.SUNDAY, date(10, 5), date(11, 2), 1)
+                () -> new Schedule(SUNDAY, date(10, 5), date(11, 2), 1)
         );
     }
 
@@ -34,7 +31,7 @@ public class ModelTest {
     public void schedule_rejectsIntervalBelowOne() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new Schedule(DayOfWeek.MONDAY, date(10, 5), date(11, 2), 0)
+                () -> new Schedule(MONDAY, date(10, 5), date(11, 2), 0)
         );
     }
 
@@ -49,7 +46,7 @@ public class ModelTest {
 
     @Test
     public void normalized_online_dropsRoomAndHybridButKeepsLink() {
-        var result = details(Mode.ONLINE, true, "A1", "https://meet.example/x").normalized();
+        var result = details(ONLINE, true, "A1", "https://meet.example/x").normalized();
         assertNull(result.room());
         assertFalse(result.hybrid());
         assertEquals("https://meet.example/x", result.link());
@@ -57,14 +54,14 @@ public class ModelTest {
 
     @Test
     public void normalized_inPersonWithoutHybrid_dropsLink() {
-        var result = details(Mode.IN_PERSON, false, "A1", "https://meet.example/x").normalized();
+        var result = details(IN_PERSON, false, "A1", "https://meet.example/x").normalized();
         assertEquals("A1", result.room());
         assertNull(result.link());
     }
 
     @Test
     public void normalized_hybrid_keepsRoomAndLink() {
-        var result = details(Mode.IN_PERSON, true, "A1", "https://meet.example/x").normalized();
+        var result = details(IN_PERSON, true, "A1", "https://meet.example/x").normalized();
         assertEquals("A1", result.room());
         assertEquals("https://meet.example/x", result.link());
         assertTrue(result.hybrid());
@@ -72,7 +69,7 @@ public class ModelTest {
 
     @Test
     public void normalized_blankTextBecomesNull() {
-        var result = details(Mode.IN_PERSON, false, "  ", null).normalized();
+        var result = details(IN_PERSON, false, "  ", null).normalized();
         assertNull(result.room());
         assertNull(result.note());
     }
@@ -80,8 +77,8 @@ public class ModelTest {
     @Test
     public void normalized_cleansTextAndTheLink() {
         var dirty = new SessionDetails(
-                SessionType.LECTURE, 480, 570, Mode.IN_PERSON, true,
-                "  A1\t ​", " meet.example/abc ", 0, " bring ‮laptop \r\n\r\n\r\n room B2 ", SessionDetails.NO_REMINDER
+                LECTURE, 480, 570, IN_PERSON, true,
+                "  A1\t ​", " meet.example/abc ", 0, " bring ‮laptop \r\n\r\n\r\n room B2 ", NO_REMINDER
         );
 
         var result = dirty.normalized();
@@ -94,8 +91,8 @@ public class ModelTest {
     @Test
     public void normalized_isIdempotent() {
         var once = new SessionDetails(
-                SessionType.LAB, 480, 570, Mode.IN_PERSON, true,
-                " A1 ", "HTTPS://meet.example/a b", 3, " x \n\n\n y ", SessionDetails.NO_REMINDER
+                LAB, 480, 570, IN_PERSON, true,
+                " A1 ", "HTTPS://meet.example/a b", 3, " x \n\n\n y ", NO_REMINDER
         ).normalized();
         assertEquals(once, once.normalized());
     }
@@ -104,24 +101,24 @@ public class ModelTest {
     public void normalized_refusesALinkThatIsNoWebLink() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> details(Mode.ONLINE, false, null, "javascript:alert(1)").normalized()
+                () -> details(ONLINE, false, null, "javascript:alert(1)").normalized()
         );
         assertThrows(
                 IllegalArgumentException.class,
-                () -> details(Mode.IN_PERSON, true, "A1", "ftp://files.example/x").normalized()
+                () -> details(IN_PERSON, true, "A1", "ftp://files.example/x").normalized()
         );
     }
 
     @Test
     public void normalized_doesNotLookAtALinkThatIsDroppedAnyway() {
-        assertNull(details(Mode.IN_PERSON, false, "A1", "javascript:alert(1)").normalized().link());
+        assertNull(details(IN_PERSON, false, "A1", "javascript:alert(1)").normalized().link());
     }
 
     @Test
     public void normalized_keepsALecturerAndMapsInvalidIdsToNone() {
-        var base = details(Mode.IN_PERSON, false, "A1", null);
+        var base = details(IN_PERSON, false, "A1", null);
         assertEquals(7, withLecturer(base, 7).normalized().lecturerId());
-        assertEquals(SessionDetails.NO_LECTURER, withLecturer(base, -3).normalized().lecturerId());
+        assertEquals(NO_LECTURER, withLecturer(base, -3).normalized().lecturerId());
     }
 
     private static SessionDetails withLecturer(SessionDetails d, long lecturerId) {
@@ -133,33 +130,33 @@ public class ModelTest {
 
     @Test
     public void normalized_bringsTheReminderIntoItsRange() {
-        var base = details(Mode.IN_PERSON, false, "A1", null);
+        var base = details(IN_PERSON, false, "A1", null);
         assertEquals(30, base.withReminder(30).normalized().reminderMin());
         assertEquals(0, base.withReminder(0).normalized().reminderMin());
-        assertEquals(SessionDetails.MAX_REMINDER_MIN, base.withReminder(180).normalized().reminderMin());
-        assertEquals(SessionDetails.MAX_REMINDER_MIN, base.withReminder(100_000).normalized().reminderMin());
-        assertEquals(SessionDetails.NO_REMINDER, base.withReminder(-1).normalized().reminderMin());
-        assertEquals(SessionDetails.NO_REMINDER, base.withReminder(-30).normalized().reminderMin());
+        assertEquals(MAX_REMINDER_MIN, base.withReminder(180).normalized().reminderMin());
+        assertEquals(MAX_REMINDER_MIN, base.withReminder(100_000).normalized().reminderMin());
+        assertEquals(NO_REMINDER, base.withReminder(-1).normalized().reminderMin());
+        assertEquals(NO_REMINDER, base.withReminder(-30).normalized().reminderMin());
     }
 
     @Test
     public void reminder_isKeptForEveryFormat() {
-        assertEquals(5, details(Mode.ONLINE, false, null, null).withReminder(5).normalized().reminderMin());
+        assertEquals(5, details(ONLINE, false, null, null).withReminder(5).normalized().reminderMin());
         assertEquals(
-                45, details(Mode.IN_PERSON, true, "A1", "https://meet.example/x").withReminder(45)
+                45, details(IN_PERSON, true, "A1", "https://meet.example/x").withReminder(45)
                         .normalized().reminderMin()
         );
     }
 
     @Test
     public void hasReminder_isTrueForZeroMinutes() {
-        assertTrue(details(Mode.IN_PERSON, false, null, null).withReminder(0).hasReminder());
-        assertFalse(details(Mode.IN_PERSON, false, null, null).withReminder(SessionDetails.NO_REMINDER).hasReminder());
+        assertTrue(details(IN_PERSON, false, null, null).withReminder(0).hasReminder());
+        assertFalse(details(IN_PERSON, false, null, null).withReminder(NO_REMINDER).hasReminder());
     }
 
     @Test
     public void with_changesOnlyThatField() {
-        var base = details(Mode.ONLINE, false, null, "https://meet.example/x").withReminder(15);
+        var base = details(ONLINE, false, null, "https://meet.example/x").withReminder(15);
 
         assertEquals(
                 base.withLecturer(9), new SessionDetails(
@@ -174,24 +171,24 @@ public class ModelTest {
 
     @Test
     public void hasValidTimes() {
-        assertTrue(new SessionDetails(SessionType.LAB, 0, 1440, Mode.ONLINE, false, null, null, 0, null, SessionDetails.NO_REMINDER).hasValidTimes());
-        assertFalse(new SessionDetails(SessionType.LAB, 600, 600, Mode.ONLINE, false, null, null, 0, null, SessionDetails.NO_REMINDER).hasValidTimes());
-        assertFalse(new SessionDetails(SessionType.LAB, 700, 600, Mode.ONLINE, false, null, null, 0, null, SessionDetails.NO_REMINDER).hasValidTimes());
-        assertFalse(new SessionDetails(SessionType.LAB, 600, 1441, Mode.ONLINE, false, null, null, 0, null, SessionDetails.NO_REMINDER).hasValidTimes());
+        assertTrue(new SessionDetails(LAB, 0, 1440, ONLINE, false, null, null, 0, null, NO_REMINDER).hasValidTimes());
+        assertFalse(new SessionDetails(LAB, 600, 600, ONLINE, false, null, null, 0, null, NO_REMINDER).hasValidTimes());
+        assertFalse(new SessionDetails(LAB, 700, 600, ONLINE, false, null, null, 0, null, NO_REMINDER).hasValidTimes());
+        assertFalse(new SessionDetails(LAB, 600, 1441, ONLINE, false, null, null, 0, null, NO_REMINDER).hasValidTimes());
     }
 
     @Test
     public void lecturer_nameFollowsTheStyle() {
         var lecturer = new Lecturer(1, "Anna", "Weber", null, null);
-        assertEquals("Weber", lecturer.name(NameStyle.LAST_NAME));
-        assertEquals("Anna Weber", lecturer.name(NameStyle.FULL_NAME));
+        assertEquals("Weber", lecturer.name(LAST_NAME));
+        assertEquals("Anna Weber", lecturer.name(FULL_NAME));
     }
 
     @Test
     public void lecturer_withoutFirstName_showsTheLastNameInBothStyles() {
         var lecturer = new Lecturer(1, "", "Prof. Weber", null, null);
-        assertEquals("Prof. Weber", lecturer.name(NameStyle.LAST_NAME));
-        assertEquals("Prof. Weber", lecturer.name(NameStyle.FULL_NAME));
+        assertEquals("Prof. Weber", lecturer.name(LAST_NAME));
+        assertEquals("Prof. Weber", lecturer.name(FULL_NAME));
     }
 
     @Test

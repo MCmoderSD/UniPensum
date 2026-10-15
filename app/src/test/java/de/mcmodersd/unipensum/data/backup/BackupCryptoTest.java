@@ -1,14 +1,11 @@
 package de.mcmodersd.unipensum.data.backup;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static de.mcmodersd.unipensum.data.backup.BackupCrypto.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import javax.crypto.AEADBadTagException;
@@ -17,10 +14,10 @@ import javax.crypto.AEADBadTagException;
 public class BackupCryptoTest {
 
     /** Far fewer than the real ones, which would only make the tests slow. */
-    private static final int ITERATIONS = BackupCrypto.MIN_ITERATIONS;
+    private static final int ITERATIONS = MIN_ITERATIONS;
 
-    private static final byte[] PLAIN = "{\"lecturers\":[{\"id\":1,\"lastName\":\"Weber\"}]}".getBytes(StandardCharsets.UTF_8);
-    private static final byte[] AAD = "{\"schema\":2}".getBytes(StandardCharsets.UTF_8);
+    private static final byte[] PLAIN = "{\"lecturers\":[{\"id\":1,\"lastName\":\"Weber\"}]}".getBytes(UTF_8);
+    private static final byte[] AAD = "{\"schema\":2}".getBytes(UTF_8);
 
     @Test
     public void whatIsEncrypted_comesBackWithTheSamePassword() throws Exception {
@@ -62,7 +59,7 @@ public class BackupCryptoTest {
         var params = BackupCrypto.newParams(ITERATIONS);
         var sealed = BackupCrypto.encrypt("correct horse".toCharArray(), params, AAD, PLAIN);
 
-        var otherManifest = "{\"schema\":3}".getBytes(StandardCharsets.UTF_8);
+        var otherManifest = "{\"schema\":3}".getBytes(UTF_8);
 
         assertThrows(
                 AEADBadTagException.class,
@@ -87,8 +84,8 @@ public class BackupCryptoTest {
         var first = BackupCrypto.newParams(ITERATIONS);
         var second = BackupCrypto.newParams(ITERATIONS);
 
-        assertEquals(BackupCrypto.SALT_BYTES, first.salt().length);
-        assertEquals(BackupCrypto.IV_BYTES, first.iv().length);
+        assertEquals(SALT_BYTES, first.salt().length);
+        assertEquals(IV_BYTES, first.iv().length);
         assertFalse(Arrays.equals(first.salt(), second.salt()));
         assertFalse(Arrays.equals(first.iv(), second.iv()));
         assertFalse(
@@ -103,7 +100,7 @@ public class BackupCryptoTest {
     @SuppressWarnings("ConstantValue")
     @Test
     public void theRealIterationCountIsWithinTheBoundsAFileMayUse() {
-        assertTrue(BackupCrypto.ITERATIONS >= BackupCrypto.MIN_ITERATIONS);
-        assertTrue(BackupCrypto.ITERATIONS <= BackupCrypto.MAX_ITERATIONS);
+        assertTrue(BackupCrypto.ITERATIONS >= MIN_ITERATIONS);
+        assertTrue(BackupCrypto.ITERATIONS <= MAX_ITERATIONS);
     }
 }

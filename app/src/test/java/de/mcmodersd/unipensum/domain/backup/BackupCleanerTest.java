@@ -1,26 +1,20 @@
 package de.mcmodersd.unipensum.domain.backup;
 
-import static de.mcmodersd.unipensum.domain.Fixtures.LECTURER;
-import static de.mcmodersd.unipensum.domain.Fixtures.SEMESTER;
-import static de.mcmodersd.unipensum.domain.Fixtures.date;
-import static de.mcmodersd.unipensum.domain.Fixtures.details;
-import static de.mcmodersd.unipensum.domain.Fixtures.sessionsOf;
-import static de.mcmodersd.unipensum.domain.Fixtures.weekly;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static de.mcmodersd.unipensum.domain.Fixtures.*;
+import static de.mcmodersd.unipensum.domain.model.CourseColor.*;
+import static de.mcmodersd.unipensum.domain.model.Mode.ONLINE;
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.*;
+import static java.time.DayOfWeek.*;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.mcmodersd.unipensum.domain.model.Course;
-import de.mcmodersd.unipensum.domain.model.CourseColor;
 import de.mcmodersd.unipensum.domain.model.Lecturer;
-import de.mcmodersd.unipensum.domain.model.Mode;
 import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.model.Session;
@@ -29,8 +23,8 @@ import de.mcmodersd.unipensum.domain.model.SessionDetails;
 public class BackupCleanerTest {
 
     private static final Lecturer WEBER = new Lecturer(LECTURER, "Anna", "Weber", "anna@uni.example", "030 1234");
-    private static final Course COURSE = new Course(1, 1, "Math", CourseColor.BLUE, "https://moodle.example/c/1");
-    private static final Series SERIES = new Series(10, 1, details(), weekly(DayOfWeek.MONDAY, date(10, 5), date(10, 26)));
+    private static final Course COURSE = new Course(1, 1, "Math", BLUE, "https://moodle.example/c/1");
+    private static final Series SERIES = new Series(10, 1, details(), weekly(MONDAY, date(10, 5), date(10, 26)));
 
     /** One lecturer, one semester, one course, one series with its four Monday sessions. */
     private static BackupData good() {
@@ -57,7 +51,7 @@ public class BackupCleanerTest {
 
     private static SessionDetails onlineWithLink(SessionDetails d, String link) {
         return new SessionDetails(
-                d.type(), d.startMin(), d.endMin(), Mode.ONLINE, d.hybrid(), d.room(), link,
+                d.type(), d.startMin(), d.endMin(), ONLINE, d.hybrid(), d.room(), link,
                 d.lecturerId(), d.note(), d.reminderMin()
         );
     }
@@ -88,7 +82,7 @@ public class BackupCleanerTest {
 
     @Test
     public void texts_areCleaned() {
-        var course = new Course(1, 1, "  Math​ \t II ", CourseColor.BLUE, " moodle.example/c/1 ");
+        var course = new Course(1, 1, "  Math​ \t II ", BLUE, " moodle.example/c/1 ");
         var semester = new Semester(1, SEMESTER.start(), SEMESTER.end(), " Winter‮  term ");
         var lecturer = new Lecturer(LECTURER, " Anna​", " Weber ", " a@uni.example ", "tel 030");
 
@@ -111,8 +105,8 @@ public class BackupCleanerTest {
         var data = clean(with(good(), null, null, null, List.of(series, tooLong, negative), List.of())).data();
 
         assertEquals(45, data.series().get(0).details().reminderMin());
-        assertEquals(SessionDetails.MAX_REMINDER_MIN, data.series().get(1).details().reminderMin());
-        assertEquals(SessionDetails.NO_REMINDER, data.series().get(2).details().reminderMin());
+        assertEquals(MAX_REMINDER_MIN, data.series().get(1).details().reminderMin());
+        assertEquals(NO_REMINDER, data.series().get(2).details().reminderMin());
     }
 
     // --- lecturers ---
@@ -124,9 +118,9 @@ public class BackupCleanerTest {
         var result = clean(with(good(), List.of(nameless), null, null, null, null));
 
         assertTrue(result.data().lecturers().isEmpty());
-        assertEquals(SessionDetails.NO_LECTURER, result.data().series().get(0).details().lecturerId());
+        assertEquals(NO_LECTURER, result.data().series().get(0).details().lecturerId());
         for (var session : result.data().sessions()) {
-            assertEquals(SessionDetails.NO_LECTURER, session.details().lecturerId());
+            assertEquals(NO_LECTURER, session.details().lecturerId());
         }
         assertEquals(1, result.report().skipped());
         assertEquals(5, result.report().adjusted());          // the series and its four sessions
@@ -136,7 +130,7 @@ public class BackupCleanerTest {
     public void aLecturerThatDoesNotExist_isCleared() {
         var result = clean(with(good(), List.of(), null, null, null, null));
 
-        assertEquals(SessionDetails.NO_LECTURER, result.data().series().get(0).details().lecturerId());
+        assertEquals(NO_LECTURER, result.data().series().get(0).details().lecturerId());
         assertEquals(0, result.report().skipped());
         assertEquals(5, result.report().adjusted());
     }
@@ -159,10 +153,10 @@ public class BackupCleanerTest {
     @Test
     public void overlappingSemester_isSkipped_theEarlierOneWins() {
         var later = new Semester(2, date(12, 1), LocalDate.of(2027, 3, 1), null);
-        var laterCourse = new Course(2, 2, "Physics", CourseColor.RED, null);
+        var laterCourse = new Course(2, 2, "Physics", RED, null);
         var laterSeries = new Series(
                 20, 2, details(),
-                weekly(DayOfWeek.TUESDAY, date(12, 1), date(12, 15))
+                weekly(TUESDAY, date(12, 1), date(12, 15))
         );
         List<Semester> semesters = List.of(later, SEMESTER);               // the order in the file does not matter
 
@@ -182,7 +176,7 @@ public class BackupCleanerTest {
 
     @Test
     public void courseWithoutAUsableName_isSkippedWithItsEvents() {
-        var nameless = new Course(1, 1, "​ \t", CourseColor.BLUE, null);
+        var nameless = new Course(1, 1, "​ \t", BLUE, null);
 
         var result = clean(with(good(), null, null, List.of(nameless), null, null));
 
@@ -194,7 +188,7 @@ public class BackupCleanerTest {
 
     @Test
     public void courseWithoutASemester_isSkipped() {
-        var orphan = new Course(1, 99, "Math", CourseColor.BLUE, null);
+        var orphan = new Course(1, 99, "Math", BLUE, null);
 
         var result = clean(with(good(), null, null, List.of(orphan), null, null));
 
@@ -203,7 +197,7 @@ public class BackupCleanerTest {
 
     @Test
     public void aMoodleLinkThatIsNoWebLink_isDropped() {
-        var course = new Course(1, 1, "Math", CourseColor.BLUE, "javascript:alert(1)");
+        var course = new Course(1, 1, "Math", BLUE, "javascript:alert(1)");
 
         var result = clean(with(good(), null, null, List.of(course), null, null));
 
@@ -216,7 +210,7 @@ public class BackupCleanerTest {
 
     @Test
     public void eventOutsideItsSemester_isSkippedWithItsSessions() {
-        var outside = new Series(10, 1, details(), weekly(DayOfWeek.MONDAY, date(9, 7), date(10, 26)));
+        var outside = new Series(10, 1, details(), weekly(MONDAY, date(9, 7), date(10, 26)));
 
         var result = clean(with(good(), null, null, null, List.of(outside), null));
 

@@ -1,24 +1,25 @@
 package de.mcmodersd.unipensum.domain.logic;
 
+import static de.mcmodersd.unipensum.domain.logic.Weeks.*;
+import static java.time.DayOfWeek.MONDAY;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 public class WeeksTest {
 
     @Test
     public void anchor_isAMonday() {
-        assertEquals(DayOfWeek.MONDAY, Weeks.ANCHOR.getDayOfWeek());
+        assertEquals(MONDAY, ANCHOR.getDayOfWeek());
     }
 
     @Test
     public void mondayOfAndPositionOf_areInverse() {
         for (var position : new int[]{0, 1, 300, 1559}) {
             var monday = Weeks.mondayOf(position);
-            assertEquals(DayOfWeek.MONDAY, monday.getDayOfWeek());
+            assertEquals(MONDAY, monday.getDayOfWeek());
             assertEquals(position, Weeks.positionOf(monday));
             assertEquals(position, Weeks.positionOf(monday.plusDays(6)));
             assertEquals(position + 1, Weeks.positionOf(monday.plusDays(7)));
@@ -47,7 +48,7 @@ public class WeeksTest {
     @Test
     public void initialPosition_isClampedToThePagerRange() {
         assertEquals(0, Weeks.initialPosition(LocalDate.of(2001, 1, 1)));
-        assertEquals(Weeks.PAGE_COUNT - 1, Weeks.initialPosition(LocalDate.of(2099, 1, 1)));
+        assertEquals(PAGE_COUNT - 1, Weeks.initialPosition(LocalDate.of(2099, 1, 1)));
     }
 
     @Test

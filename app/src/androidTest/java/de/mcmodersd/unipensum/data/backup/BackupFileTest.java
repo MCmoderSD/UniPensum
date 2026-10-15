@@ -1,11 +1,16 @@
 package de.mcmodersd.unipensum.data.backup;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static de.mcmodersd.unipensum.data.backup.BackupCrypto.MIN_ITERATIONS;
+import static de.mcmodersd.unipensum.data.backup.BackupException.Reason.*;
+import static de.mcmodersd.unipensum.domain.backup.BackupInfo.Compatibility.*;
+import static de.mcmodersd.unipensum.domain.model.CourseColor.*;
+import static de.mcmodersd.unipensum.domain.model.EditScope.THIS_ONLY;
+import static de.mcmodersd.unipensum.domain.model.Mode.*;
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.*;
+import static de.mcmodersd.unipensum.domain.model.SessionType.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.time.DayOfWeek.*;
+import static org.junit.Assert.*;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -22,8 +27,6 @@ import org.junit.runner.RunWith;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -37,25 +40,20 @@ import de.mcmodersd.unipensum.data.TimetableStore;
 import de.mcmodersd.unipensum.data.db.DbHelper;
 import de.mcmodersd.unipensum.data.db.Schema;
 import de.mcmodersd.unipensum.domain.backup.BackupData;
-import de.mcmodersd.unipensum.domain.backup.BackupInfo;
 import de.mcmodersd.unipensum.domain.backup.BackupReport;
 import de.mcmodersd.unipensum.domain.model.Course;
-import de.mcmodersd.unipensum.domain.model.CourseColor;
-import de.mcmodersd.unipensum.domain.model.EditScope;
 import de.mcmodersd.unipensum.domain.model.Lecturer;
-import de.mcmodersd.unipensum.domain.model.Mode;
 import de.mcmodersd.unipensum.domain.model.Schedule;
 import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.domain.model.Series;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
-import de.mcmodersd.unipensum.domain.model.SessionType;
 
 @SuppressWarnings("SpellCheckingInspection")
 @RunWith(AndroidJUnit4.class)
 public class BackupFileTest {
 
     /** Few iterations: the real count would only make the tests slow. */
-    private static final int ITERATIONS = BackupCrypto.MIN_ITERATIONS;
+    private static final int ITERATIONS = MIN_ITERATIONS;
     private static final char[] PASSWORD = "correct horse".toCharArray();
     private static final BackupFile.Meta META =
             new BackupFile.Meta(Schema.VERSION, 1, "1.0", Instant.parse("2026-10-05T10:00:00Z"));
@@ -85,29 +83,29 @@ public class BackupFileTest {
         var semester = TimetableStore.saveSemester(db, new Semester(0, START, END, "Winter term"));
 
         var lecture = new SessionDetails(
-                SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
+                LECTURE, 480, 675, IN_PERSON, true,
                 "A1", "https://meet.example/x", weber, "bring laptop\n\nroom B2", 45
         );
         var exercise = new SessionDetails(
-                SessionType.EXERCISE, 600, 700, Mode.ONLINE, false,
-                null, "https://meet.example/y", koch, null, SessionDetails.NO_REMINDER
+                EXERCISE, 600, 700, ONLINE, false,
+                null, "https://meet.example/y", koch, null, NO_REMINDER
         );
         TimetableStore.createCourse(
                 db,
-                new Course(0, semester, "Math", CourseColor.TEAL, "https://moodle.example/c/1"),
+                new Course(0, semester, "Math", TEAL, "https://moodle.example/c/1"),
                 List.of(
-                        new Series(0, 0, lecture, new Schedule(DayOfWeek.MONDAY, START, END, 1)),
-                        new Series(0, 0, exercise, new Schedule(DayOfWeek.THURSDAY, START, END, 2))
+                        new Series(0, 0, lecture, new Schedule(MONDAY, START, END, 1)),
+                        new Series(0, 0, exercise, new Schedule(THURSDAY, START, END, 2))
                 )
         );
 
         // One session of the lecture deviates: another day and room.
         var first = TimetableStore.loadTimetable(db).on(START.plusWeeks(2)).get(0).session();
         var moved = new SessionDetails(
-                SessionType.LECTURE, 480, 675, Mode.IN_PERSON, true,
+                LECTURE, 480, 675, IN_PERSON, true,
                 "B7", "https://meet.example/x", weber, "bring laptop\n\nroom B2", 45
         );
-        TimetableStore.editSession(db, first.id(), EditScope.THIS_ONLY, moved, START.plusWeeks(2).plusDays(1), null);
+        TimetableStore.editSession(db, first.id(), THIS_ONLY, moved, START.plusWeeks(2).plusDays(1), null);
         return TimetableStore.exportData(db);
     }
 
@@ -144,7 +142,7 @@ public class BackupFileTest {
         assertEquals(1, info.appVersionCode());
         assertEquals("1.0", info.appVersion());
         assertEquals(Instant.parse("2026-10-05T10:00:00Z"), info.exportedAt());
-        assertEquals(BackupInfo.Compatibility.SAME, info.compatibility(BackupFile.FORMAT, Schema.VERSION, 1));
+        assertEquals(SAME, info.compatibility(BackupFile.FORMAT, Schema.VERSION, 1));
     }
 
     @Test
@@ -152,7 +150,7 @@ public class BackupFileTest {
         var entries = unzip(BackupFile.write(sample(), META, null));
 
         assertEquals(2, entries.size());
-        var manifest = new String(entries.get("manifest.json"), StandardCharsets.UTF_8);
+        var manifest = new String(entries.get("manifest.json"), UTF_8);
         assertTrue(manifest, manifest.contains("\"app\":\"UniPensum\""));
         assertTrue(manifest, manifest.contains("\"schema\":" + Schema.VERSION));
         assertFalse(manifest, manifest.contains("encryption"));
@@ -168,11 +166,11 @@ public class BackupFileTest {
 
         assertTrue(entries.containsKey("data.enc"));
         assertFalse(entries.containsKey("data.json"));
-        var manifest = new String(entries.get("manifest.json"), StandardCharsets.UTF_8);
+        var manifest = new String(entries.get("manifest.json"), UTF_8);
         assertTrue(manifest, manifest.contains("AES-256-GCM"));
         assertTrue(manifest, manifest.contains("\"iterations\":" + ITERATIONS));
         // The lecturer's name appears nowhere in the file, not even compressed away.
-        assertEquals(-1, indexOf(entries.get("data.enc"), "Weber".getBytes(StandardCharsets.UTF_8)));
+        assertEquals(-1, indexOf(entries.get("data.enc"), "Weber".getBytes(UTF_8)));
 
         var opened = open(file);
         assertTrue(opened.isEncrypted());
@@ -183,9 +181,9 @@ public class BackupFileTest {
     public void aWrongOrMissingPassword_isRefused() throws Exception {
         var opened = open(BackupFile.write(sample(), META, PASSWORD.clone(), ITERATIONS));
 
-        assertEquals(BackupException.Reason.WRONG_PASSWORD, reasonOf(() -> opened.read("wrong horse".toCharArray())));
-        assertEquals(BackupException.Reason.WRONG_PASSWORD, reasonOf(() -> opened.read(null)));
-        assertEquals(BackupException.Reason.WRONG_PASSWORD, reasonOf(() -> opened.read(new char[0])));
+        assertEquals(WRONG_PASSWORD, reasonOf(() -> opened.read("wrong horse".toCharArray())));
+        assertEquals(WRONG_PASSWORD, reasonOf(() -> opened.read(null)));
+        assertEquals(WRONG_PASSWORD, reasonOf(() -> opened.read(new char[0])));
         // A wrong try does not spoil the file: the right password still works.
         assertFalse(opened.read(PASSWORD.clone()).data().sessions().isEmpty());
     }
@@ -194,16 +192,16 @@ public class BackupFileTest {
     public void aChangedManifest_makesAProtectedBackupFail() throws Exception {
         var file = BackupFile.write(sample(), META, PASSWORD.clone(), ITERATIONS);
         var entries = unzip(file);
-        var manifest = new String(entries.get("manifest.json"), StandardCharsets.UTF_8);
+        var manifest = new String(entries.get("manifest.json"), UTF_8);
         entries.put(
                 "manifest.json", manifest.replace("\"appVersion\":\"1.0\"", "\"appVersion\":\"6.6\"")
-                        .getBytes(StandardCharsets.UTF_8)
+                        .getBytes(UTF_8)
         );
 
         var opened = open(zip(entries));
 
         assertEquals("6.6", opened.info().appVersion());
-        assertEquals(BackupException.Reason.WRONG_PASSWORD, reasonOf(() -> opened.read(PASSWORD.clone())));
+        assertEquals(WRONG_PASSWORD, reasonOf(() -> opened.read(PASSWORD.clone())));
     }
 
     @Test
@@ -215,31 +213,28 @@ public class BackupFileTest {
 
         var opened = open(zip(entries));
 
-        assertEquals(BackupException.Reason.WRONG_PASSWORD, reasonOf(() -> opened.read(PASSWORD.clone())));
+        assertEquals(WRONG_PASSWORD, reasonOf(() -> opened.read(PASSWORD.clone())));
     }
 
     // --- files that are not (good) backups ---
 
     @Test
     public void anotherKindOfFile_isNotABackup() {
-        assertEquals(
-                BackupException.Reason.NOT_A_BACKUP,
-                reasonOf(() -> open("just some text".getBytes(StandardCharsets.UTF_8)))
-        );
-        assertEquals(BackupException.Reason.NOT_A_BACKUP, reasonOf(() -> open(new byte[0])));
-        assertEquals(BackupException.Reason.NOT_A_BACKUP, reasonOf(() -> open(new byte[]{0x1f, (byte) 0x8b, 8, 0, 0})));
+        assertEquals(NOT_A_BACKUP, reasonOf(() -> open("just some text".getBytes(UTF_8))));
+        assertEquals(NOT_A_BACKUP, reasonOf(() -> open(new byte[0])));
+        assertEquals(NOT_A_BACKUP, reasonOf(() -> open(new byte[]{0x1f, (byte) 0x8b, 8, 0, 0})));
     }
 
     @Test
     public void aZipWithoutOurManifest_isNotABackup() throws Exception {
         var other = new LinkedHashMap<String, byte[]>();
         other.put("photo.jpg", new byte[]{1, 2, 3});
-        assertEquals(BackupException.Reason.NOT_A_BACKUP, reasonOf(() -> open(zip(other))));
+        assertEquals(NOT_A_BACKUP, reasonOf(() -> open(zip(other))));
 
         var foreign = new LinkedHashMap<String, byte[]>();
-        foreign.put("manifest.json", "{\"app\":\"SomethingElse\",\"format\":1,\"schema\":1}".getBytes(StandardCharsets.UTF_8));
-        foreign.put("data.json", "{}".getBytes(StandardCharsets.UTF_8));
-        assertEquals(BackupException.Reason.NOT_A_BACKUP, reasonOf(() -> open(zip(foreign))));
+        foreign.put("manifest.json", "{\"app\":\"SomethingElse\",\"format\":1,\"schema\":1}".getBytes(UTF_8));
+        foreign.put("data.json", "{}".getBytes(UTF_8));
+        assertEquals(NOT_A_BACKUP, reasonOf(() -> open(zip(foreign))));
     }
 
     @Test
@@ -250,16 +245,16 @@ public class BackupFileTest {
 
         var truncated = Arrays.copyOf(file, cut);
 
-        assertEquals(BackupException.Reason.DAMAGED, reasonOf(() -> open(truncated)));
+        assertEquals(DAMAGED, reasonOf(() -> open(truncated)));
     }
 
     @Test
     public void aManifestThatIsNoJson_isDamaged() throws Exception {
         var entries = new LinkedHashMap<String, byte[]>();
-        entries.put("manifest.json", "this is not json".getBytes(StandardCharsets.UTF_8));
-        entries.put("data.json", "{}".getBytes(StandardCharsets.UTF_8));
+        entries.put("manifest.json", "this is not json".getBytes(UTF_8));
+        entries.put("data.json", "{}".getBytes(UTF_8));
 
-        assertEquals(BackupException.Reason.DAMAGED, reasonOf(() -> open(zip(entries))));
+        assertEquals(DAMAGED, reasonOf(() -> open(zip(entries))));
     }
 
     @Test
@@ -267,25 +262,22 @@ public class BackupFileTest {
         var entries = unzip(BackupFile.write(sample(), META, null));
         entries.remove("data.json");
 
-        assertEquals(BackupException.Reason.DAMAGED, reasonOf(() -> open(zip(entries))));
+        assertEquals(DAMAGED, reasonOf(() -> open(zip(entries))));
     }
 
     @Test
     public void dataThatIsNoJson_isDamaged() throws Exception {
         var entries = unzip(BackupFile.write(sample(), META, null));
-        entries.put("data.json", "[1, 2, 3]".getBytes(StandardCharsets.UTF_8));
+        entries.put("data.json", "[1, 2, 3]".getBytes(UTF_8));
 
         var opened = open(zip(entries));
 
-        assertEquals(BackupException.Reason.DAMAGED, reasonOf(() -> opened.read(null)));
+        assertEquals(DAMAGED, reasonOf(() -> opened.read(null)));
     }
 
     @Test
     public void aFileLargerThanAnyBackup_isRefusedBeforeItIsOpened() {
-        assertEquals(
-                BackupException.Reason.TOO_LARGE,
-                reasonOf(() -> open(new byte[(int) BackupFile.MAX_FILE_BYTES + 1]))
-        );
+        assertEquals(TOO_LARGE, reasonOf(() -> open(new byte[(int) BackupFile.MAX_FILE_BYTES + 1])));
     }
 
     @Test
@@ -300,7 +292,7 @@ public class BackupFileTest {
         var file = bomb.toByteArray();
 
         assertTrue("The test file should be small, was " + file.length, file.length < BackupFile.MAX_FILE_BYTES);
-        assertEquals(BackupException.Reason.TOO_LARGE, reasonOf(() -> open(file)));
+        assertEquals(TOO_LARGE, reasonOf(() -> open(file)));
     }
 
     @Test
@@ -308,10 +300,10 @@ public class BackupFileTest {
         var manifest = "{\"app\":\"UniPensum\",\"format\":1,\"schema\":1,\"encryption\":"
                 + "{\"cipher\":\"ChaCha20\",\"kdf\":\"Argon2\",\"iterations\":3,\"salt\":\"AAAA\",\"iv\":\"AAAA\"}}";
         var entries = new LinkedHashMap<String, byte[]>();
-        entries.put("manifest.json", manifest.getBytes(StandardCharsets.UTF_8));
+        entries.put("manifest.json", manifest.getBytes(UTF_8));
         entries.put("data.enc", new byte[]{1, 2, 3});
 
-        assertEquals(BackupException.Reason.UNSUPPORTED, reasonOf(() -> open(zip(entries))));
+        assertEquals(UNSUPPORTED, reasonOf(() -> open(zip(entries))));
     }
 
     @Test
@@ -321,10 +313,10 @@ public class BackupFileTest {
                     + "{\"cipher\":\"AES-256-GCM\",\"kdf\":\"PBKDF2WithHmacSHA256\",\"iterations\":" + iterations
                     + ",\"salt\":\"AAAAAAAAAAAAAAAAAAAAAA==\",\"iv\":\"AAAAAAAAAAAAAAAA\"}}";
             var entries = new LinkedHashMap<String, byte[]>();
-            entries.put("manifest.json", manifest.getBytes(StandardCharsets.UTF_8));
+            entries.put("manifest.json", manifest.getBytes(UTF_8));
             entries.put("data.enc", new byte[]{1, 2, 3});
 
-            assertEquals("iterations " + iterations, BackupException.Reason.DAMAGED, reasonOf(() -> open(zip(entries))));
+            assertEquals("iterations " + iterations, DAMAGED, reasonOf(() -> open(zip(entries))));
         }
     }
 
@@ -364,14 +356,14 @@ public class BackupFileTest {
         assertEquals("", data.lecturers().get(1).firstName());
         assertEquals("Winter term", data.semesters().get(0).customName());
         assertEquals(LocalDate.of(2027, 1, 22), data.semesters().get(0).end());
-        assertEquals(CourseColor.BLUE, data.courses().get(0).color());
+        assertEquals(BLUE, data.courses().get(0).color());
         assertEquals("https://moodle.example/c/1", data.courses().get(0).moodleLink());
-        assertEquals(DayOfWeek.MONDAY, data.series().get(0).schedule().weekday());
+        assertEquals(MONDAY, data.series().get(0).schedule().weekday());
         assertEquals(1, data.series().get(0).details().lecturerId());
         var moved = data.sessions().get(1);
         assertEquals(LocalDate.of(2026, 10, 13), moved.day());
-        assertEquals(SessionType.EXERCISE, moved.details().type());
-        assertEquals(Mode.ONLINE, moved.details().mode());
+        assertEquals(EXERCISE, moved.details().type());
+        assertEquals(ONLINE, moved.details().mode());
         assertNull(moved.details().room());
         assertEquals(2, moved.details().lecturerId());
     }
@@ -400,8 +392,8 @@ public class BackupFileTest {
 
         var series = result.data().series();
         assertEquals(0, series.get(0).details().reminderMin());
-        assertEquals(SessionDetails.NO_REMINDER, series.get(1).details().reminderMin());
-        assertEquals(SessionDetails.MAX_REMINDER_MIN, series.get(2).details().reminderMin());
+        assertEquals(NO_REMINDER, series.get(1).details().reminderMin());
+        assertEquals(MAX_REMINDER_MIN, series.get(2).details().reminderMin());
         assertEquals(5, series.get(3).details().reminderMin());
         // Only the value that is no number counts as adjusted.
         assertEquals(new BackupReport(0, 1, 1, 4, 0, 0, 1), result.report());
@@ -428,12 +420,12 @@ public class BackupFileTest {
 
         var result = opened.read(null);
 
-        assertEquals(BackupInfo.Compatibility.NEWER, opened.info().compatibility(BackupFile.FORMAT, Schema.VERSION, 1));
+        assertEquals(NEWER, opened.info().compatibility(BackupFile.FORMAT, Schema.VERSION, 1));
         // Taken over, with a default where the value is unknown: the color, the event's type, the session's mode.
         assertEquals(new BackupReport(1, 1, 1, 1, 1, 0, 3), result.report());
-        assertEquals(CourseColor.BLUE, result.data().courses().get(0).color());
-        assertEquals(SessionType.LECTURE, result.data().series().get(0).details().type());
-        assertEquals(Mode.IN_PERSON, result.data().sessions().get(0).details().mode());
+        assertEquals(BLUE, result.data().courses().get(0).color());
+        assertEquals(LECTURE, result.data().series().get(0).details().type());
+        assertEquals(IN_PERSON, result.data().sessions().get(0).details().mode());
     }
 
     @Test
@@ -483,7 +475,7 @@ public class BackupFileTest {
         assertNull(details.room());
         assertNull(details.link());
         assertNull(details.note());
-        assertEquals(SessionDetails.NO_LECTURER, details.lecturerId());
+        assertEquals(NO_LECTURER, details.lecturerId());
         assertEquals(30, details.reminderMin());
         assertNull(result.data().semesters().get(0).customName());
         assertNull(result.data().courses().get(0).moodleLink());
@@ -516,8 +508,8 @@ public class BackupFileTest {
 
     private static LinkedHashMap<String, byte[]> sampleFile(String manifest, String data) {
         var entries = new LinkedHashMap<String, byte[]>();
-        entries.put("manifest.json", manifest.getBytes(StandardCharsets.UTF_8));
-        entries.put("data.json", data.getBytes(StandardCharsets.UTF_8));
+        entries.put("manifest.json", manifest.getBytes(UTF_8));
+        entries.put("data.json", data.getBytes(UTF_8));
         return entries;
     }
 
