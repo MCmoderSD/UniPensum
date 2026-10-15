@@ -1,5 +1,8 @@
 package de.mcmodersd.unipensum.domain.model;
 
+import static de.mcmodersd.unipensum.domain.model.NameStyle.FULL_NAME;
+import static de.mcmodersd.unipensum.domain.text.TextSanitizer.MAX_NAME;
+
 import java.util.Objects;
 
 import de.mcmodersd.unipensum.domain.text.TextSanitizer;
@@ -33,8 +36,8 @@ public record Lecturer(
     public Lecturer normalized() {
         return new Lecturer(
                 id,
-                TextSanitizer.line(firstName, TextSanitizer.MAX_NAME),
-                TextSanitizer.line(lastName, TextSanitizer.MAX_NAME),
+                TextSanitizer.line(firstName, MAX_NAME),
+                TextSanitizer.line(lastName, MAX_NAME),
                 TextSanitizer.email(email),
                 TextSanitizer.phone(phone)
         );
@@ -42,7 +45,7 @@ public record Lecturer(
 
     /** The last name, or first and last name; without a first name both styles show the last name. */
     public String name(NameStyle style) {
-        if (style == NameStyle.FULL_NAME && !firstName.isEmpty()) return firstName + " " + lastName;
+        if (style == FULL_NAME && !firstName.isEmpty()) return firstName + " " + lastName;
         return lastName;
     }
 }

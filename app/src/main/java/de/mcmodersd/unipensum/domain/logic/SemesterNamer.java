@@ -1,5 +1,7 @@
 package de.mcmodersd.unipensum.domain.logic;
 
+import static de.mcmodersd.unipensum.domain.logic.SemesterNamer.Season.*;
+
 import java.time.LocalDate;
 
 /** Derives the default semester name from its start date. Spelling is up to the UI layer. */
@@ -21,9 +23,9 @@ public final class SemesterNamer {
     public static Label label(LocalDate start) {
         var month = start.getMonthValue();
         if (month >= 3 && month <= 8) {
-            return new Label(Season.SUMMER, start.getYear());
+            return new Label(SUMMER, start.getYear());
         }
         var winterYear = month >= 9 ? start.getYear() : start.getYear() - 1;
-        return new Label(Season.WINTER, winterYear);
+        return new Label(WINTER, winterYear);
     }
 }

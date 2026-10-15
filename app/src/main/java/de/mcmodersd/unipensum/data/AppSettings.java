@@ -1,5 +1,10 @@
 package de.mcmodersd.unipensum.data;
 
+import static android.app.UiModeManager.*;
+import static android.content.Context.MODE_PRIVATE;
+import static de.mcmodersd.unipensum.data.AppSettings.ThemeMode.SYSTEM;
+import static de.mcmodersd.unipensum.domain.model.NameStyle.LAST_NAME;
+
 import android.app.UiModeManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,9 +23,9 @@ public final class AppSettings {
 
     /** The choice is handed to the system (see {@link #applyTheme()}), so these are the modes of {@link UiModeManager}. */
     public enum ThemeMode {
-        SYSTEM(UiModeManager.MODE_NIGHT_AUTO),
-        LIGHT(UiModeManager.MODE_NIGHT_NO),
-        DARK(UiModeManager.MODE_NIGHT_YES);
+        SYSTEM(MODE_NIGHT_AUTO),
+        LIGHT(MODE_NIGHT_NO),
+        DARK(MODE_NIGHT_YES);
 
         final int nightMode;
 
@@ -57,7 +62,7 @@ public final class AppSettings {
     private final MutableLiveData<NameStyle> lecturerNameStyle = new MutableLiveData<>();
 
     public AppSettings(Context context) {
-        prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        prefs = context.getApplicationContext().getSharedPreferences(PREFS, MODE_PRIVATE);
         uiModeManager = context.getSystemService(UiModeManager.class);
         timeWindow.setValue(readTimeWindow());
         lecturerNameStyle.setValue(readLecturerNameStyle());
@@ -76,9 +81,9 @@ public final class AppSettings {
 
     private NameStyle readLecturerNameStyle() {
         try {
-            return NameStyle.valueOf(prefs.getString(KEY_LECTURER_NAME, NameStyle.LAST_NAME.name()));
+            return NameStyle.valueOf(prefs.getString(KEY_LECTURER_NAME, LAST_NAME.name()));
         } catch (IllegalArgumentException unknown) {
-            return NameStyle.LAST_NAME;
+            return LAST_NAME;
         }
     }
 
@@ -102,9 +107,9 @@ public final class AppSettings {
 
     public ThemeMode themeMode() {
         try {
-            return ThemeMode.valueOf(prefs.getString(KEY_THEME, ThemeMode.SYSTEM.name()));
+            return ThemeMode.valueOf(prefs.getString(KEY_THEME, SYSTEM.name()));
         } catch (IllegalArgumentException unknown) {
-            return ThemeMode.SYSTEM;
+            return SYSTEM;
         }
     }
 

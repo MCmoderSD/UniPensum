@@ -1,5 +1,8 @@
 package de.mcmodersd.unipensum.domain.backup;
 
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.NO_LECTURER;
+import static de.mcmodersd.unipensum.domain.text.TextSanitizer.MAX_NAME;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -75,7 +78,7 @@ public final class BackupCleaner {
             candidates.add(
                     new Semester(
                             semester.id(), semester.start(), semester.end(),
-                            TextSanitizer.lineOrNull(semester.customName(), TextSanitizer.MAX_NAME)
+                            TextSanitizer.lineOrNull(semester.customName(), MAX_NAME)
                     )
             );
         }
@@ -96,7 +99,7 @@ public final class BackupCleaner {
     private LinkedHashMap<Long, Course> cleanCourses(List<Course> raw, LinkedHashMap<Long, Semester> semesters) {
         var kept = new LinkedHashMap<Long, Course>();
         for (var course : raw) {
-            var name = TextSanitizer.line(course.name(), TextSanitizer.MAX_NAME);
+            var name = TextSanitizer.line(course.name(), MAX_NAME);
             if (course.id() <= 0 || kept.containsKey(course.id()) || name.isEmpty()
                     || !semesters.containsKey(course.semesterId())) {
                 skipped++;
@@ -154,8 +157,8 @@ public final class BackupCleaner {
     private SessionDetails cleanDetails(SessionDetails details, Set<Long> lecturerIds) {
         if (!details.hasValidTimes()) return null;
         var lecturer = details.lecturerId();
-        if (lecturer != SessionDetails.NO_LECTURER && !lecturerIds.contains(lecturer)) {
-            lecturer = SessionDetails.NO_LECTURER;
+        if (lecturer != NO_LECTURER && !lecturerIds.contains(lecturer)) {
+            lecturer = NO_LECTURER;
             adjusted++;
         }
         var candidate = details.withLecturer(lecturer);

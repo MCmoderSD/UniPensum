@@ -1,5 +1,7 @@
 package de.mcmodersd.unipensum.data.backup;
 
+import static de.mcmodersd.unipensum.data.backup.BackupException.Reason.TOO_LARGE;
+
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -144,7 +146,7 @@ public final class BackupManager {
             int read;
             while ((read = in.read(buffer)) != -1) {
                 total += read;
-                if (total > BackupFile.MAX_FILE_BYTES) throw new BackupException(BackupException.Reason.TOO_LARGE);
+                if (total > BackupFile.MAX_FILE_BYTES) throw new BackupException(TOO_LARGE);
                 out.write(buffer, 0, read);
             }
             return out.toByteArray();

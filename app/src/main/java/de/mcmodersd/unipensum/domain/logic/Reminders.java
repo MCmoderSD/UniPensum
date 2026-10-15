@@ -1,5 +1,7 @@
 package de.mcmodersd.unipensum.domain.logic;
 
+import static de.mcmodersd.unipensum.domain.model.Mode.ONLINE;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,7 +32,7 @@ public final class Reminders {
     private Reminders() { }
 
     public static int defaultFor(Mode mode) {
-        return mode == Mode.ONLINE ? ONLINE_DEFAULT_MIN : IN_PERSON_DEFAULT_MIN;
+        return mode == ONLINE ? ONLINE_DEFAULT_MIN : IN_PERSON_DEFAULT_MIN;
     }
 
     /**

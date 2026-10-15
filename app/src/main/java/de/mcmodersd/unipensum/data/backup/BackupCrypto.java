@@ -1,5 +1,7 @@
 package de.mcmodersd.unipensum.data.backup;
 
+import static javax.crypto.Cipher.*;
+
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 
@@ -53,7 +55,7 @@ final class BackupCrypto {
     /** @param aad data that is not encrypted but must be unchanged when the result is opened */
     static byte[] encrypt(char[] password, Params params, byte[] aad, byte[] plain) throws GeneralSecurityException {
         var cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        cipher.init(Cipher.ENCRYPT_MODE, key(password, params), new GCMParameterSpec(TAG_BITS, params.iv()));
+        cipher.init(ENCRYPT_MODE, key(password, params), new GCMParameterSpec(TAG_BITS, params.iv()));
         cipher.updateAAD(aad);
         return cipher.doFinal(plain);
     }
@@ -63,7 +65,7 @@ final class BackupCrypto {
      */
     static byte[] decrypt(char[] password, Params params, byte[] aad, byte[] sealed) throws GeneralSecurityException {
         var cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, key(password, params), new GCMParameterSpec(TAG_BITS, params.iv()));
+        cipher.init(DECRYPT_MODE, key(password, params), new GCMParameterSpec(TAG_BITS, params.iv()));
         cipher.updateAAD(aad);
         return cipher.doFinal(sealed);
     }

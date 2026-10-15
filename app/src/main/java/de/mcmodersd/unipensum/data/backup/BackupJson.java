@@ -1,5 +1,11 @@
 package de.mcmodersd.unipensum.data.backup;
 
+import static de.mcmodersd.unipensum.domain.model.CourseColor.BLUE;
+import static de.mcmodersd.unipensum.domain.model.Mode.IN_PERSON;
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.*;
+import static de.mcmodersd.unipensum.domain.model.SessionType.LECTURE;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.JsonWriter;
@@ -10,7 +16,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -50,7 +55,7 @@ final class BackupJson {
     // --- writing ---
 
     static void write(BackupData data, OutputStream out) throws IOException {
-        var json = new JsonWriter(new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8)));
+        var json = new JsonWriter(new BufferedWriter(new OutputStreamWriter(out, UTF_8)));
         json.beginObject();
 
         json.name("lecturers").beginArray();
@@ -125,7 +130,7 @@ final class BackupJson {
         if (details.hybrid()) json.name("hybrid").value(true);
         optional(json, "room", details.room());
         optional(json, "link", details.link());
-        if (details.lecturerId() != SessionDetails.NO_LECTURER) json.name("lecturer").value(details.lecturerId());
+        if (details.lecturerId() != NO_LECTURER) json.name("lecturer").value(details.lecturerId());
         optional(json, "note", details.note());
         // Always written, "none" as -1.
         json.name("reminder").value(details.reminderMin());
@@ -139,7 +144,7 @@ final class BackupJson {
 
     /** @throws IOException if the text is not JSON; {@link IllegalStateException} if it is not an object */
     static Parsed read(InputStream in) throws IOException {
-        return new Reader().read(new JsonReader(new InputStreamReader(in, StandardCharsets.UTF_8)));
+        return new Reader().read(new JsonReader(new InputStreamReader(in, UTF_8)));
     }
 
     private static final class Reader {
@@ -256,7 +261,7 @@ final class BackupJson {
             try {
                 color = CourseColor.fromKey(text(f, "color"));
             } catch (IllegalArgumentException unknown) {
-                color = CourseColor.BLUE;
+                color = BLUE;
                 adjusted++;
             }
             return new Course(id, semester, name, color, text(f, "moodle"));
@@ -281,19 +286,19 @@ final class BackupJson {
         private SessionDetails details(HashMap<String, Object> f) {
             var startMin = (int) requiredLong(f, "startMin");
             var endMin = (int) requiredLong(f, "endMin");
-            var lecturer = f.containsKey("lecturer") ? requiredLong(f, "lecturer") : SessionDetails.NO_LECTURER;
+            var lecturer = f.containsKey("lecturer") ? requiredLong(f, "lecturer") : NO_LECTURER;
             SessionType type;
             try {
                 type = SessionType.fromKey(text(f, "type"));
             } catch (IllegalArgumentException unknown) {
-                type = SessionType.LECTURE;
+                type = LECTURE;
                 adjusted++;
             }
             Mode mode;
             try {
                 mode = Mode.fromKey(text(f, "mode"));
             } catch (IllegalArgumentException unknown) {
-                mode = Mode.IN_PERSON;
+                mode = IN_PERSON;
                 adjusted++;
             }
             return new SessionDetails(
@@ -306,10 +311,7 @@ final class BackupJson {
         private int reminder(HashMap<String, Object> f, Mode mode) {
             if (!f.containsKey("reminder")) return Reminders.defaultFor(mode);
             try {
-                return (int) Math.max(
-                        SessionDetails.NO_REMINDER,
-                        Math.min(SessionDetails.MAX_REMINDER_MIN, requiredLong(f, "reminder"))
-                );
+                return (int) Math.max(NO_REMINDER, Math.min(MAX_REMINDER_MIN, requiredLong(f, "reminder")));
             } catch (RuntimeException notANumber) {
                 adjusted++;
                 return Reminders.defaultFor(mode);

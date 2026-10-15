@@ -1,5 +1,7 @@
 package de.mcmodersd.unipensum.data.db;
 
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.NO_REMINDER;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 
@@ -39,7 +41,7 @@ final class Rows {
                 string(cursor, "link"),
                 longOrZero(cursor, "lecturer_id"),
                 string(cursor, "note"),
-                nullableInt(cursor, "reminder_min", SessionDetails.NO_REMINDER)
+                nullableInt(cursor, "reminder_min", NO_REMINDER)
         );
     }
 

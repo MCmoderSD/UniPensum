@@ -1,6 +1,7 @@
 package de.mcmodersd.unipensum.domain.logic;
 
-import java.time.DayOfWeek;
+import static java.time.DayOfWeek.*;
+
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
@@ -26,8 +27,8 @@ public final class SemesterDefaults {
      */
     public static LocalDate lectureEnd(LocalDate start) {
         var end = start.plusWeeks(LECTURE_WEEKS).minusDays(1);
-        if (end.getDayOfWeek() == DayOfWeek.SATURDAY) return end.minusDays(1);
-        if (end.getDayOfWeek() == DayOfWeek.SUNDAY) return end.minusDays(2);
+        if (end.getDayOfWeek() == SATURDAY) return end.minusDays(1);
+        if (end.getDayOfWeek() == SUNDAY) return end.minusDays(2);
         return end;
     }
 
@@ -38,7 +39,7 @@ public final class SemesterDefaults {
     public static Period suggest(LocalDate today, List<Semester> existing) {
         for (var year = today.getYear() - 1; year <= today.getYear() + 3; year++) {
             for (var month : new int[]{4, 10}) {
-                var start = LocalDate.of(year, month, 1).with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+                var start = LocalDate.of(year, month, 1).with(TemporalAdjusters.nextOrSame(MONDAY));
                 var end = lectureEnd(start);
                 if (end.isBefore(today) || overlapsAny(start, end, existing)) continue;
                 return new Period(start, end);

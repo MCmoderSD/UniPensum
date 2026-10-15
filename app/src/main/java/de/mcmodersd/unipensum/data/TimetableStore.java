@@ -1,5 +1,8 @@
 package de.mcmodersd.unipensum.data;
 
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.NO_LECTURER;
+import static de.mcmodersd.unipensum.domain.text.TextSanitizer.MAX_NAME;
+
 import android.database.sqlite.SQLiteDatabase;
 
 import java.time.LocalDate;
@@ -123,7 +126,7 @@ public final class TimetableStore {
         Course course = require(CourseDao.get(db, series.courseId()), "course", series.courseId());
         Semester semester = require(SemesterDao.get(db, course.semesterId()), "semester", course.semesterId());
         var lecturerId = session.details().lecturerId();
-        Lecturer lecturer = lecturerId == SessionDetails.NO_LECTURER ? null : LecturerDao.get(db, lecturerId);
+        Lecturer lecturer = lecturerId == NO_LECTURER ? null : LecturerDao.get(db, lecturerId);
         return new SessionContext(session, series, course, semester, lecturer);
     }
 
@@ -205,8 +208,7 @@ public final class TimetableStore {
 
     /** The details with the lecturer id of the data replaced by the one the lecturer got in the database. */
     private static SessionDetails withLecturer(SessionDetails d, HashMap<Long, Long> lecturerIds) {
-        var lecturer = d.lecturerId() == SessionDetails.NO_LECTURER
-                ? SessionDetails.NO_LECTURER : mapped(lecturerIds, d.lecturerId(), "lecturer");
+        var lecturer = d.lecturerId() == NO_LECTURER ? NO_LECTURER : mapped(lecturerIds, d.lecturerId(), "lecturer");
         return d.withLecturer(lecturer);
     }
 
@@ -241,7 +243,7 @@ public final class TimetableStore {
      * @return the semester id
      */
     public static long saveSemester(SQLiteDatabase db, Semester semester) {
-        var customName = TextSanitizer.lineOrNull(semester.customName(), TextSanitizer.MAX_NAME);
+        var customName = TextSanitizer.lineOrNull(semester.customName(), MAX_NAME);
         var clean = new Semester(semester.id(), semester.start(), semester.end(), customName);
 
         return transact(db, () -> {
@@ -422,8 +424,8 @@ public final class TimetableStore {
     private static SessionDetails requireValid(SQLiteDatabase db, SessionDetails details) {
         var clean = details.normalized();
         if (!clean.hasValidTimes()) throw new IllegalArgumentException("Invalid start or end time");
-        if (clean.lecturerId() != SessionDetails.NO_LECTURER && LecturerDao.get(db, clean.lecturerId()) == null) {
-            return clean.withLecturer(SessionDetails.NO_LECTURER);
+        if (clean.lecturerId() != NO_LECTURER && LecturerDao.get(db, clean.lecturerId()) == null) {
+            return clean.withLecturer(NO_LECTURER);
         }
         return clean;
     }
@@ -434,7 +436,7 @@ public final class TimetableStore {
     }
 
     private static String requireName(String name) {
-        var clean = TextSanitizer.line(name, TextSanitizer.MAX_NAME);
+        var clean = TextSanitizer.line(name, MAX_NAME);
         if (clean.isEmpty()) throw new IllegalArgumentException("The name must not be empty");
         return clean;
     }

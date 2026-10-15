@@ -23,6 +23,6 @@ public record BackupInfo(
         if (bySchema != 0) return bySchema > 0 ? NEWER : OLDER;
         var byBuild = Integer.compare(appVersionCode, currentAppVersionCode);
         if (byBuild != 0) return byBuild > 0 ? NEWER : OLDER;
-        return Compatibility.SAME;
+        return SAME;
     }
 }

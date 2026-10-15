@@ -1,5 +1,7 @@
 package de.mcmodersd.unipensum.domain.text;
 
+import static java.text.Normalizer.Form.NFC;
+
 import java.text.Normalizer;
 import java.util.Locale;
 
@@ -30,7 +32,7 @@ public final class TextSanitizer {
                 out.appendCodePoint(cp);
             }
         }
-        return limit(Normalizer.normalize(out, Normalizer.Form.NFC), maxLength);
+        return limit(Normalizer.normalize(out, NFC), maxLength);
     }
 
     public static String lineOrNull(String raw, int maxLength) {
@@ -139,7 +141,7 @@ public final class TextSanitizer {
             i += Character.charCount(cp);
             if (!isSpace(cp) && !isDropped(cp)) out.appendCodePoint(cp);
         }
-        return Normalizer.normalize(out, Normalizer.Form.NFC);
+        return Normalizer.normalize(out, NFC);
     }
 
     private static String limit(String text, int max) {

@@ -1,6 +1,7 @@
 package de.mcmodersd.unipensum.domain.logic;
 
-import java.time.DayOfWeek;
+import static java.time.DayOfWeek.*;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,7 +43,7 @@ public final class SemesterRules {
 
     public static boolean isWeekday(LocalDate day) {
         var weekday = day.getDayOfWeek();
-        return weekday != DayOfWeek.SATURDAY && weekday != DayOfWeek.SUNDAY;
+        return weekday != SATURDAY && weekday != SUNDAY;
     }
 
     /** A session may only be moved to Monday to Friday within its semester. */

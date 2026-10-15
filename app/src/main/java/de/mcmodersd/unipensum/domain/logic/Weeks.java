@@ -1,9 +1,10 @@
 package de.mcmodersd.unipensum.domain.logic;
 
-import java.time.DayOfWeek;
+import static java.time.DayOfWeek.*;
+import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.IsoFields;
 
 /** Maps pager positions to weeks: position 0 is the week of {@link #ANCHOR}, one position per week. */
 public final class Weeks {
@@ -27,12 +28,12 @@ public final class Weeks {
 
     /** The current week, or the coming one on Saturday and Sunday, which the app does not show. */
     public static int initialPosition(LocalDate today) {
-        var weekend = today.getDayOfWeek() == DayOfWeek.SATURDAY || today.getDayOfWeek() == DayOfWeek.SUNDAY;
+        var weekend = today.getDayOfWeek() == SATURDAY || today.getDayOfWeek() == SUNDAY;
         var position = positionOf(today) + (weekend ? 1 : 0);
         return Math.max(0, Math.min(PAGE_COUNT - 1, position));
     }
 
     public static int isoWeekNumber(LocalDate monday) {
-        return monday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        return monday.get(WEEK_OF_WEEK_BASED_YEAR);
     }
 }

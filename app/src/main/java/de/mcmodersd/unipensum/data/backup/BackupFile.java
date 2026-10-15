@@ -1,5 +1,11 @@
 package de.mcmodersd.unipensum.data.backup;
 
+import static de.mcmodersd.unipensum.data.backup.BackupCrypto.*;
+import static de.mcmodersd.unipensum.data.backup.BackupException.Reason.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+import static java.util.zip.Deflater.BEST_COMPRESSION;
+
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.JsonWriter;
@@ -11,10 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.zip.Deflater;
@@ -56,7 +60,7 @@ public final class BackupFile {
      * @param password the password to protect the data with, {@code null} for none
      */
     public static byte[] write(BackupData data, Meta meta, char[] password) throws IOException, GeneralSecurityException {
-        return write(data, meta, password, BackupCrypto.ITERATIONS);
+        return write(data, meta, password, ITERATIONS);
     }
 
     static byte[] write(BackupData data, Meta meta, char[] password, int iterations)
@@ -81,7 +85,7 @@ public final class BackupFile {
 
         var archive = new ByteArrayOutputStream();
         try (var zip = new ZipOutputStream(archive)) {
-            zip.setLevel(Deflater.BEST_COMPRESSION);
+            zip.setLevel(BEST_COMPRESSION);
             put(zip, MANIFEST, manifest);
             put(zip, payloadName, payload);
         }
@@ -96,7 +100,7 @@ public final class BackupFile {
 
     private static byte[] manifest(Meta meta, BackupCrypto.Params params) throws IOException {
         var bytes = new ByteArrayOutputStream();
-        var json = new JsonWriter(new BufferedWriter(new OutputStreamWriter(bytes, StandardCharsets.UTF_8)));
+        var json = new JsonWriter(new BufferedWriter(new OutputStreamWriter(bytes, UTF_8)));
         json.beginObject();
         json.name("app").value(APP);
         json.name("format").value(FORMAT);
@@ -104,12 +108,12 @@ public final class BackupFile {
         json.name("appVersion").value(meta.appVersion());
         json.name("appVersionCode").value(meta.appVersionCode());
         if (meta.exportedAt() != null) {
-            json.name("exportedAt").value(DateTimeFormatter.ISO_INSTANT.format(meta.exportedAt()));
+            json.name("exportedAt").value(ISO_INSTANT.format(meta.exportedAt()));
         }
         if (params != null) {
             json.name("encryption").beginObject();
-            json.name("cipher").value(BackupCrypto.CIPHER_NAME);
-            json.name("kdf").value(BackupCrypto.KDF_NAME);
+            json.name("cipher").value(CIPHER_NAME);
+            json.name("kdf").value(KDF_NAME);
             json.name("iterations").value(params.iterations());
             json.name("salt").value(Base64.getEncoder().encodeToString(params.salt()));
             json.name("iv").value(Base64.getEncoder().encodeToString(params.iv()));
@@ -122,7 +126,7 @@ public final class BackupFile {
 
     private static byte[] deflate(byte[] plain) throws IOException {
         var bytes = new ByteArrayOutputStream();
-        var deflater = new Deflater(Deflater.BEST_COMPRESSION);
+        var deflater = new Deflater(BEST_COMPRESSION);
         try (var out = new DeflaterOutputStream(bytes, deflater)) {
             out.write(plain);
         } finally {
@@ -159,20 +163,20 @@ public final class BackupFile {
         public BackupCleaner.Result read(char[] password) throws BackupException {
             var json = data;
             if (crypto != null) {
-                if (password == null || password.length == 0) throw new BackupException(BackupException.Reason.WRONG_PASSWORD);
+                if (password == null || password.length == 0) throw new BackupException(WRONG_PASSWORD);
                 try {
                     json = inflate(BackupCrypto.decrypt(password, crypto, manifest, data));
                 } catch (AEADBadTagException wrong) {
-                    throw new BackupException(BackupException.Reason.WRONG_PASSWORD, wrong);
+                    throw new BackupException(WRONG_PASSWORD, wrong);
                 } catch (GeneralSecurityException broken) {
-                    throw new BackupException(BackupException.Reason.DAMAGED, broken);
+                    throw new BackupException(DAMAGED, broken);
                 }
             }
             BackupJson.Parsed parsed;
             try {
                 parsed = BackupJson.read(new ByteArrayInputStream(json));
             } catch (IOException | IllegalStateException | NumberFormatException broken) {
-                throw new BackupException(BackupException.Reason.DAMAGED, broken);
+                throw new BackupException(DAMAGED, broken);
             }
             return BackupCleaner.clean(parsed.data(), parsed.skipped(), parsed.adjusted());
         }
@@ -185,20 +189,20 @@ public final class BackupFile {
      *                         inconsistent one, {@code TOO_LARGE}, {@code UNSUPPORTED}
      */
     public static Opened open(byte[] bytes) throws BackupException {
-        if (bytes.length > MAX_FILE_BYTES) throw new BackupException(BackupException.Reason.TOO_LARGE);
+        if (bytes.length > MAX_FILE_BYTES) throw new BackupException(TOO_LARGE);
         // Every archive this class writes begins with the header of its first entry. Checking it here keeps
         // "some other file" apart from "a damaged backup", whatever the zip reader does with odd input.
         if (bytes.length < 4 || bytes[0] != 'P' || bytes[1] != 'K' || bytes[2] != 3 || bytes[3] != 4) {
-            throw new BackupException(BackupException.Reason.NOT_A_BACKUP);
+            throw new BackupException(NOT_A_BACKUP);
         }
 
         var entries = unzip(bytes);
         var manifest = entries.get(MANIFEST);
-        if (manifest == null) throw new BackupException(BackupException.Reason.NOT_A_BACKUP);
+        if (manifest == null) throw new BackupException(NOT_A_BACKUP);
 
         var parsed = parseManifest(manifest);
         var data = entries.get(parsed.crypto == null ? DATA_JSON : DATA_ENC);
-        if (data == null) throw new BackupException(BackupException.Reason.DAMAGED);
+        if (data == null) throw new BackupException(DAMAGED);
         return new Opened(parsed.info, parsed.crypto, manifest, data);
     }
 
@@ -209,7 +213,7 @@ public final class BackupFile {
             ZipEntry entry;
             var count = 0;
             while ((entry = zip.getNextEntry()) != null) {
-                if (++count > MAX_ENTRIES) throw new BackupException(BackupException.Reason.DAMAGED);
+                if (++count > MAX_ENTRIES) throw new BackupException(DAMAGED);
                 // Every entry is read through, even the ones that are ignored, so all of them count to the cap.
                 var content = readCapped(zip, budget);
                 budget -= content.length;
@@ -219,7 +223,7 @@ public final class BackupFile {
                 }
             }
         } catch (IOException damaged) {
-            throw new BackupException(BackupException.Reason.DAMAGED, damaged);
+            throw new BackupException(DAMAGED, damaged);
         }
         return entries;
     }
@@ -228,7 +232,7 @@ public final class BackupFile {
         try (var in = new InflaterInputStream(new ByteArrayInputStream(packed))) {
             return readCapped(in, MAX_UNPACKED_BYTES);
         } catch (IOException damaged) {
-            throw new BackupException(BackupException.Reason.DAMAGED, damaged);
+            throw new BackupException(DAMAGED, damaged);
         }
     }
 
@@ -240,7 +244,7 @@ public final class BackupFile {
         int read;
         while ((read = in.read(buffer)) != -1) {
             total += read;
-            if (total > limit) throw new BackupException(BackupException.Reason.TOO_LARGE);
+            if (total > limit) throw new BackupException(TOO_LARGE);
             out.write(buffer, 0, read);
         }
         return out.toByteArray();
@@ -259,7 +263,7 @@ public final class BackupFile {
         Instant exportedAt = null;
         BackupCrypto.Params crypto = null;
 
-        var json = new JsonReader(new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8));
+        var json = new JsonReader(new InputStreamReader(new ByteArrayInputStream(bytes), UTF_8));
         try {
             json.beginObject();
             while (json.hasNext()) {
@@ -292,11 +296,11 @@ public final class BackupFile {
             }
             json.endObject();
         } catch (IOException | IllegalStateException | NumberFormatException damaged) {
-            throw new BackupException(BackupException.Reason.DAMAGED, damaged);
+            throw new BackupException(DAMAGED, damaged);
         }
 
-        if (!APP.equals(app)) throw new BackupException(BackupException.Reason.NOT_A_BACKUP);
-        if (format == null || schema == null) throw new BackupException(BackupException.Reason.DAMAGED);
+        if (!APP.equals(app)) throw new BackupException(NOT_A_BACKUP);
+        if (format == null || schema == null) throw new BackupException(DAMAGED);
         return new ParsedManifest(new BackupInfo(format, schema, build, version, exportedAt), crypto);
     }
 
@@ -332,13 +336,13 @@ public final class BackupFile {
         json.endObject();
 
         // A newer version may protect the data in a way this one cannot undo.
-        if (!BackupCrypto.CIPHER_NAME.equals(cipher) || !BackupCrypto.KDF_NAME.equals(kdf)) {
-            throw new BackupException(BackupException.Reason.UNSUPPORTED);
+        if (!CIPHER_NAME.equals(cipher) || !KDF_NAME.equals(kdf)) {
+            throw new BackupException(UNSUPPORTED);
         }
-        var sane = iterations >= BackupCrypto.MIN_ITERATIONS && iterations <= BackupCrypto.MAX_ITERATIONS
-                && salt != null && salt.length == BackupCrypto.SALT_BYTES
-                && iv != null && iv.length == BackupCrypto.IV_BYTES;
-        if (!sane) throw new BackupException(BackupException.Reason.DAMAGED);
+        var sane = iterations >= MIN_ITERATIONS && iterations <= MAX_ITERATIONS
+                && salt != null && salt.length == SALT_BYTES
+                && iv != null && iv.length == IV_BYTES;
+        if (!sane) throw new BackupException(DAMAGED);
         return new BackupCrypto.Params(iterations, salt, iv);
     }
 

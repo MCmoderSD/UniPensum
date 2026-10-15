@@ -1,5 +1,7 @@
 package de.mcmodersd.unipensum.domain.model;
 
+import static java.time.DayOfWeek.*;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -14,7 +16,7 @@ public record Schedule(DayOfWeek weekday, LocalDate first, LocalDate last, int i
         Objects.requireNonNull(weekday, "weekday");
         Objects.requireNonNull(first, "first");
         Objects.requireNonNull(last, "last");
-        if (weekday == DayOfWeek.SATURDAY || weekday == DayOfWeek.SUNDAY) {
+        if (weekday == SATURDAY || weekday == SUNDAY) {
             throw new IllegalArgumentException("The week only has Monday to Friday: " + weekday);
         }
         if (intervalWeeks < 1) {

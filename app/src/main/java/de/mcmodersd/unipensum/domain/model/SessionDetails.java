@@ -1,5 +1,8 @@
 package de.mcmodersd.unipensum.domain.model;
 
+import static de.mcmodersd.unipensum.domain.model.Mode.ONLINE;
+import static de.mcmodersd.unipensum.domain.text.TextSanitizer.*;
+
 import java.util.Objects;
 
 import de.mcmodersd.unipensum.domain.text.TextSanitizer;
@@ -67,7 +70,7 @@ public record SessionDetails(
      *                                  {@link TextSanitizer#webLink}; check with {@link TextSanitizer#isValidWebLink} first
      */
     public SessionDetails normalized() {
-        var online = mode == Mode.ONLINE;
+        var online = mode == ONLINE;
         var hybridEffective = !online && hybrid;
         return new SessionDetails(
                 type,
@@ -75,10 +78,10 @@ public record SessionDetails(
                 endMin,
                 mode,
                 hybridEffective,
-                online ? null : TextSanitizer.lineOrNull(room, TextSanitizer.MAX_ROOM),
+                online ? null : TextSanitizer.lineOrNull(room, MAX_ROOM),
                 (online || hybridEffective) ? TextSanitizer.webLink(link) : null,
                 lecturerId > 0 ? lecturerId : NO_LECTURER,
-                TextSanitizer.text(note, TextSanitizer.MAX_NOTE),
+                TextSanitizer.text(note, MAX_NOTE),
                 reminderMin < 0 ? NO_REMINDER : Math.min(reminderMin, MAX_REMINDER_MIN)
         );
     }
