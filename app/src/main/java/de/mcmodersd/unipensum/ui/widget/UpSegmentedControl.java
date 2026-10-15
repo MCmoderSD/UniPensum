@@ -1,5 +1,7 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static de.mcmodersd.unipensum.R.color.*;
+
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -19,8 +21,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
 import java.util.ArrayList;
-
-import de.mcmodersd.unipensum.R;
 
 /**
  * A row of mutually exclusive options. The selection is a pill in the accent color that slides to
@@ -57,13 +57,13 @@ public class UpSegmentedControl extends LinearLayout {
         setPadding(padding, padding, padding, padding);
         var background = new GradientDrawable();
         background.setCornerRadius(14 * dp);
-        background.setColor(ContextCompat.getColor(context, R.color.surface));
+        background.setColor(ContextCompat.getColor(context, surface));
         setBackground(background);
         setWillNotDraw(false);
 
-        pillPaint.setColor(ContextCompat.getColor(context, R.color.accent));
-        colorSelected = ContextCompat.getColor(context, R.color.text_on_accent);
-        colorIdle = ContextCompat.getColor(context, R.color.text_secondary);
+        pillPaint.setColor(ContextCompat.getColor(context, accent));
+        colorSelected = ContextCompat.getColor(context, text_on_accent);
+        colorIdle = ContextCompat.getColor(context, text_secondary);
     }
 
     public void setOptions(CharSequence... labels) {

@@ -1,5 +1,8 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static androidx.core.view.accessibility.AccessibilityNodeInfoCompat.CHECKED_STATE_FALSE;
+import static androidx.core.view.accessibility.AccessibilityNodeInfoCompat.CHECKED_STATE_TRUE;
+
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -102,8 +105,7 @@ public class UpSwitch extends View {
         info.setClassName("android.widget.Switch");
         info.setCheckable(true);
         AccessibilityNodeInfoCompat.wrap(info).setChecked(
-                checked
-                        ? AccessibilityNodeInfoCompat.CHECKED_STATE_TRUE : AccessibilityNodeInfoCompat.CHECKED_STATE_FALSE
+                checked ? CHECKED_STATE_TRUE : CHECKED_STATE_FALSE
         );
     }
 }
