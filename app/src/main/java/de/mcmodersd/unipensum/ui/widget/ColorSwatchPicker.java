@@ -1,5 +1,12 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+import static android.view.MotionEvent.*;
+import static androidx.core.view.accessibility.AccessibilityNodeInfoCompat.*;
+import static de.mcmodersd.unipensum.R.color.text_primary;
+import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.domain.model.CourseColor.BLUE;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -18,7 +25,6 @@ import androidx.customview.widget.ExploreByTouchHelper;
 
 import java.util.List;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.domain.model.CourseColor;
 import de.mcmodersd.unipensum.ui.format.CourseColors;
 
@@ -33,12 +39,12 @@ public class ColorSwatchPicker extends View {
     private static final int COLUMNS = 6;
 
     private final CourseColor[] colors = CourseColor.values();
-    private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint fill = new Paint(ANTI_ALIAS_FLAG);
+    private final Paint ring = new Paint(ANTI_ALIAS_FLAG);
     private final float dp = getResources().getDisplayMetrics().density;
     private final float cellHeight = 56 * dp;
     private final SwatchAccessibility accessibility = new SwatchAccessibility();
-    private CourseColor selected = CourseColor.BLUE;
+    private CourseColor selected = BLUE;
     private OnColorSelectedListener listener;
     private float downX;
     private float downY;
@@ -51,7 +57,7 @@ public class ColorSwatchPicker extends View {
         super(context, attrs);
         ring.setStyle(Paint.Style.STROKE);
         ring.setStrokeWidth(2.5f * dp);
-        ring.setColor(ContextCompat.getColor(context, R.color.text_primary));
+        ring.setColor(ContextCompat.getColor(context, text_primary));
         ViewCompat.setAccessibilityDelegate(this, accessibility);
     }
 
@@ -97,11 +103,11 @@ public class ColorSwatchPicker extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
+            case ACTION_DOWN:
                 downX = event.getX();
                 downY = event.getY();
                 return true;
-            case MotionEvent.ACTION_UP:
+            case ACTION_UP:
                 if (Math.abs(event.getX() - downX) < 12 * dp && Math.abs(event.getY() - downY) < 12 * dp) {
                     pick(indexAt(event.getX(), event.getY()));
                     performClick();
@@ -137,17 +143,17 @@ public class ColorSwatchPicker extends View {
     private String colorName(CourseColor color) {
         var context = getContext();
         return switch (color) {
-            case RED -> context.getString(R.string.color_red);
-            case ORANGE -> context.getString(R.string.color_orange);
-            case YELLOW -> context.getString(R.string.color_yellow);
-            case GREEN -> context.getString(R.string.color_green);
-            case TEAL -> context.getString(R.string.color_teal);
-            case BLUE -> context.getString(R.string.color_blue);
-            case VIOLET -> context.getString(R.string.color_violet);
-            case PINK -> context.getString(R.string.color_pink);
-            case GRAPHITE -> context.getString(R.string.color_graphite);
-            case GRAY -> context.getString(R.string.color_gray);
-            default -> context.getString(R.string.color_silver);
+            case RED -> context.getString(color_red);
+            case ORANGE -> context.getString(color_orange);
+            case YELLOW -> context.getString(color_yellow);
+            case GREEN -> context.getString(color_green);
+            case TEAL -> context.getString(color_teal);
+            case BLUE -> context.getString(color_blue);
+            case VIOLET -> context.getString(color_violet);
+            case PINK -> context.getString(color_pink);
+            case GRAPHITE -> context.getString(color_graphite);
+            case GRAY -> context.getString(color_gray);
+            default -> context.getString(color_silver);
         };
     }
 
@@ -176,16 +182,13 @@ public class ColorSwatchPicker extends View {
             setBoundsInScreenFromBoundsInParent(node, bounds);
             node.setContentDescription(colorName(colors[id]));
             node.setCheckable(true);
-            node.setChecked(
-                    colors[id] == selected
-                            ? AccessibilityNodeInfoCompat.CHECKED_STATE_TRUE : AccessibilityNodeInfoCompat.CHECKED_STATE_FALSE
-            );
-            node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
+            node.setChecked(colors[id] == selected ? CHECKED_STATE_TRUE : CHECKED_STATE_FALSE);
+            node.addAction(ACTION_CLICK);
         }
 
         @Override
         protected boolean onPerformActionForVirtualView(int id, int action, Bundle arguments) {
-            if (action != AccessibilityNodeInfoCompat.ACTION_CLICK) return false;
+            if (action != ACTION_CLICK) return false;
             pick(id);
             invalidateVirtualView(id);
             return true;

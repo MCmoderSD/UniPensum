@@ -1,5 +1,11 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.View.*;
+import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
+import static de.mcmodersd.unipensum.R.id.*;
+import static de.mcmodersd.unipensum.R.layout.sheet_base;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -19,7 +25,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-import de.mcmodersd.unipensum.R;
 
 /**
  * Base of every sheet in the app. Material only supplies the drag and back-gesture mechanics;
@@ -52,14 +57,14 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        var root = inflater.inflate(R.layout.sheet_base, container, false);
+        var root = inflater.inflate(sheet_base, container, false);
 
-        TextView title = root.findViewById(R.id.sheet_title);
+        TextView title = root.findViewById(sheet_title);
         var text = title(requireContext());
         title.setText(text);
-        title.setVisibility(text == null ? View.GONE : View.VISIBLE);
+        title.setVisibility(text == null ? GONE : VISIBLE);
 
-        ViewGroup content = root.findViewById(R.id.sheet_content);
+        ViewGroup content = root.findViewById(sheet_content);
         content.addView(createContent(savedInstanceState));
 
         var fraction = minHeightFraction();
@@ -90,28 +95,28 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
      * scrolls. Pass {@code null} to remove it. Call once the view exists.
      */
     protected final void setFooter(@Nullable View view) {
-        ViewGroup footer = requireView().findViewById(R.id.sheet_footer);
+        ViewGroup footer = requireView().findViewById(sheet_footer);
         footer.removeAllViews();
         if (view != null) footer.addView(view);
-        footer.setVisibility(view == null ? View.GONE : View.VISIBLE);
+        footer.setVisibility(view == null ? GONE : VISIBLE);
     }
 
     /** For sheets whose title is only known after their data has loaded. */
     protected final void setSheetTitle(@Nullable CharSequence text) {
         var root = getView();
         if (root == null) return;
-        TextView title = root.findViewById(R.id.sheet_title);
+        TextView title = root.findViewById(sheet_title);
         title.setText(text);
-        title.setVisibility(text == null ? View.GONE : View.VISIBLE);
+        title.setVisibility(text == null ? GONE : VISIBLE);
     }
 
     /** Shows an icon button next to the title, or replaces the one already there. Call once the view exists. */
     protected final void setHeaderAction(@DrawableRes int icon, CharSequence description, View.OnClickListener listener) {
-        UpIconButton action = requireView().findViewById(R.id.sheet_action);
+        UpIconButton action = requireView().findViewById(sheet_action);
         action.setImageResource(icon);
         action.setContentDescription(description);
         action.setOnClickListener(listener);
-        action.setVisibility(View.VISIBLE);
+        action.setVisibility(VISIBLE);
     }
 
     /**
@@ -125,7 +130,7 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
         return new BottomSheetDialog(requireContext(), getTheme()) {
             @Override
             public boolean dispatchTouchEvent(@NonNull MotionEvent event) {
-                if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                if (event.getActionMasked() == ACTION_DOWN) {
                     getBehavior().setDraggable(isOnHeader(event.getRawX(), event.getRawY()));
                 }
                 return super.dispatchTouchEvent(event);
@@ -136,7 +141,7 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
     private boolean isOnHeader(float rawX, float rawY) {
         var root = getView();
         if (root == null) return false;
-        View header = root.findViewById(R.id.sheet_header);
+        View header = root.findViewById(sheet_header);
         var location = new int[2];
         header.getLocationOnScreen(location);
         return rawX >= location[0] && rawX < location[0] + header.getWidth()
@@ -149,6 +154,6 @@ public abstract class UpSheet extends BottomSheetDialogFragment {
         var dialog = (BottomSheetDialog) requireDialog();
         BottomSheetBehavior<?> behavior = dialog.getBehavior();
         behavior.setSkipCollapsed(true);
-        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        behavior.setState(STATE_EXPANDED);
     }
 }

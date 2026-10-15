@@ -1,7 +1,9 @@
 package de.mcmodersd.unipensum.ui.widget;
 
-import android.os.Build;
-import android.view.HapticFeedbackConstants;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE;
+import static android.view.HapticFeedbackConstants.*;
+
 import android.view.View;
 
 /**
@@ -14,29 +16,29 @@ public final class Haptics {
 
     /** A plain press of a button, a row or an icon: a firm click. */
     public static void tap(View view) {
-        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+        view.performHapticFeedback(VIRTUAL_KEY);
     }
 
     /** A completed action such as saving. */
     public static void confirm(View view) {
-        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+        view.performHapticFeedback(CONFIRM);
     }
 
     /** An action that was refused, such as an invalid form. */
     public static void reject(View view) {
-        view.performHapticFeedback(HapticFeedbackConstants.REJECT);
+        view.performHapticFeedback(REJECT);
     }
 
     public static void toggle(View view, boolean on) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            view.performHapticFeedback(on ? HapticFeedbackConstants.TOGGLE_ON : HapticFeedbackConstants.TOGGLE_OFF);
+        if (SDK_INT >= UPSIDE_DOWN_CAKE) {
+            view.performHapticFeedback(on ? TOGGLE_ON : TOGGLE_OFF);
         } else {
-            view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            view.performHapticFeedback(VIRTUAL_KEY);
         }
     }
 
     /** One step of a wheel, a segmented control, a stepper or a calendar selection: as firm as a press. */
     public static void segmentTick(View view) {
-        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+        view.performHapticFeedback(VIRTUAL_KEY);
     }
 }

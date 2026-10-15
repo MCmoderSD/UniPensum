@@ -1,12 +1,15 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.view.MotionEvent.*;
+import static android.widget.ImageView.ScaleType.FIT_CENTER;
+import static de.mcmodersd.unipensum.R.color.text_primary;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
-import android.widget.ImageView;
 
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.content.ContextCompat;
@@ -14,7 +17,6 @@ import androidx.core.widget.ImageViewCompat;
 
 import java.util.function.BooleanSupplier;
 
-import de.mcmodersd.unipensum.R;
 
 /** A tappable icon with a 44dp touch target. Set a content description wherever it is used. */
 public class UpIconButton extends AppCompatImageView {
@@ -48,13 +50,10 @@ public class UpIconButton extends AppCompatImageView {
         var dp = getResources().getDisplayMetrics().density;
         var padding = Math.round(10 * dp);
         setPadding(padding, padding, padding, padding);
-        setScaleType(ImageView.ScaleType.FIT_CENTER);
+        setScaleType(FIT_CENTER);
         setClickable(true);
         setFocusable(true);
-        ImageViewCompat.setImageTintList(
-                this,
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.text_primary))
-        );
+        ImageViewCompat.setImageTintList(this, ColorStateList.valueOf(ContextCompat.getColor(context, text_primary)));
     }
 
     @Override
@@ -89,26 +88,26 @@ public class UpIconButton extends AppCompatImageView {
     public boolean onTouchEvent(MotionEvent event) {
         if (holdAction != null && isEnabled()) {
             switch (event.getActionMasked()) {
-                case MotionEvent.ACTION_DOWN:
+                case ACTION_DOWN:
                     held = false;
                     interval = FIRST_INTERVAL_MS;
                     postDelayed(repeater, ViewConfiguration.getLongPressTimeout());
                     break;
-                case MotionEvent.ACTION_MOVE:
+                case ACTION_MOVE:
                     if (!isInside(event)) removeCallbacks(repeater);
                     break;
-                case MotionEvent.ACTION_UP:
+                case ACTION_UP:
                     removeCallbacks(repeater);
                     if (held) {
                         // The hold has done the steps already, so letting go must not count as one more tap.
                         var cancel = MotionEvent.obtain(event);
-                        cancel.setAction(MotionEvent.ACTION_CANCEL);
+                        cancel.setAction(ACTION_CANCEL);
                         var handled = super.onTouchEvent(cancel);
                         cancel.recycle();
                         return handled;
                     }
                     break;
-                case MotionEvent.ACTION_CANCEL:
+                case ACTION_CANCEL:
                     removeCallbacks(repeater);
                     break;
                 default:

@@ -1,19 +1,25 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.text.InputType.TYPE_CLASS_NUMBER;
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.Gravity.*;
+import static android.view.View.*;
+import static android.view.ViewGroup.LayoutParams.*;
+import static android.view.inputmethod.EditorInfo.*;
+import static android.widget.LinearLayout.VERTICAL;
+import static de.mcmodersd.unipensum.R.color.*;
+import static de.mcmodersd.unipensum.R.drawable.*;
+import static de.mcmodersd.unipensum.R.string.*;
+
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
-import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 
-import de.mcmodersd.unipensum.R;
 
 /**
  * Picks a time of day. The wheels move in 5-minute steps; the keyboard button in the header switches
@@ -86,24 +91,18 @@ public final class TimePickerSheet extends UpSheet {
         wheelsLayer = buildWheels(context, dp);
         typingLayer = buildTypingFields(context, dp);
         var height = Math.round(5 * 44 * dp);
-        stack.addView(wheelsLayer, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
-        stack.addView(typingLayer, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+        stack.addView(wheelsLayer, new FrameLayout.LayoutParams(MATCH_PARENT, height));
+        stack.addView(typingLayer, new FrameLayout.LayoutParams(MATCH_PARENT, height));
         showTime(initial / 60 % 24, initial % 60);
 
         var done = new UpButton(context);
-        done.setText(R.string.action_done);
+        done.setText(action_done);
         done.setOnClickListener(this::finish);
 
         var column = new LinearLayout(context);
-        column.setOrientation(LinearLayout.VERTICAL);
-        column.addView(
-                stack, new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-        );
-        var doneParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+        column.setOrientation(VERTICAL);
+        column.addView(stack, new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+        var doneParams = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         doneParams.topMargin = Math.round(12 * dp);
         column.addView(done, doneParams);
         return column;
@@ -134,25 +133,17 @@ public final class TimePickerSheet extends UpSheet {
 
         var colon = colon(context, 22);
         var wheels = new LinearLayout(context);
-        wheels.setGravity(Gravity.CENTER);
-        wheels.addView(hourWheel, new LinearLayout.LayoutParams(Math.round(88 * dp), ViewGroup.LayoutParams.WRAP_CONTENT));
-        wheels.addView(colon, new LinearLayout.LayoutParams(Math.round(20 * dp), ViewGroup.LayoutParams.WRAP_CONTENT));
-        wheels.addView(minuteWheel, new LinearLayout.LayoutParams(Math.round(88 * dp), ViewGroup.LayoutParams.WRAP_CONTENT));
+        wheels.setGravity(CENTER);
+        wheels.addView(hourWheel, new LinearLayout.LayoutParams(Math.round(88 * dp), WRAP_CONTENT));
+        wheels.addView(colon, new LinearLayout.LayoutParams(Math.round(20 * dp), WRAP_CONTENT));
+        wheels.addView(minuteWheel, new LinearLayout.LayoutParams(Math.round(88 * dp), WRAP_CONTENT));
 
         // The band behind the wheels marks the selected row.
         var band = new View(context);
         band.setBackground(rounded(context, 12 * dp));
         var layer = new FrameLayout(context);
-        layer.addView(
-                band, new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, Math.round(44 * dp), Gravity.CENTER_VERTICAL
-                )
-        );
-        layer.addView(
-                wheels, new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER
-                )
-        );
+        layer.addView(band, new FrameLayout.LayoutParams(MATCH_PARENT, Math.round(44 * dp), CENTER_VERTICAL));
+        layer.addView(wheels, new FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT, CENTER));
         return layer;
     }
 
@@ -174,12 +165,12 @@ public final class TimePickerSheet extends UpSheet {
     // --- typing ---
 
     private View buildTypingFields(Context context, float dp) {
-        hourInput = numberField(context, dp, getString(R.string.time_hour));
-        minuteInput = numberField(context, dp, getString(R.string.time_minute));
-        hourInput.setImeOptions(EditorInfo.IME_ACTION_NEXT);
-        minuteInput.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        hourInput = numberField(context, dp, getString(time_hour));
+        minuteInput = numberField(context, dp, getString(time_minute));
+        hourInput.setImeOptions(IME_ACTION_NEXT);
+        minuteInput.setImeOptions(IME_ACTION_DONE);
         minuteInput.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId != EditorInfo.IME_ACTION_DONE) return false;
+            if (actionId != IME_ACTION_DONE) return false;
             finish(v);
             return true;
         });
@@ -192,21 +183,21 @@ public final class TimePickerSheet extends UpSheet {
         );
 
         var row = new LinearLayout(context);
-        row.setGravity(Gravity.CENTER);
+        row.setGravity(CENTER);
         row.addView(hourInput, new LinearLayout.LayoutParams(Math.round(96 * dp), Math.round(68 * dp)));
-        row.addView(colon(context, 28), new LinearLayout.LayoutParams(Math.round(28 * dp), ViewGroup.LayoutParams.WRAP_CONTENT));
+        row.addView(colon(context, 28), new LinearLayout.LayoutParams(Math.round(28 * dp), WRAP_CONTENT));
         row.addView(minuteInput, new LinearLayout.LayoutParams(Math.round(96 * dp), Math.round(68 * dp)));
         return row;
     }
 
     private AppCompatEditText numberField(Context context, float dp, String description) {
         var field = new AppCompatEditText(context);
-        field.setInputType(InputType.TYPE_CLASS_NUMBER);
+        field.setInputType(TYPE_CLASS_NUMBER);
         field.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
-        field.setGravity(Gravity.CENTER);
-        field.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
+        field.setGravity(CENTER);
+        field.setTextSize(COMPLEX_UNIT_SP, 28);
         field.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        field.setTextColor(ContextCompat.getColor(context, R.color.text_primary));
+        field.setTextColor(ContextCompat.getColor(context, text_primary));
         field.setSelectAllOnFocus(true);
         field.setPadding(0, 0, 0, 0);
         field.setBackground(rounded(context, 14 * dp));
@@ -218,7 +209,7 @@ public final class TimePickerSheet extends UpSheet {
     private void markValid(AppCompatEditText field, boolean valid) {
         var background = (GradientDrawable) field.getBackground();
         var dp = getResources().getDisplayMetrics().density;
-        background.setStroke(valid ? 0 : Math.round(1.5f * dp), ContextCompat.getColor(requireContext(), R.color.danger));
+        background.setStroke(valid ? 0 : Math.round(1.5f * dp), ContextCompat.getColor(requireContext(), danger));
     }
 
     // --- mode and result ---
@@ -272,11 +263,11 @@ public final class TimePickerSheet extends UpSheet {
     }
 
     private void applyMode(boolean byUser) {
-        wheelsLayer.setVisibility(typing ? View.INVISIBLE : View.VISIBLE);
-        typingLayer.setVisibility(typing ? View.VISIBLE : View.INVISIBLE);
+        wheelsLayer.setVisibility(typing ? INVISIBLE : VISIBLE);
+        typingLayer.setVisibility(typing ? VISIBLE : INVISIBLE);
         setHeaderAction(
-                typing ? R.drawable.ic_clock : R.drawable.ic_keyboard,
-                getString(typing ? R.string.time_use_wheels : R.string.time_type), v -> toggleMode()
+                typing ? ic_clock : ic_keyboard,
+                getString(typing ? time_use_wheels : time_type), v -> toggleMode()
         );
 
         var window = window();
@@ -324,16 +315,16 @@ public final class TimePickerSheet extends UpSheet {
     private static TextView colon(Context context, float sp) {
         var colon = new TextView(context);
         colon.setText(":");
-        colon.setGravity(Gravity.CENTER);
-        colon.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
-        colon.setTextColor(ContextCompat.getColor(context, R.color.text_primary));
+        colon.setGravity(CENTER);
+        colon.setTextSize(COMPLEX_UNIT_SP, sp);
+        colon.setTextColor(ContextCompat.getColor(context, text_primary));
         return colon;
     }
 
     private static GradientDrawable rounded(Context context, float radius) {
         var drawable = new GradientDrawable();
         drawable.setCornerRadius(radius);
-        drawable.setColor(ContextCompat.getColor(context, R.color.surface));
+        drawable.setColor(ContextCompat.getColor(context, surface));
         return drawable;
     }
 

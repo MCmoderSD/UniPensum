@@ -1,7 +1,8 @@
 package de.mcmodersd.unipensum.ui.widget;
 
-import static androidx.core.view.accessibility.AccessibilityNodeInfoCompat.CHECKED_STATE_FALSE;
-import static androidx.core.view.accessibility.AccessibilityNodeInfoCompat.CHECKED_STATE_TRUE;
+import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+import static androidx.core.view.accessibility.AccessibilityNodeInfoCompat.*;
+import static de.mcmodersd.unipensum.R.color.*;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -16,7 +17,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
-import de.mcmodersd.unipensum.R;
 
 /** The app's own toggle: a pill track with a sliding thumb. */
 public class UpSwitch extends View {
@@ -25,8 +25,8 @@ public class UpSwitch extends View {
         void onCheckedChanged(boolean checked);
     }
 
-    private final Paint trackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint thumbPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint trackPaint = new Paint(ANTI_ALIAS_FLAG);
+    private final Paint thumbPaint = new Paint(ANTI_ALIAS_FLAG);
     private final RectF track = new RectF();
     private final float dp = getResources().getDisplayMetrics().density;
     private final int trackOn;
@@ -43,10 +43,10 @@ public class UpSwitch extends View {
 
     public UpSwitch(Context context, AttributeSet attrs) {
         super(context, attrs);
-        trackOn = ContextCompat.getColor(context, R.color.accent);
-        trackOff = ContextCompat.getColor(context, R.color.divider);
-        thumbOn = ContextCompat.getColor(context, R.color.text_on_accent);
-        thumbOff = ContextCompat.getColor(context, R.color.sheet);
+        trackOn = ContextCompat.getColor(context, accent);
+        trackOff = ContextCompat.getColor(context, divider);
+        thumbOn = ContextCompat.getColor(context, text_on_accent);
+        thumbOff = ContextCompat.getColor(context, sheet);
         setClickable(true);
         setFocusable(true);
     }

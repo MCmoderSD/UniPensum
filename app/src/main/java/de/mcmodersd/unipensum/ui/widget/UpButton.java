@@ -1,11 +1,15 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.Gravity.CENTER;
+import static de.mcmodersd.unipensum.R.color.*;
+import static de.mcmodersd.unipensum.R.styleable.UpButton_upVariant;
+import static de.mcmodersd.unipensum.ui.widget.UpButton.Variant.PRIMARY;
+
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.Gravity;
 
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.ContextCompat;
@@ -25,19 +29,19 @@ public class UpButton extends AppCompatTextView {
         super(context, attrs);
         var dp = getResources().getDisplayMetrics().density;
 
-        setGravity(Gravity.CENTER);
+        setGravity(CENTER);
         setMinHeight(Math.round(52 * dp));
         setPadding(Math.round(20 * dp), 0, Math.round(20 * dp), 0);
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        setTextSize(COMPLEX_UNIT_SP, 16);
         setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         setClickable(true);
         setFocusable(true);
         setAllCaps(false);
 
-        var variant = Variant.PRIMARY;
+        var variant = PRIMARY;
         if (attrs != null) {
             try (var array = context.obtainStyledAttributes(attrs, R.styleable.UpButton)) {
-                variant = Variant.values()[array.getInt(R.styleable.UpButton_upVariant, 0)];
+                variant = Variant.values()[array.getInt(UpButton_upVariant, 0)];
             }
         }
         setVariant(variant);
@@ -47,16 +51,16 @@ public class UpButton extends AppCompatTextView {
         int fill;
         int text = switch (variant) {
             case SECONDARY -> {
-                fill = R.color.surface;
-                yield R.color.text_primary;
+                fill = surface;
+                yield text_primary;
             }
             case DESTRUCTIVE -> {
-                fill = R.color.surface;
-                yield R.color.danger;
+                fill = surface;
+                yield danger;
             }
             default -> {
-                fill = R.color.accent;
-                yield R.color.text_on_accent;
+                fill = accent;
+                yield text_on_accent;
             }
         };
         var background = new GradientDrawable();

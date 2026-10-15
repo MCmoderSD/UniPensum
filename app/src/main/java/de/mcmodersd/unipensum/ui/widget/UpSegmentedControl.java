@@ -1,5 +1,9 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.Gravity.CENTER;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static de.mcmodersd.unipensum.R.color.*;
 
 import android.animation.ValueAnimator;
@@ -10,8 +14,6 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import android.view.animation.PathInterpolator;
 import android.widget.LinearLayout;
@@ -35,7 +37,7 @@ public class UpSegmentedControl extends LinearLayout {
     private static final long SLIDE_MILLIS = 260;
 
     private final ArrayList<TextView> segments = new ArrayList<>();
-    private final Paint pillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pillPaint = new Paint(ANTI_ALIAS_FLAG);
     private final RectF pillRect = new RectF();
     private final float dp = getResources().getDisplayMetrics().density;
     private final int colorSelected;
@@ -72,9 +74,9 @@ public class UpSegmentedControl extends LinearLayout {
         for (var i = 0; i < labels.length; i++) {
             var segment = new TextView(getContext());
             segment.setText(labels[i]);
-            segment.setGravity(Gravity.CENTER);
+            segment.setGravity(CENTER);
             segment.setMaxLines(1);
-            segment.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            segment.setTextSize(COMPLEX_UNIT_SP, 14);
             segment.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
             segment.setMinHeight(Math.round(42 * dp));
             segment.setPadding(Math.round(4 * dp), 0, Math.round(4 * dp), 0);
@@ -82,7 +84,7 @@ public class UpSegmentedControl extends LinearLayout {
             segment.setFocusable(true);
             final var index = i;
             segment.setOnClickListener(v -> select(index));
-            addView(segment, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
+            addView(segment, new LayoutParams(0, WRAP_CONTENT, 1f));
             segments.add(segment);
         }
         setSelectedIndex(Math.min(selected, Math.max(0, labels.length - 1)));

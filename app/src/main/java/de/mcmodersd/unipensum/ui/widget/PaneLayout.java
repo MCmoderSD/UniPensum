@@ -1,5 +1,9 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.view.View.MeasureSpec.EXACTLY;
+import static de.mcmodersd.unipensum.R.color.divider;
+import static de.mcmodersd.unipensum.R.dimen.*;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
@@ -14,7 +18,6 @@ import android.view.animation.AnimationUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import de.mcmodersd.unipensum.R;
 
 /**
  * The frame of the app's main screen. It holds two containers: the first is the week calendar, the
@@ -56,11 +59,11 @@ public final class PaneLayout extends ViewGroup {
 
     public PaneLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        splitMinWidth = getResources().getDimensionPixelSize(R.dimen.pane_split_min_width);
-        sideMinWidth = getResources().getDimensionPixelSize(R.dimen.pane_side_min);
-        sideMaxWidth = getResources().getDimensionPixelSize(R.dimen.pane_side_max);
+        splitMinWidth = getResources().getDimensionPixelSize(pane_split_min_width);
+        sideMinWidth = getResources().getDimensionPixelSize(pane_side_min);
+        sideMaxWidth = getResources().getDimensionPixelSize(pane_side_max);
         dividerWidth = Math.max(1, Math.round(getResources().getDisplayMetrics().density));
-        dividerPaint.setColor(ContextCompat.getColor(context, R.color.divider));
+        dividerPaint.setColor(ContextCompat.getColor(context, divider));
     }
 
     @Override
@@ -147,10 +150,7 @@ public final class PaneLayout extends ViewGroup {
     }
 
     private static void measureExactly(View child, int width, int height) {
-        child.measure(
-                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
-        );
+        child.measure(MeasureSpec.makeMeasureSpec(width, EXACTLY), MeasureSpec.makeMeasureSpec(height, EXACTLY));
     }
 
     @Override

@@ -1,11 +1,17 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.Gravity.CENTER;
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.View.MeasureSpec.EXACTLY;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
+import static de.mcmodersd.unipensum.R.color.text_primary;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +24,6 @@ import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-import de.mcmodersd.unipensum.R;
 
 /**
  * A vertical wheel that snaps to one of its values; values far from the center fade out.
@@ -38,7 +43,7 @@ public class WheelPicker extends RecyclerView {
     private String[] labels = new String[0];
     private int selected;
     /** The value in the center row the last time the wheel moved, to notice when the next one arrives. */
-    private int centered = RecyclerView.NO_POSITION;
+    private int centered = NO_POSITION;
 
     public WheelPicker(Context context) {
         this(context, null);
@@ -77,7 +82,7 @@ public class WheelPicker extends RecyclerView {
         var snapView = snapHelper.findSnapView(layoutManager);
         if (snapView != null && !isLayoutRequested()) {
             var index = getChildAdapterPosition(snapView);
-            if (index != RecyclerView.NO_POSITION) return index;
+            if (index != NO_POSITION) return index;
         }
         return selected;
     }
@@ -91,7 +96,7 @@ public class WheelPicker extends RecyclerView {
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        super.onMeasure(widthSpec, MeasureSpec.makeMeasureSpec(itemHeight * VISIBLE_ITEMS, MeasureSpec.EXACTLY));
+        super.onMeasure(widthSpec, MeasureSpec.makeMeasureSpec(itemHeight * VISIBLE_ITEMS, EXACTLY));
     }
 
     @Override
@@ -109,7 +114,7 @@ public class WheelPicker extends RecyclerView {
 
     /** From the first touch on, no ancestor may take the gesture away, in either direction. */
     private void claimGesture(MotionEvent event) {
-        if (event.getActionMasked() == MotionEvent.ACTION_DOWN && getParent() != null) {
+        if (event.getActionMasked() == ACTION_DOWN && getParent() != null) {
             getParent().requestDisallowInterceptTouchEvent(true);
         }
     }
@@ -126,7 +131,7 @@ public class WheelPicker extends RecyclerView {
         var snapView = snapHelper.findSnapView(layoutManager);
         if (snapView == null) return;
         var index = getChildAdapterPosition(snapView);
-        if (index == RecyclerView.NO_POSITION || index == centered) return;
+        if (index == NO_POSITION || index == centered) return;
         centered = index;
         // A jump to a value (setSelectedIndex) moves the center without the wheel turning, which is silent.
         if (getScrollState() != SCROLL_STATE_IDLE) Haptics.segmentTick(this);
@@ -139,7 +144,7 @@ public class WheelPicker extends RecyclerView {
         var snapView = snapHelper.findSnapView(layoutManager);
         if (snapView == null) return;
         var index = getChildAdapterPosition(snapView);
-        if (index != RecyclerView.NO_POSITION && index != selected) {
+        if (index != NO_POSITION && index != selected) {
             selected = index;
         }
     }
@@ -172,16 +177,16 @@ public class WheelPicker extends RecyclerView {
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             var view = new TextView(parent.getContext());
-            view.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, itemHeight));
-            view.setGravity(Gravity.CENTER);
-            view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+            view.setLayoutParams(new LayoutParams(MATCH_PARENT, itemHeight));
+            view.setGravity(CENTER);
+            view.setTextSize(COMPLEX_UNIT_SP, 22);
             view.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-            view.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.text_primary));
+            view.setTextColor(ContextCompat.getColor(parent.getContext(), text_primary));
             RecyclerView.ViewHolder holder = new RecyclerView.ViewHolder(view) {
             };
             view.setOnClickListener(v -> {
                 var position = holder.getBindingAdapterPosition();
-                if (position != RecyclerView.NO_POSITION && position != selected) scrollToIndex(position);
+                if (position != NO_POSITION && position != selected) scrollToIndex(position);
             });
             return holder;
         }

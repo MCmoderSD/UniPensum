@@ -1,10 +1,15 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.ViewGroup.LayoutParams.*;
+import static android.widget.LinearLayout.VERTICAL;
+import static de.mcmodersd.unipensum.R.color.text_secondary;
+import static de.mcmodersd.unipensum.R.string.action_cancel;
+import static de.mcmodersd.unipensum.ui.widget.UpButton.Variant.*;
+
 import android.content.Context;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -15,7 +20,6 @@ import androidx.fragment.app.FragmentManager;
 
 import java.util.Objects;
 
-import de.mcmodersd.unipensum.R;
 
 /**
  * Asks before something irreversible. Delivers {@link #RESULT_CONFIRMED} under the request key
@@ -57,18 +61,18 @@ public final class ConfirmSheet extends UpSheet {
         var dp = getResources().getDisplayMetrics().density;
 
         var column = new LinearLayout(context);
-        column.setOrientation(LinearLayout.VERTICAL);
+        column.setOrientation(VERTICAL);
 
         var message = new TextView(context);
         message.setText(args.getCharSequence(ARG_MESSAGE));
-        message.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        message.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+        message.setTextSize(COMPLEX_UNIT_SP, 16);
+        message.setTextColor(ContextCompat.getColor(context, text_secondary));
         message.setPadding(Math.round(8 * dp), 0, Math.round(8 * dp), Math.round(20 * dp));
         column.addView(message);
 
         var confirm = new UpButton(context);
         confirm.setText(args.getCharSequence(ARG_CONFIRM));
-        confirm.setVariant(args.getBoolean(ARG_DESTRUCTIVE) ? UpButton.Variant.DESTRUCTIVE : UpButton.Variant.PRIMARY);
+        confirm.setVariant(args.getBoolean(ARG_DESTRUCTIVE) ? DESTRUCTIVE : PRIMARY);
         confirm.setOnClickListener(v -> {
             Haptics.confirm(v);
             var result = new Bundle();
@@ -76,19 +80,13 @@ public final class ConfirmSheet extends UpSheet {
             getParentFragmentManager().setFragmentResult(Objects.requireNonNull(args.getString(ARG_KEY)), result);
             dismiss();
         });
-        column.addView(
-                confirm, new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-        );
+        column.addView(confirm, new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 
         var cancel = new UpButton(context);
-        cancel.setText(R.string.action_cancel);
-        cancel.setVariant(UpButton.Variant.SECONDARY);
+        cancel.setText(action_cancel);
+        cancel.setVariant(SECONDARY);
         cancel.setOnClickListener(v -> dismiss());
-        var cancelParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+        var cancelParams = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         cancelParams.topMargin = Math.round(8 * dp);
         column.addView(cancel, cancelParams);
         return column;

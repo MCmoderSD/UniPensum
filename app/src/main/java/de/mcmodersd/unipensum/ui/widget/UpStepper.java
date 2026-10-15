@@ -1,16 +1,20 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.Gravity.*;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static de.mcmodersd.unipensum.R.color.*;
+import static de.mcmodersd.unipensum.R.drawable.*;
+import static de.mcmodersd.unipensum.R.string.*;
+
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
-import de.mcmodersd.unipensum.R;
 
 /** A number with minus and plus buttons. Holding a button steps on, faster and faster, until the end of the range. */
 public class UpStepper extends LinearLayout {
@@ -41,34 +45,34 @@ public class UpStepper extends LinearLayout {
         super(context, attrs);
         var dp = getResources().getDisplayMetrics().density;
         setOrientation(HORIZONTAL);
-        setGravity(Gravity.CENTER_VERTICAL);
+        setGravity(CENTER_VERTICAL);
         setPadding(Math.round(4 * dp), Math.round(4 * dp), Math.round(4 * dp), Math.round(4 * dp));
         var background = new GradientDrawable();
         background.setCornerRadius(14 * dp);
-        background.setColor(ContextCompat.getColor(context, R.color.surface));
+        background.setColor(ContextCompat.getColor(context, surface));
         setBackground(background);
 
         minus = new UpIconButton(context);
-        minus.setImageResource(R.drawable.ic_minus);
-        minus.setContentDescription(context.getString(R.string.stepper_decrease));
+        minus.setImageResource(ic_minus);
+        minus.setContentDescription(context.getString(stepper_decrease));
         minus.setOnClickListener(v -> step(-1));
         minus.setOnHoldListener(() -> change(-1));
         // A step ticks and a refused step rejects, so the press itself stays quiet.
         minus.setClickHaptic(false);
         plus = new UpIconButton(context);
-        plus.setImageResource(R.drawable.ic_add);
-        plus.setContentDescription(context.getString(R.string.stepper_increase));
+        plus.setImageResource(ic_add);
+        plus.setContentDescription(context.getString(stepper_increase));
         plus.setOnClickListener(v -> step(1));
         plus.setOnHoldListener(() -> change(1));
         plus.setClickHaptic(false);
 
         valueView = new TextView(context);
-        valueView.setGravity(Gravity.CENTER);
-        valueView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        valueView.setTextColor(ContextCompat.getColor(context, R.color.text_primary));
+        valueView.setGravity(CENTER);
+        valueView.setTextSize(COMPLEX_UNIT_SP, 16);
+        valueView.setTextColor(ContextCompat.getColor(context, text_primary));
 
         addView(minus);
-        addView(valueView, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
+        addView(valueView, new LayoutParams(0, WRAP_CONTENT, 1f));
         addView(plus);
         render();
     }

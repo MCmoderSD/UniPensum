@@ -1,5 +1,15 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.Gravity.*;
+import static android.view.MotionEvent.*;
+import static android.view.ViewGroup.LayoutParams.*;
+import static androidx.core.view.accessibility.AccessibilityNodeInfoCompat.*;
+import static de.mcmodersd.unipensum.R.color.*;
+import static de.mcmodersd.unipensum.R.drawable.*;
+import static de.mcmodersd.unipensum.R.string.*;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,7 +19,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -27,7 +36,6 @@ import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.List;
 
-import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
 
 /**
@@ -61,29 +69,29 @@ public class MonthCalendarView extends LinearLayout {
         setOrientation(VERTICAL);
 
         var header = new LinearLayout(context);
-        header.setGravity(Gravity.CENTER_VERTICAL);
+        header.setGravity(CENTER_VERTICAL);
         previous = new UpIconButton(context);
-        previous.setImageResource(R.drawable.ic_chevron_left);
-        previous.setContentDescription(context.getString(R.string.calendar_previous_month));
+        previous.setImageResource(ic_chevron_left);
+        previous.setContentDescription(context.getString(calendar_previous_month));
         previous.setOnClickListener(v -> showMonth(month.minusMonths(1)));
         next = new UpIconButton(context);
-        next.setImageResource(R.drawable.ic_chevron_right);
-        next.setContentDescription(context.getString(R.string.calendar_next_month));
+        next.setImageResource(ic_chevron_right);
+        next.setContentDescription(context.getString(calendar_next_month));
         next.setOnClickListener(v -> showMonth(month.plusMonths(1)));
 
         monthTitle = new TextView(context);
-        monthTitle.setGravity(Gravity.CENTER);
-        monthTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        monthTitle.setGravity(CENTER);
+        monthTitle.setTextSize(COMPLEX_UNIT_SP, 17);
         monthTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        monthTitle.setTextColor(ContextCompat.getColor(context, R.color.text_primary));
+        monthTitle.setTextColor(ContextCompat.getColor(context, text_primary));
 
         header.addView(previous);
-        header.addView(monthTitle, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
+        header.addView(monthTitle, new LayoutParams(0, WRAP_CONTENT, 1f));
         header.addView(next);
-        addView(header, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        addView(header, new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 
         grid = new Grid(context);
-        addView(grid, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        addView(grid, new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
         refresh();
     }
 
@@ -134,10 +142,10 @@ public class MonthCalendarView extends LinearLayout {
 
     private final class Grid extends View {
 
-        private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Paint ringPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint textPaint = new Paint(ANTI_ALIAS_FLAG);
+        private final Paint labelPaint = new Paint(ANTI_ALIAS_FLAG);
+        private final Paint fillPaint = new Paint(ANTI_ALIAS_FLAG);
+        private final Paint ringPaint = new Paint(ANTI_ALIAS_FLAG);
         private final float dp = getResources().getDisplayMetrics().density;
         private final float cellHeight = 44 * dp;
         private final float labelHeight = 28 * dp;
@@ -152,17 +160,17 @@ public class MonthCalendarView extends LinearLayout {
         Grid(Context context) {
             super(context);
             ViewCompat.setAccessibilityDelegate(this, accessibility);
-            textColor = ContextCompat.getColor(context, R.color.text_primary);
-            disabledColor = ContextCompat.getColor(context, R.color.divider);
-            onAccent = ContextCompat.getColor(context, R.color.text_on_accent);
+            textColor = ContextCompat.getColor(context, text_primary);
+            disabledColor = ContextCompat.getColor(context, divider);
+            onAccent = ContextCompat.getColor(context, text_on_accent);
 
             textPaint.setTextAlign(Paint.Align.CENTER);
-            textPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16, getResources().getDisplayMetrics()));
+            textPaint.setTextSize(TypedValue.applyDimension(COMPLEX_UNIT_SP, 16, getResources().getDisplayMetrics()));
             labelPaint.setTextAlign(Paint.Align.CENTER);
-            labelPaint.setColor(ContextCompat.getColor(context, R.color.text_secondary));
-            labelPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
-            fillPaint.setColor(ContextCompat.getColor(context, R.color.accent));
-            ringPaint.setColor(ContextCompat.getColor(context, R.color.accent));
+            labelPaint.setColor(ContextCompat.getColor(context, text_secondary));
+            labelPaint.setTextSize(TypedValue.applyDimension(COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+            fillPaint.setColor(ContextCompat.getColor(context, accent));
+            ringPaint.setColor(ContextCompat.getColor(context, accent));
             ringPaint.setStyle(Paint.Style.STROKE);
             ringPaint.setStrokeWidth(1.5f * dp);
         }
@@ -237,11 +245,11 @@ public class MonthCalendarView extends LinearLayout {
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
+                case ACTION_DOWN:
                     downX = event.getX();
                     downY = event.getY();
                     return true;
-                case MotionEvent.ACTION_UP:
+                case ACTION_UP:
                     if (Math.abs(event.getX() - downX) < 12 * dp && Math.abs(event.getY() - downY) < 12 * dp) {
                         select(event.getX(), event.getY());
                         performClick();
@@ -325,17 +333,14 @@ public class MonthCalendarView extends LinearLayout {
                                 + ", " + TimeFormat.dateMedium(context, day)
                 );
                 node.setCheckable(true);
-                node.setChecked(
-                        day.equals(selected)
-                                ? AccessibilityNodeInfoCompat.CHECKED_STATE_TRUE : AccessibilityNodeInfoCompat.CHECKED_STATE_FALSE
-                );
+                node.setChecked(day.equals(selected) ? CHECKED_STATE_TRUE : CHECKED_STATE_FALSE);
                 node.setEnabled(isSelectable(day));
-                node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
+                node.addAction(ACTION_CLICK);
             }
 
             @Override
             protected boolean onPerformActionForVirtualView(int id, int action, Bundle arguments) {
-                if (action != AccessibilityNodeInfoCompat.ACTION_CLICK) return false;
+                if (action != ACTION_CLICK) return false;
                 choose(month.atDay(id));
                 return true;
             }

@@ -1,12 +1,17 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.Gravity.CENTER_VERTICAL;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static de.mcmodersd.unipensum.R.color.*;
+import static de.mcmodersd.unipensum.R.drawable.ic_chevron_right;
+import static de.mcmodersd.unipensum.R.styleable.*;
+
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -37,43 +42,43 @@ public class UpRow extends LinearLayout {
         super(context, attrs);
         var dp = getResources().getDisplayMetrics().density;
         setOrientation(HORIZONTAL);
-        setGravity(Gravity.CENTER_VERTICAL);
+        setGravity(CENTER_VERTICAL);
         setMinimumHeight(Math.round(56 * dp));
         setPadding(Math.round(16 * dp), Math.round(8 * dp), Math.round(12 * dp), Math.round(8 * dp));
         var background = new GradientDrawable();
         background.setCornerRadius(14 * dp);
-        background.setColor(ContextCompat.getColor(context, R.color.surface));
+        background.setColor(ContextCompat.getColor(context, surface));
         setBackground(background);
 
         var texts = new LinearLayout(context);
         texts.setOrientation(VERTICAL);
-        title = text(context, 16, R.color.text_primary);
-        subtitle = text(context, 13, R.color.text_secondary);
+        title = text(context, 16, text_primary);
+        subtitle = text(context, 13, text_secondary);
         subtitle.setVisibility(GONE);
         texts.addView(title);
         texts.addView(subtitle);
-        addView(texts, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
+        addView(texts, new LayoutParams(0, WRAP_CONTENT, 1f));
 
-        value = text(context, 16, R.color.text_secondary);
+        value = text(context, 16, text_secondary);
         value.setVisibility(GONE);
         value.setPadding(Math.round(12 * dp), 0, 0, 0);
         addView(value);
 
         chevron = new ImageView(context);
-        chevron.setImageResource(R.drawable.ic_chevron_right);
+        chevron.setImageResource(ic_chevron_right);
         ImageViewCompat.setImageTintList(
                 chevron,
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.text_secondary))
+                ColorStateList.valueOf(ContextCompat.getColor(context, text_secondary))
         );
         chevron.setVisibility(GONE);
         addView(chevron, new LayoutParams(Math.round(20 * dp), Math.round(20 * dp)));
 
         if (attrs != null) {
             try (var array = context.obtainStyledAttributes(attrs, R.styleable.UpRow)) {
-                setTitle(array.getText(R.styleable.UpRow_upTitle));
-                setSubtitle(array.getText(R.styleable.UpRow_upSubtitle));
-                setValue(array.getText(R.styleable.UpRow_upValue));
-                setChevronVisible(array.getBoolean(R.styleable.UpRow_upChevron, false));
+                setTitle(array.getText(UpRow_upTitle));
+                setSubtitle(array.getText(UpRow_upSubtitle));
+                setValue(array.getText(UpRow_upValue));
+                setChevronVisible(array.getBoolean(UpRow_upChevron, false));
             }
         }
     }
@@ -118,7 +123,7 @@ public class UpRow extends LinearLayout {
             leadingIcon = new ImageView(getContext());
             ImageViewCompat.setImageTintList(
                     leadingIcon,
-                    ColorStateList.valueOf(ContextCompat.getColor(getContext(), R.color.text_secondary))
+                    ColorStateList.valueOf(ContextCompat.getColor(getContext(), text_secondary))
             );
             var params = new LayoutParams(Math.round(22 * dp), Math.round(22 * dp));
             params.setMarginEnd(Math.round(14 * dp));
@@ -137,7 +142,7 @@ public class UpRow extends LinearLayout {
     public void setAction(int iconRes, CharSequence description, OnClickListener listener) {
         if (action == null) {
             action = new UpIconButton(getContext());
-            var params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            var params = new LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
             params.setMarginStart(Math.round(4 * getResources().getDisplayMetrics().density));
             addView(action, params);
         }
@@ -160,7 +165,7 @@ public class UpRow extends LinearLayout {
 
     private static TextView text(Context context, float sp, int colorRes) {
         var view = new TextView(context);
-        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
+        view.setTextSize(COMPLEX_UNIT_SP, sp);
         view.setTextColor(ContextCompat.getColor(context, colorRes));
         return view;
     }

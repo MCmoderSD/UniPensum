@@ -1,5 +1,12 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.text.InputType.*;
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.Gravity.*;
+import static android.view.ViewGroup.LayoutParams.*;
+import static de.mcmodersd.unipensum.R.color.*;
+import static de.mcmodersd.unipensum.R.styleable.*;
+
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
@@ -8,8 +15,6 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -39,37 +44,37 @@ public class UpTextField extends LinearLayout {
         setOrientation(VERTICAL);
 
         label = new TextView(context);
-        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        label.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+        label.setTextSize(COMPLEX_UNIT_SP, 13);
+        label.setTextColor(ContextCompat.getColor(context, text_secondary));
         label.setPadding(Math.round(4 * dp), 0, 0, Math.round(6 * dp));
         addView(label);
 
         input = new AppCompatEditText(context);
         input.setSingleLine(true);
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-        input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        input.setTextColor(ContextCompat.getColor(context, R.color.text_primary));
-        input.setHintTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-        input.setGravity(Gravity.CENTER_VERTICAL);
+        input.setInputType(TYPE_CLASS_TEXT | TYPE_TEXT_FLAG_CAP_SENTENCES);
+        input.setTextSize(COMPLEX_UNIT_SP, 16);
+        input.setTextColor(ContextCompat.getColor(context, text_primary));
+        input.setHintTextColor(ContextCompat.getColor(context, text_secondary));
+        input.setGravity(CENTER_VERTICAL);
         input.setMinHeight(Math.round(52 * dp));
         input.setPadding(Math.round(16 * dp), 0, Math.round(16 * dp), 0);
         background.setCornerRadius(14 * dp);
-        background.setColor(ContextCompat.getColor(context, R.color.surface));
+        background.setColor(ContextCompat.getColor(context, surface));
         input.setBackground(background);
         input.setOnFocusChangeListener((v, focused) -> updateStroke(focused));
-        addView(input, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        addView(input, new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 
         error = new TextView(context);
-        error.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        error.setTextColor(ContextCompat.getColor(context, R.color.danger));
+        error.setTextSize(COMPLEX_UNIT_SP, 13);
+        error.setTextColor(ContextCompat.getColor(context, danger));
         error.setPadding(Math.round(4 * dp), Math.round(6 * dp), 0, 0);
         error.setVisibility(GONE);
         addView(error);
 
         if (attrs != null) {
             try (var array = context.obtainStyledAttributes(attrs, R.styleable.UpTextField)) {
-                label.setText(array.getText(R.styleable.UpTextField_upLabel));
-                input.setHint(array.getText(R.styleable.UpTextField_upHint));
+                label.setText(array.getText(UpTextField_upLabel));
+                input.setHint(array.getText(UpTextField_upHint));
             }
         }
         label.setVisibility(label.length() == 0 ? GONE : VISIBLE);
@@ -102,7 +107,7 @@ public class UpTextField extends LinearLayout {
      * suggest it, and the autofill service leaves it alone.
      */
     public void setPassword() {
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setInputType(TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_PASSWORD);
         input.setImportantForAutofill(IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);
     }
 
@@ -137,11 +142,8 @@ public class UpTextField extends LinearLayout {
     public void setMultiLine(int minLines) {
         input.setSingleLine(false);
         input.setMinLines(minLines);
-        input.setGravity(Gravity.TOP | Gravity.START);
-        input.setInputType(
-                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
-                        | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-        );
+        input.setGravity(TOP | START);
+        input.setInputType(TYPE_CLASS_TEXT | TYPE_TEXT_FLAG_MULTI_LINE | TYPE_TEXT_FLAG_CAP_SENTENCES);
         input.setPadding(input.getPaddingLeft(), Math.round(14 * dp), input.getPaddingRight(), Math.round(14 * dp));
     }
 
@@ -158,9 +160,9 @@ public class UpTextField extends LinearLayout {
     private void updateStroke(boolean focused) {
         var hasError = error.getVisibility() == VISIBLE;
         if (hasError) {
-            background.setStroke(Math.round(1.5f * dp), ContextCompat.getColor(getContext(), R.color.danger));
+            background.setStroke(Math.round(1.5f * dp), ContextCompat.getColor(getContext(), danger));
         } else if (focused) {
-            background.setStroke(Math.round(1.5f * dp), ContextCompat.getColor(getContext(), R.color.accent));
+            background.setStroke(Math.round(1.5f * dp), ContextCompat.getColor(getContext(), accent));
         } else {
             background.setStroke(0, 0);
         }
