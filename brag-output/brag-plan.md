@@ -101,7 +101,7 @@ of the current time and the Algorithms lecture get a subtle glow. One short labe
 framing line, not a claim), later "The current time is marked." (README).
 Sequential/interaction: none (slow push-in)
 Audio intent: calm, the first real product moment
-Audio-coupled idea: the glow of the time line breathes with the bass
+Audio-coupled idea: the glow of the timeline breathes with the bass
 Music: steady
 Transition mood: soft slide up (0.5s) → Scene 3
 
