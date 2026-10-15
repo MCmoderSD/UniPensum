@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 
-
 /**
  * Picks a time of day. The wheels move in 5-minute steps; the keyboard button in the header switches
  * to two number fields for typing any minute. Delivers {@link #RESULT_MINUTES} under the request key.

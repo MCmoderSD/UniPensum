@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
-
 /** A number with minus and plus buttons. Holding a button steps on, faster and faster, until the end of the range. */
 public class UpStepper extends LinearLayout {
 

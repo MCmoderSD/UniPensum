@@ -10,7 +10,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-
 @SuppressWarnings("SpellCheckingInspection")
 public class ModelTest {
 

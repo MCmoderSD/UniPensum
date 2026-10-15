@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import java.time.Instant;
 
-
 public class BackupInfoTest {
 
     private static BackupInfo info(int format, int schema, int build) {

@@ -18,7 +18,6 @@ import android.view.animation.AnimationUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-
 /**
  * The frame of the app's main screen. It holds two containers: the first is the week calendar, the
  * second is the pane for the pages that open from it (settings, courses, editors).

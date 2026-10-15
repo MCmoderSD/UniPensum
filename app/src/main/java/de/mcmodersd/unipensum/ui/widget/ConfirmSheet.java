@@ -20,7 +20,6 @@ import androidx.fragment.app.FragmentManager;
 
 import java.util.Objects;
 
-
 /**
  * Asks before something irreversible. Delivers {@link #RESULT_CONFIRMED} under the request key
  * only when the user confirms; cancelling just closes the sheet.

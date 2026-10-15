@@ -4,7 +4,6 @@ import static de.mcmodersd.unipensum.R.string.*;
 
 import android.content.Context;
 
-
 /** How long before an event it reminds: "At the start", "30 min before", "1 h 30 min before". */
 public final class ReminderFormat {
 

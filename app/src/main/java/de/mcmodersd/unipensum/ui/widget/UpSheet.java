@@ -25,7 +25,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-
 /**
  * Base of every sheet in the app. Material only supplies the drag and back-gesture mechanics;
  * the look (surface, corners, handle, title) comes from the app theme and {@code sheet_base.xml}.

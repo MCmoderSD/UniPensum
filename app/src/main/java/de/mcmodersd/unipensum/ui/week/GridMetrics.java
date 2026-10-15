@@ -4,7 +4,6 @@ import static de.mcmodersd.unipensum.R.dimen.*;
 
 import android.content.Context;
 
-
 /**
  * Every measurement of the week grid in one place. Open question 1 of the requirements (whole day on
  * one screen versus scrolling) is a matter of {@link #minHourHeight}: the grid fills the screen as long

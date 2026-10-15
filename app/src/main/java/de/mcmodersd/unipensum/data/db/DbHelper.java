@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 
-
 public final class DbHelper extends SQLiteOpenHelper {
 
     private final Resources resources;

@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 /**
  * A vertical wheel that snaps to one of its values; values far from the center fade out.
  * Tapping a value scrolls it into the center. The wheel keeps every vertical gesture that starts

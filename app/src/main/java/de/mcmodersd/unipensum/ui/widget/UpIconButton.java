@@ -17,7 +17,6 @@ import androidx.core.widget.ImageViewCompat;
 
 import java.util.function.BooleanSupplier;
 
-
 /** A tappable icon with a 44dp touch target. Set a content description wherever it is used. */
 public class UpIconButton extends AppCompatImageView {
 
