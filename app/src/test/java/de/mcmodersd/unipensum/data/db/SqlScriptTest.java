@@ -50,7 +50,7 @@ public class SqlScriptTest {
         var statements = SqlScript.statements(Files.readString(RAW.resolve("schema.sql")));
 
         assertEquals(11, statements.size());
-        for (var i = 0; i < 5; i++) assertTrue(statements.get(i), statements.get(i).startsWith("CREATE TABLE "));
-        for (var i = 5; i < 11; i++) assertTrue(statements.get(i), statements.get(i).startsWith("CREATE INDEX "));
+        for (var statement : statements.subList(0, 5)) assertTrue(statement, statement.startsWith("CREATE TABLE "));
+        for (var statement : statements.subList(5, 11)) assertTrue(statement, statement.startsWith("CREATE INDEX "));
     }
 }
