@@ -17,7 +17,7 @@ customview = "1.2.0"
 # with known security issues; the build files require at least the versions below (bundle "buildToolFixes").
 # An entry can go once the plugin asks for that version or a newer one by itself.
 # The Kotlin plugin also sets the version of the Kotlin standard library that ends up in the app.
-bouncycastle = "1.86"
+bouncycastle = "1.87"
 jose4j = "0.9.7"
 jdom2 = "2.0.6.1"
 commonsLang3 = "3.21.0"
