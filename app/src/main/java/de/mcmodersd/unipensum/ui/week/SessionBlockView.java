@@ -42,6 +42,8 @@ import de.mcmodersd.unipensum.ui.widget.Haptics;
 @SuppressLint("ViewConstructor")
 final class SessionBlockView extends LinearLayout {
 
+    /** How much of the course color tints the area of a session: 18 %. At full strength it is only a line or a dot. */
+    static final int TINT_ALPHA = 0x2E;
     /** Lets the time range break after the dash when it does not fit on one line. */
     private static final String BREAKABLE_DASH = "–​";
 
@@ -70,7 +72,7 @@ final class SessionBlockView extends LinearLayout {
 
         var background = new GradientDrawable();
         background.setCornerRadius(radius);
-        background.setColor(ColorUtils.setAlphaComponent(accent, 0x2E));
+        background.setColor(ColorUtils.setAlphaComponent(accent, TINT_ALPHA));
         if (overlapping) {
             background.setStroke(Math.round(1.5f * dp), accent, 4 * dp, 3 * dp);
         }

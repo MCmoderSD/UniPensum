@@ -99,8 +99,11 @@ public class WeekFragment extends Fragment {
             Haptics.tap(v);
             resetZoom();
         });
-        // The view is rebuilt while the grid is zoomed (turning, theme, language): the label has to come back.
-        if (viewModel.zoom() > ZoomMetrics.MIN) showZoom(viewModel.zoom());
+        // The view is rebuilt while the grid is zoomed (turning, theme, language): the label has to come back. A list
+        // of days, shown for large text, has no zoom.
+        if (viewModel.zoom() > ZoomMetrics.MIN && !WeekAgendaView.wanted(requireContext())) {
+            showZoom(viewModel.zoom());
+        }
         adapter.setOnSessionClickListener(session ->
                 SessionDetailSheet.show(getParentFragmentManager(), session.session().id())
         );

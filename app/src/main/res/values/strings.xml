@@ -9,6 +9,10 @@
     <!-- Week header -->
     <string name="week_subtitle">%1$s – %2$s · Week %3$d</string>
 
+    <!-- The week as a list of days, for large text sizes. -->
+    <string name="agenda_today">%1$s · Today</string>
+    <string name="agenda_no_events">No events</string>
+
     <!-- Empty state -->
     <string name="empty_title">No semester yet</string>
     <string name="empty_body">Create your first semester to start planning.</string>

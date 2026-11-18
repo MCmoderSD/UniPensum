@@ -17,10 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.IntSupplier;
 
 import de.mcmodersd.unipensum.data.AppSettings.TimeWindow;
@@ -32,6 +34,10 @@ import de.mcmodersd.unipensum.ui.widget.Haptics;
 /**
  * One pager page: the day header on top, the scrollable grid below. Two fingers stretch the hours of the grid,
  * keeping the time between the fingers in place; a double tap puts them back.
+ * <p>
+ * With a large system font the page holds a {@link WeekAgendaView}, a list of days, instead: no header, no grid, no
+ * zoom, and the pages do not follow each other's scroll position, because a list of one week says nothing about
+ * the time of day of another.
  */
 // Created in code by WeekPagerAdapter only, never inflated from XML.
 @SuppressLint("ViewConstructor")
@@ -52,9 +58,16 @@ final class WeekPageView extends LinearLayout {
     private static final int NO_SCROLL = Integer.MIN_VALUE;
 
     private final GridMetrics metrics;
+    private final boolean agendaMode;
+    /** The day header and the grid; {@code null} while the page holds the list of days. */
+    @Nullable
     private final WeekHeaderView header;
     private final ScrollView scroll;
+    @Nullable
     private final WeekGridView grid;
+    /** The list of days; {@code null} while the page holds the grid. */
+    @Nullable
+    private final WeekAgendaView agenda;
     private final ScaleGestureDetector pinch;
     private final GestureDetector taps;
     private OnZoomListener zoomListener;
@@ -71,15 +84,23 @@ final class WeekPageView extends LinearLayout {
         this.metrics = metrics;
         setOrientation(VERTICAL);
 
-        header = new WeekHeaderView(context, metrics);
-        addView(header, new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
-
+        agendaMode = WeekAgendaView.wanted(context);
         scroll = new ScrollView(context);
         scroll.setFillViewport(true);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setOverScrollMode(OVER_SCROLL_NEVER);
-        grid = new WeekGridView(context, metrics);
-        scroll.addView(grid, new ScrollView.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+        if (agendaMode) {
+            header = null;
+            grid = null;
+            agenda = new WeekAgendaView(context);
+            scroll.addView(agenda, new ScrollView.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+        } else {
+            header = new WeekHeaderView(context, metrics);
+            addView(header, new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+            grid = new WeekGridView(context, metrics);
+            agenda = null;
+            scroll.addView(grid, new ScrollView.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+        }
         addView(scroll, new LayoutParams(MATCH_PARENT, 0, 1f));
 
         pinch = new ScaleGestureDetector(context, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
@@ -92,7 +113,7 @@ final class WeekPageView extends LinearLayout {
 
             @Override
             public boolean onScale(@NonNull ScaleGestureDetector detector) {
-                zoomTo(grid.zoom() * detector.getScaleFactor(), detector.getFocusY());
+                zoomTo(grid().zoom() * detector.getScaleFactor(), detector.getFocusY());
                 return true;
             }
 
@@ -108,7 +129,7 @@ final class WeekPageView extends LinearLayout {
         taps = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(@NonNull MotionEvent event) {
-                if (grid.zoom() > ZoomMetrics.MIN) {
+                if (grid().zoom() > ZoomMetrics.MIN) {
                     Haptics.tap(WeekPageView.this);
                     resetZoom(event.getY());
                 }
@@ -121,16 +142,30 @@ final class WeekPageView extends LinearLayout {
     /** @param timetable {@code null} while loading; the grid then stays empty */
     void bind(LocalDate monday, LocalDate today, TimeWindow window, NameStyle nameStyle, Timetable timetable,
               WeekGridView.OnSessionClickListener clickListener) {
-        header.bind(monday, today);
         var perDay = new ArrayList<List<SessionView>>();
         for (var i = 0; i < 5; i++) {
             perDay.add(timetable == null ? List.of() : timetable.on(monday.plusDays(i)));
         }
-        grid.bind(monday, window, nameStyle, perDay, clickListener);
+        if (agenda != null) {
+            agenda.bind(monday, today, nameStyle, perDay, clickListener);
+            return;
+        }
+        header().bind(monday, today);
+        grid().bind(monday, window, nameStyle, perDay, clickListener);
+    }
+
+    /** The grid of a page in grid mode; zoom and header only exist there. */
+    private WeekGridView grid() {
+        return Objects.requireNonNull(grid, "the page shows the list of days");
+    }
+
+    private WeekHeaderView header() {
+        return Objects.requireNonNull(header, "the page shows the list of days");
     }
 
     /** Reports every scroll of this page, except the ones {@link #followWhenReady} makes. */
     void setScrollListener(OnScrollListener listener) {
+        if (agendaMode) return;
         scroll.setOnScrollChangeListener((v, x, y, oldX, oldY) -> {
             if (!following) listener.onScrolled(this, y);
         });
@@ -151,12 +186,13 @@ final class WeekPageView extends LinearLayout {
      * fling.
      */
     void followWhenReady(IntSupplier y) {
+        if (agendaMode) return;
         scroll.post(() -> scrollWithoutReport(y.getAsInt()));
     }
 
     /** Sets the zoom before the page is shown; the scroll position is set separately. */
     void setZoom(float zoom) {
-        grid.setZoom(zoom);
+        if (grid != null) grid.setZoom(zoom);
     }
 
     /**
@@ -164,7 +200,7 @@ final class WeekPageView extends LinearLayout {
      * after the grid has its new height, because a position beyond the old height could not be reached.
      */
     void followZoom(float zoom, IntSupplier y) {
-        if (grid.zoom() == zoom) return;
+        if (grid == null || grid.zoom() == zoom) return;
         grid.setZoom(zoom);
         afterNextLayout(() -> scrollWithoutReport(y.getAsInt()));
     }
@@ -173,6 +209,7 @@ final class WeekPageView extends LinearLayout {
 
     /** Puts the hours back to their normal height, around the middle of the grid. */
     void resetZoom() {
+        if (agendaMode) return;
         resetZoom(scroll.getTop() + scroll.getHeight() / 2f);
     }
 
@@ -180,12 +217,15 @@ final class WeekPageView extends LinearLayout {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         // The grid fills the scrolling area, whose height is only known now, so a change needs a second pass.
-        if (grid.setViewportHeight(scroll.getMeasuredHeight())) super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (grid != null && grid.setViewportHeight(scroll.getMeasuredHeight())) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        }
     }
 
     /** Sees every touch before the children do, and takes the touch away from them once it becomes a pinch. */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
+        if (agendaMode) return super.dispatchTouchEvent(event);
         switch (event.getActionMasked()) {
             case ACTION_DOWN -> {
                 stopReset();
@@ -226,26 +266,26 @@ final class WeekPageView extends LinearLayout {
      * changing then, so it is reported as not settled.
      */
     private void zoomTo(float requested, float focusY) {
-        var old = grid.zoom();
+        var old = grid().zoom();
         var next = ZoomMetrics.clamp(requested);
         if (next != old) {
             var focus = Math.max(0, focusY - scroll.getTop());
             float current = pendingScroll != NO_SCROLL ? pendingScroll : scroll.getScrollY();
             var target = ZoomMetrics.scrollAfterZoom(current, focus, metrics.verticalPadding, next / old);
-            grid.setZoom(next);
+            grid().setZoom(next);
             scrollAfterLayout(Math.round(target));
         }
         reportZoom(false);
     }
 
     private void reportZoom(boolean settled) {
-        if (zoomListener != null) zoomListener.onZoomed(this, grid.zoom(), settled);
+        if (zoomListener != null) zoomListener.onZoomed(this, grid().zoom(), settled);
     }
 
     private void resetZoom(float focusY) {
-        if (grid.zoom() == ZoomMetrics.MIN) return;
+        if (grid().zoom() == ZoomMetrics.MIN) return;
         stopReset();
-        var animator = ValueAnimator.ofFloat(grid.zoom(), ZoomMetrics.MIN);
+        var animator = ValueAnimator.ofFloat(grid().zoom(), ZoomMetrics.MIN);
         animator.setDuration(RESET_DURATION_MS);
         animator.setInterpolator(new DecelerateInterpolator());
         animator.addUpdateListener(a -> zoomTo((float) a.getAnimatedValue(), focusY));
