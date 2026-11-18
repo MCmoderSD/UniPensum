@@ -74,7 +74,10 @@ public class SettingsFragment extends Fragment {
         bindTheme(view.findViewById(theme_control));
         bindHours(view.findViewById(R.id.hours_start), view.findViewById(R.id.hours_end));
         bindLecturerNames(view.findViewById(lecturer_name_control));
-        bindReminders(view.findViewById(reminders_switch), view.findViewById(notifications_row));
+        bindReminders(
+                view.findViewById(reminders_row), view.findViewById(reminders_switch),
+                view.findViewById(notifications_row)
+        );
 
         view.findViewById(manage_lecturers).setOnClickListener(v ->
                 LecturerSheet.showManager(getParentFragmentManager())
@@ -124,8 +127,9 @@ public class SettingsFragment extends Fragment {
         control.setOnSelectionChangedListener(index -> settings.setLecturerNameStyle(NameStyle.values()[index]));
     }
 
-    private void bindReminders(UpSwitch enabled, UpRow notifications) {
+    private void bindReminders(View row, UpSwitch enabled, UpRow notifications) {
         notificationsRow = notifications;
+        UpSwitch.bindRow(row, enabled);
         enabled.setChecked(settings.remindersEnabled());
         enabled.setOnCheckedChangeListener(on -> {
             settings.setRemindersEnabled(on);

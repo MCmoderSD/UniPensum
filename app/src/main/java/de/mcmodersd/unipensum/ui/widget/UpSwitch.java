@@ -58,6 +58,15 @@ public class UpSwitch extends View {
         setFocusable(true);
     }
 
+    /**
+     * Makes the whole row a switch: a tap anywhere on it toggles {@code toggle}. A screen reader only gets the
+     * switch, which carries the name of the row, so the row is not read a second time.
+     */
+    public static void bindRow(View row, UpSwitch toggle) {
+        row.setOnClickListener(v -> toggle.performClick());
+        row.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+    }
+
     public boolean isChecked() {
         return checked;
     }

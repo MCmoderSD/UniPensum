@@ -97,6 +97,8 @@ public final class BackupExportSheet extends UpSheet {
         protect = new UpSwitch(context);
         protect.setContentDescription(getString(backup_protect));
         switchRow.addView(protect);
+        UpSwitch.bindRow(switchRow, protect);
+        switchLabel.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
         formColumn.addView(switchRow, spaced(dp, 0, 8));
 
         var block = new LinearLayout(context);

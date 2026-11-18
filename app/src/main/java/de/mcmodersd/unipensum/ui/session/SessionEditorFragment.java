@@ -315,10 +315,12 @@ public class SessionEditorFragment extends Fragment {
         untilRow = view.findViewById(until_row);
         hybridSwitch = view.findViewById(hybrid_switch);
         hybridRow = view.findViewById(hybrid_row);
+        UpSwitch.bindRow(hybridRow, hybridSwitch);
         roomField = view.findViewById(room_field);
         linkField = view.findViewById(link_field);
         lecturerRow = view.findViewById(lecturer_row);
         reminderSwitch = view.findViewById(R.id.reminder_switch);
+        UpSwitch.bindRow(view.findViewById(R.id.reminder_row), reminderSwitch);
         reminderStepper = view.findViewById(reminder_stepper);
         notificationsOffRow = view.findViewById(notifications_off_row);
         noteField = view.findViewById(note_field);
