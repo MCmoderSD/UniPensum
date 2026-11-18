@@ -17,12 +17,20 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
-/** The app's own toggle: a pill track with a sliding thumb. */
+/**
+ * The app's own toggle: a pill track with a sliding thumb. The track is 52 x 32dp; the view around it is 48dp tall,
+ * so the touch target has the size Android asks for.
+ */
 public class UpSwitch extends View {
 
     public interface OnCheckedChangeListener {
         void onCheckedChanged(boolean checked);
     }
+
+    private static final int WIDTH_DP = 52;
+    private static final int TRACK_HEIGHT_DP = 32;
+    private static final int TOUCH_HEIGHT_DP = 48;
+    private static final int THUMB_INSET_DP = 3;
 
     private final Paint trackPaint = new Paint(ANTI_ALIAS_FLAG);
     private final Paint thumbPaint = new Paint(ANTI_ALIAS_FLAG);
@@ -67,20 +75,21 @@ public class UpSwitch extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(Math.round(52 * dp), Math.round(32 * dp));
+        setMeasuredDimension(Math.round(WIDTH_DP * dp), Math.round(TOUCH_HEIGHT_DP * dp));
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        var radius = getHeight() / 2f;
-        track.set(0, 0, getWidth(), getHeight());
+        var radius = TRACK_HEIGHT_DP * dp / 2f;
+        var top = (getHeight() - TRACK_HEIGHT_DP * dp) / 2f;
+        track.set(0, top, getWidth(), top + TRACK_HEIGHT_DP * dp);
         trackPaint.setColor(ColorUtils.blendARGB(trackOff, trackOn, progress));
         canvas.drawRoundRect(track, radius, radius, trackPaint);
 
-        var thumbRadius = radius - 3 * dp;
+        var thumbRadius = radius - THUMB_INSET_DP * dp;
         var endX = getWidth() - radius;
         thumbPaint.setColor(ColorUtils.blendARGB(thumbOff, thumbOn, progress));
-        canvas.drawCircle(radius + (endX - radius) * progress, radius, thumbRadius, thumbPaint);
+        canvas.drawCircle(radius + (endX - radius) * progress, top + radius, thumbRadius, thumbPaint);
     }
 
     @Override

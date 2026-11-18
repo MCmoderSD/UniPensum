@@ -34,6 +34,9 @@ public class UpSegmentedControl extends LinearLayout {
     }
 
     private static final long SLIDE_MILLIS = 260;
+    private static final int SEGMENT_HEIGHT_DP = 48;
+    private static final int PILL_INSET_DP = 3;
+    private static final int PILL_RADIUS_DP = 11;
 
     private final ArrayList<TextView> segments = new ArrayList<>();
     private final Paint pillPaint = new Paint(ANTI_ALIAS_FLAG);
@@ -54,8 +57,7 @@ public class UpSegmentedControl extends LinearLayout {
     public UpSegmentedControl(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOrientation(HORIZONTAL);
-        var padding = Math.round(3 * dp);
-        setPadding(padding, padding, padding, padding);
+        setPadding(Math.round(PILL_INSET_DP * dp), 0, Math.round(PILL_INSET_DP * dp), 0);
         var background = new GradientDrawable();
         background.setCornerRadius(14 * dp);
         background.setColor(ContextCompat.getColor(context, surface));
@@ -77,7 +79,7 @@ public class UpSegmentedControl extends LinearLayout {
             segment.setMaxLines(1);
             segment.setTextSize(COMPLEX_UNIT_SP, 14);
             segment.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-            segment.setMinHeight(Math.round(42 * dp));
+            segment.setMinHeight(Math.round(SEGMENT_HEIGHT_DP * dp));
             segment.setPadding(Math.round(4 * dp), 0, Math.round(4 * dp), 0);
             segment.setClickable(true);
             segment.setFocusable(true);
@@ -142,8 +144,8 @@ public class UpSegmentedControl extends LinearLayout {
         var b = segments.get(to);
         var left = a.getLeft() + (b.getLeft() - a.getLeft()) * fraction;
         var right = a.getRight() + (b.getRight() - a.getRight()) * fraction;
-        pillRect.set(left, getPaddingTop(), right, getHeight() - getPaddingBottom());
-        canvas.drawRoundRect(pillRect, 11 * dp, 11 * dp, pillPaint);
+        pillRect.set(left, PILL_INSET_DP * dp, right, getHeight() - PILL_INSET_DP * dp);
+        canvas.drawRoundRect(pillRect, PILL_RADIUS_DP * dp, PILL_RADIUS_DP * dp, pillPaint);
     }
 
     @Override

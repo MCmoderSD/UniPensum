@@ -147,7 +147,7 @@ public class MonthCalendarView extends LinearLayout {
         private final Paint fillPaint = new Paint(ANTI_ALIAS_FLAG);
         private final Paint ringPaint = new Paint(ANTI_ALIAS_FLAG);
         private final float dp = getResources().getDisplayMetrics().density;
-        private final float cellHeight = 44 * dp;
+        private final float cellHeight = 48 * dp;
         private final float labelHeight = 28 * dp;
         private final int textColor;
         private final int disabledColor;
