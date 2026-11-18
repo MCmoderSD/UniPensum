@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         ImageView back = view == null ? null : view.findViewById(R.id.back);
         if (back == null) return;
         var closes = pane.isSplit() && FIRST_PAGE.equals(page.getTag());
-        back.setImageResource(closes ? ic_close : ic_chevron_left);
+        back.setImageResource(closes ? ic_close : ic_arrow_back);
         back.setContentDescription(getString(closes ? action_close : action_back));
     }
 
