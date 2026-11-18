@@ -4,6 +4,7 @@ import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.util.TypedValue.COMPLEX_UNIT_SP;
 import static android.view.View.MeasureSpec.EXACTLY;
 import static de.mcmodersd.unipensum.R.color.*;
+import static de.mcmodersd.unipensum.ui.week.GridMetrics.*;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -94,7 +95,9 @@ final class WeekGridView extends ViewGroup {
         linePaint.setStrokeWidth(Math.max(1f, getResources().getDisplayMetrics().density * 0.75f));
 
         labelPaint.setColor(ContextCompat.getColor(context, text_secondary));
-        labelPaint.setTextSize(TypedValue.applyDimension(COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
+        labelPaint.setTextSize(
+                TypedValue.applyDimension(COMPLEX_UNIT_SP, HOUR_LABEL_SP, getResources().getDisplayMetrics())
+        );
         labelPaint.setTextAlign(Paint.Align.RIGHT);
 
         // The marker is black on the light theme and white on the dark one, like the rest of the app.
@@ -272,7 +275,7 @@ final class WeekGridView extends ViewGroup {
             var label = TimeFormat.hour(getContext(), hour);
             var paint = now != null && now.minutes() / 60 == hour ? nowLabelPaint : labelPaint;
             canvas.drawText(
-                    label, metrics.gutter - 6 * getResources().getDisplayMetrics().density,
+                    label, metrics.gutter - HOUR_LABEL_GAP_DP * getResources().getDisplayMetrics().density,
                     y - labelOffset, paint
             );
         }

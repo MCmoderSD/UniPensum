@@ -33,6 +33,8 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     }
 
     private final ArrayList<WeekPageView> attached = new ArrayList<>();
+    /** Measuring the hour labels is not free, and the numbers are the same for every page, so they are made once. */
+    private GridMetrics metrics;
     private Timetable timetable;
     private TimeWindow window = TimeWindow.DEFAULT;
     private NameStyle nameStyle = LAST_NAME;
@@ -78,7 +80,8 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     @NonNull
     @Override
     public PageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        var page = new WeekPageView(parent.getContext(), new GridMetrics(parent.getContext()));
+        if (metrics == null) metrics = new GridMetrics(parent.getContext());
+        var page = new WeekPageView(parent.getContext(), metrics);
         page.setLayoutParams(new RecyclerView.LayoutParams(MATCH_PARENT, MATCH_PARENT));
         page.setScrollListener(this::onPageScrolled);
         page.setZoomListener(this::onPageZoomed);
