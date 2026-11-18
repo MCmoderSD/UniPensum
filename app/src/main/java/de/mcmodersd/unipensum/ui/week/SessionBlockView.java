@@ -30,6 +30,7 @@ import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.ui.format.CourseColors;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
+import de.mcmodersd.unipensum.ui.widget.FocusRing;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
 
 /**
@@ -79,6 +80,7 @@ final class SessionBlockView extends LinearLayout {
         setGravity(TOP);
         setClickable(true);
         setFocusable(true);
+        FocusRing.install(this, radius / dp);
 
         var details = session.session().details();
         title = line(context, true, session.courseName());

@@ -56,6 +56,7 @@ public class UpSwitch extends View {
         thumbOff = ContextCompat.getColor(context, sheet);
         setClickable(true);
         setFocusable(true);
+        FocusRing.install(this, TRACK_HEIGHT_DP / 2f, (TOUCH_HEIGHT_DP - TRACK_HEIGHT_DP) / 2f);
     }
 
     /**

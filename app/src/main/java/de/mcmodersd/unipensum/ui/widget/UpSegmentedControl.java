@@ -83,6 +83,7 @@ public class UpSegmentedControl extends LinearLayout {
             segment.setPadding(Math.round(4 * dp), 0, Math.round(4 * dp), 0);
             segment.setClickable(true);
             segment.setFocusable(true);
+            FocusRing.install(segment, PILL_RADIUS_DP, PILL_INSET_DP);
             final var index = i;
             segment.setOnClickListener(v -> select(index));
             addView(segment, new LayoutParams(0, WRAP_CONTENT, 1f));

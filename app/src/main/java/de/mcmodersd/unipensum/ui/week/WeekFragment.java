@@ -44,6 +44,7 @@ import de.mcmodersd.unipensum.ui.semester.SemesterSheet;
 import de.mcmodersd.unipensum.ui.session.SessionDetailSheet;
 import de.mcmodersd.unipensum.ui.settings.SettingsFragment;
 import de.mcmodersd.unipensum.ui.widget.ConfirmSheet;
+import de.mcmodersd.unipensum.ui.widget.FocusRing;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
 
 /**
@@ -119,6 +120,7 @@ public class WeekFragment extends Fragment {
                 KEY_NOTIFICATIONS, getViewLifecycleOwner(),
                 (key, result) -> allowNotifications()
         );
+        FocusRing.install(title, 8);
         title.setOnClickListener(v -> {
             Haptics.tap(v);
             SemesterSheet.show(getParentFragmentManager());

@@ -55,6 +55,7 @@ public class UpIconButton extends AppCompatImageView {
         setClickable(true);
         setFocusable(true);
         ImageViewCompat.setImageTintList(this, ColorStateList.valueOf(ContextCompat.getColor(context, text_primary)));
+        FocusRing.install(this, SIZE_DP / 2f);
     }
 
     @Override

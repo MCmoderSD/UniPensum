@@ -35,8 +35,10 @@
                     android:drawablePadding="@dimen/space_2"
                     android:ellipsize="end"
                     android:focusable="true"
+                    android:layout_marginStart="-6dp"
                     android:layout_marginVertical="-5dp"
                     android:maxLines="1"
+                    android:paddingHorizontal="6dp"
                     android:paddingVertical="5dp"
                     app:drawableEndCompat="@drawable/ic_chevron_down"
                     app:drawableTint="@color/text_secondary" />
