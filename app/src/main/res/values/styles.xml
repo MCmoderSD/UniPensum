@@ -12,7 +12,9 @@
         <item name="android:letterSpacing">-0.01</item>
     </style>
 
+    <!-- Titles of sheets, of pages and of the empty state: headings for a screen reader. -->
     <style name="TextAppearance.Up.Title">
+        <item name="android:accessibilityHeading">true</item>
         <item name="android:textSize">20sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
@@ -26,8 +28,9 @@
         <item name="android:textColor">@color/text_secondary</item>
     </style>
 
-    <!-- Heading above a group of fields in the editors. -->
+    <!-- Heading above a group of fields in the editors. A screen reader can jump from one to the next. -->
     <style name="TextAppearance.Up.Section">
+        <item name="android:accessibilityHeading">true</item>
         <item name="android:textSize">13sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/text_secondary</item>

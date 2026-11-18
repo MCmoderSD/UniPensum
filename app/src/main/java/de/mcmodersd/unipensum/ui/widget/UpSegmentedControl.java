@@ -4,6 +4,7 @@ import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.util.TypedValue.COMPLEX_UNIT_SP;
 import static android.view.Gravity.CENTER;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static androidx.core.view.accessibility.AccessibilityNodeInfoCompat.CollectionInfoCompat.SELECTION_MODE_SINGLE;
 import static de.mcmodersd.unipensum.R.color.*;
 
 import android.animation.ValueAnimator;
@@ -14,18 +15,30 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.animation.PathInterpolator;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
+import androidx.core.view.AccessibilityDelegateCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.CollectionInfoCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.CollectionItemInfoCompat;
 
 import java.util.ArrayList;
 
 /**
  * A row of mutually exclusive options. The selection is a pill in the accent color that slides to
- * the chosen segment, while the labels cross-fade between their two colors along the way.
+ * the chosen segment, while the labels cross-fade between their two colors along the way. Each segment is
+ * 48dp tall, the touch size Android asks for; the pill is drawn 3dp inside it. For a screen reader the control is
+ * a group of radio buttons.
  */
 public class UpSegmentedControl extends LinearLayout {
 
@@ -84,6 +97,7 @@ public class UpSegmentedControl extends LinearLayout {
             segment.setClickable(true);
             segment.setFocusable(true);
             FocusRing.install(segment, PILL_RADIUS_DP, PILL_INSET_DP);
+            ViewCompat.setAccessibilityDelegate(segment, new SegmentAccessibility(i));
             final var index = i;
             segment.setOnClickListener(v -> select(index));
             addView(segment, new LayoutParams(0, WRAP_CONTENT, 1f));
@@ -150,6 +164,20 @@ public class UpSegmentedControl extends LinearLayout {
     }
 
     @Override
+    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(RadioGroup.class.getName());
+        AccessibilityNodeInfoCompat.wrap(info).setCollectionInfo(
+                new CollectionInfoCompat.Builder()
+                        .setRowCount(1)
+                        .setColumnCount(segments.size())
+                        .setHierarchical(false)
+                        .setSelectionMode(SELECTION_MODE_SINGLE)
+                        .build()
+        );
+    }
+
+    @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (slide != null) slide.cancel();
@@ -160,5 +188,32 @@ public class UpSegmentedControl extends LinearLayout {
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         for (var segment : segments) segment.setEnabled(enabled);
+    }
+
+    /** A segment is a radio button of the group: it says whether it is the chosen one, and which one of how many. */
+    private static final class SegmentAccessibility extends AccessibilityDelegateCompat {
+
+        private final int index;
+
+        SegmentAccessibility(int index) {
+            this.index = index;
+        }
+
+        @Override
+        public void onInitializeAccessibilityNodeInfo(@NonNull View host, @NonNull AccessibilityNodeInfoCompat info) {
+            super.onInitializeAccessibilityNodeInfo(host, info);
+            info.setClassName(RadioButton.class.getName());
+            info.setCheckable(true);
+            info.setChecked(host.isSelected());
+            info.setCollectionItemInfo(
+                    new CollectionItemInfoCompat.Builder()
+                            .setRowIndex(0)
+                            .setRowSpan(1)
+                            .setColumnIndex(index)
+                            .setColumnSpan(1)
+                            .setSelected(host.isSelected())
+                            .build()
+            );
+        }
     }
 }
