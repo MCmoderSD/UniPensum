@@ -1,0 +1,162 @@
+package de.mcmodersd.unipensum.ui.week;
+
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.View.MeasureSpec.AT_MOST;
+import static android.view.View.MeasureSpec.makeMeasureSpec;
+import static de.mcmodersd.unipensum.domain.model.CourseColor.RED;
+import static de.mcmodersd.unipensum.domain.model.Mode.IN_PERSON;
+import static de.mcmodersd.unipensum.domain.model.SessionDetails.*;
+import static de.mcmodersd.unipensum.domain.model.SessionType.LECTURE;
+import static de.mcmodersd.unipensum.ui.week.GridMetrics.HOUR_LABEL_SP;
+import static org.junit.Assert.*;
+
+import android.content.Context;
+import android.content.res.Configuration;
+import android.graphics.Paint;
+import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
+import android.view.View;
+import android.widget.TextView;
+
+import androidx.core.view.ViewCompat;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.List;
+
+import de.mcmodersd.unipensum.R;
+import de.mcmodersd.unipensum.data.SessionView;
+import de.mcmodersd.unipensum.domain.model.NameStyle;
+import de.mcmodersd.unipensum.domain.model.Session;
+import de.mcmodersd.unipensum.domain.model.SessionDetails;
+import de.mcmodersd.unipensum.ui.format.TimeFormat;
+
+/** The week follows the font size of the system, and a screen reader hears on which day a session is. */
+@RunWith(AndroidJUnit4.class)
+public class WeekViewsTest {
+
+    private static final LocalDate MONDAY = LocalDate.of(2026, 10, 12);
+
+    private final Context normal = new ContextThemeWrapper(
+            ApplicationProvider.<Context>getApplicationContext(), R.style.Theme_UniPensum
+    );
+
+    private Context withFontScale(float scale) {
+        var configuration = new Configuration(normal.getResources().getConfiguration());
+        configuration.fontScale = scale;
+        return new ContextThemeWrapper(normal.createConfigurationContext(configuration), R.style.Theme_UniPensum);
+    }
+
+    private static SessionView session(long id, LocalDate day, String course, String room) {
+        var details = new SessionDetails(
+                LECTURE, 8 * 60, 11 * 60 + 15, IN_PERSON, false, room, null, NO_LECTURER, null, NO_REMINDER
+        );
+        return new SessionView(new Session(id, 1, day, details), 1, 1, course, RED, null);
+    }
+
+    /** Five days; the second one is empty. */
+    private static ArrayList<List<SessionView>> week() {
+        var perDay = new ArrayList<List<SessionView>>();
+        perDay.add(List.of(session(1, MONDAY, "Algorithms", "H1"), session(2, MONDAY, "Databases", "H2")));
+        perDay.add(List.of());
+        perDay.add(List.of(session(3, MONDAY.plusDays(2), "Physics", "A2")));
+        perDay.add(List.of());
+        perDay.add(List.of());
+        return perDay;
+    }
+
+    private static void measure(View view, int width) {
+        view.measure(makeMeasureSpec(width, AT_MOST), makeMeasureSpec(10_000, AT_MOST));
+    }
+
+    @Test
+    public void largeTextWidensTheGutterAndTheHeader() {
+        var small = new GridMetrics(withFontScale(1f));
+        var large = new GridMetrics(withFontScale(1.3f));
+        assertTrue(large.gutter >= small.gutter);
+        assertTrue(large.headerHeight > small.headerHeight);
+    }
+
+    @Test
+    public void gutterFitsTheWidestHourLabel() {
+        var context = withFontScale(1.3f);
+        var metrics = new GridMetrics(context);
+        var paint = new Paint();
+        paint.setTextSize(
+                TypedValue.applyDimension(COMPLEX_UNIT_SP, HOUR_LABEL_SP, context.getResources().getDisplayMetrics())
+        );
+        var widest = 0f;
+        for (var hour = 0; hour < 24; hour++) {
+            widest = Math.max(widest, paint.measureText(TimeFormat.hour(context, hour)));
+        }
+        assertTrue(metrics.gutter >= widest);
+    }
+
+    @Test
+    public void listOfDaysFromFontScale1Point3() {
+        assertFalse(WeekAgendaView.wanted(withFontScale(1.15f)));
+        assertTrue(WeekAgendaView.wanted(withFontScale(1.3f)));
+        assertTrue(WeekAgendaView.wanted(withFontScale(2f)));
+    }
+
+    @Test
+    public void listHasAHeadingForEveryDayAndACardForEverySession() {
+        var context = withFontScale(1.5f);
+        var agenda = new WeekAgendaView(context);
+        agenda.bind(MONDAY, MONDAY.plusDays(2), NameStyle.LAST_NAME, week(), null);
+        measure(agenda, 1000);
+
+        var headings = new ArrayList<TextView>();
+        var cards = 0;
+        var emptyDays = 0;
+        for (var i = 0; i < agenda.getChildCount(); i++) {
+            var child = agenda.getChildAt(i);
+            if (child instanceof AgendaCardView) {
+                cards++;
+            } else if (ViewCompat.isAccessibilityHeading(child)) {
+                headings.add((TextView) child);
+            } else {
+                emptyDays++;
+            }
+        }
+        assertEquals(5, headings.size());
+        assertEquals(3, cards);
+        assertEquals(3, emptyDays);
+        // today is the Wednesday
+        assertTrue(headings.get(2).getText().toString().contains(context.getString(R.string.agenda_today, "").trim()));
+        assertFalse(headings.get(0).getText().toString().contains(context.getString(R.string.agenda_today, "").trim()));
+    }
+
+    @Test
+    public void everyLineOfACardIsShownInFull() {
+        var context = withFontScale(2f);
+        var card = new AgendaCardView(context, session(1, MONDAY, "Software Engineering", "Library 2"), NameStyle.LAST_NAME);
+        measure(card, 600);
+        var texts = new ArrayList<String>();
+        for (var i = 0; i < card.getChildCount(); i++) {
+            var line = (TextView) card.getChildAt(i);
+            texts.add(line.getText().toString());
+            assertEquals("a line must not be cut off", Integer.MAX_VALUE, line.getMaxLines());
+        }
+        assertTrue(texts.contains("Software Engineering"));
+        assertTrue(texts.contains("Library 2"));
+    }
+
+    @Test
+    public void sessionDescriptionSaysTheDay() {
+        var description = SessionBlockView.describe(normal, session(1, MONDAY, "Algorithms", "H1"));
+        // the weekday of 2026-10-12 is a Monday, in the language of the device
+        var day = DayOfWeek.MONDAY.getDisplayName(
+                TextStyle.FULL, normal.getResources().getConfiguration().getLocales().get(0)
+        );
+        assertTrue(description, description.contains(day));
+        assertTrue(description, description.contains("Algorithms"));
+    }
+}
