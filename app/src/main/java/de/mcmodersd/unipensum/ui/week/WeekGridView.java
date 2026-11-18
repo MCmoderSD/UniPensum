@@ -39,8 +39,9 @@ import de.mcmodersd.unipensum.ui.format.TimeFormat;
  * Zooming stretches the hours further.
  * <p>
  * In the current week, a line marks the current time: faint across the whole week, solid in the column of
- * today, drawn over the session blocks. The label of the current hour is highlighted. The marker moves with
- * the clock, once a minute.
+ * today, drawn over the grid. The solid line stops at a session block, where the faint one carries on, so that it
+ * never strikes through the text of the lecture that is on right now. The label of the current hour is
+ * highlighted. The marker moves with the clock, once a minute.
  */
 // Created in code by WeekPageView only, never inflated from XML.
 @SuppressLint("ViewConstructor")
@@ -286,7 +287,10 @@ final class WeekGridView extends ViewGroup {
         }
     }
 
-    /** Over the session blocks, so the current time stays readable inside a lecture. */
+    /**
+     * Over the session blocks, so the current time stays visible inside a lecture. The faint line crosses them;
+     * the solid line leaves them out, because a solid line through the text of a block makes it hard to read.
+     */
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
         super.dispatchDraw(canvas);
@@ -295,7 +299,15 @@ final class WeekGridView extends ViewGroup {
         var columnWidth = metrics.columnWidth(getWidth());
         var left = metrics.gutter + now.dayIndex() * columnWidth;
         canvas.drawLine(metrics.gutter, y, getWidth(), y, nowFaintPaint);
+
+        // The gap between a block and the line of its column belongs to the block, or it would show as a dot.
+        var saved = canvas.save();
+        for (var item : placed) {
+            var bounds = item.bounds;
+            canvas.clipOutRect(bounds.left - metrics.blockInset, bounds.top, bounds.right + metrics.blockInset, bounds.bottom);
+        }
         canvas.drawLine(left, y, left + columnWidth, y, nowLinePaint);
+        canvas.restoreToCount(saved);
     }
 
     private float hourHeight(int totalHeight) {
