@@ -51,7 +51,7 @@ public class UpSwitch extends View {
     public UpSwitch(Context context, AttributeSet attrs) {
         super(context, attrs);
         trackOn = ContextCompat.getColor(context, accent);
-        trackOff = ContextCompat.getColor(context, divider);
+        trackOff = ContextCompat.getColor(context, track_off);
         thumbOn = ContextCompat.getColor(context, text_on_accent);
         thumbOff = ContextCompat.getColor(context, sheet);
         setClickable(true);

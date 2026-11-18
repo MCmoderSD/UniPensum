@@ -182,7 +182,7 @@ final class SessionBlockView extends LinearLayout {
     private TextView line(Context context, boolean primary, String text) {
         var view = new TextView(context);
         view.setText(text);
-        view.setTextColor(ContextCompat.getColor(context, primary ? text_primary : text_secondary));
+        view.setTextColor(ContextCompat.getColor(context, primary ? text_primary : text_detail));
         view.setEllipsize(TextUtils.TruncateAt.END);
         view.setIncludeFontPadding(false);
         view.setTypeface(Typeface.create(primary ? "sans-serif-medium" : "sans-serif", Typeface.NORMAL));
