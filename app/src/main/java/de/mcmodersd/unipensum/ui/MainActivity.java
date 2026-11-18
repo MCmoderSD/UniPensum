@@ -1,6 +1,5 @@
 package de.mcmodersd.unipensum.ui;
 
-import static android.content.pm.ActivityInfo.*;
 import static androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
 import static de.mcmodersd.unipensum.R.animator.*;
 import static de.mcmodersd.unipensum.R.drawable.*;
@@ -9,7 +8,6 @@ import static de.mcmodersd.unipensum.R.layout.activity_main;
 import static de.mcmodersd.unipensum.R.string.*;
 import static de.mcmodersd.unipensum.debug.DebugSeeder.EXTRA_SEED;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -39,8 +37,6 @@ import de.mcmodersd.unipensum.ui.widget.PaneLayout;
  */
 public class MainActivity extends AppCompatActivity implements Navigator {
 
-    /** Phones stay upright; from this smallest width on a device is a tablet and may turn. */
-    private static final int TABLET_MIN_SMALLEST_WIDTH_DP = 600;
     /**
      * The fragment tag of the first page of the pane. It stays with the page when its view is rebuilt, which
      * is more reliable than counting back stack entries while a page is leaving.
@@ -55,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements Navigator {
     protected void onCreate(Bundle savedInstanceState) {
         EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
-        lockPhonesToPortrait();
         setContentView(activity_main);
 
         pane = findViewById(R.id.pane);
@@ -123,16 +118,6 @@ public class MainActivity extends AppCompatActivity implements Navigator {
         var shown = manager.findFragmentByTag(SessionDetailSheet.TAG);
         if (shown instanceof DialogFragment) ((DialogFragment) shown).dismissAllowingStateLoss();
         SessionDetailSheet.show(manager, sessionId);
-    }
-
-    /**
-     * Asked for in code, not in the manifest: a manifest value would also lock tablets on Android 12 to 15,
-     * while a tablet is the one device where turning is wanted.
-     */
-    @SuppressLint("SourceLockedOrientationActivity")
-    private void lockPhonesToPortrait() {
-        var tablet = getResources().getConfiguration().smallestScreenWidthDp >= TABLET_MIN_SMALLEST_WIDTH_DP;
-        setRequestedOrientation(tablet ? SCREEN_ORIENTATION_UNSPECIFIED : SCREEN_ORIENTATION_PORTRAIT);
     }
 
     @Override
