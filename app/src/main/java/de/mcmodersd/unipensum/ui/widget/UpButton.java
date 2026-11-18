@@ -37,6 +37,7 @@ public class UpButton extends AppCompatTextView {
         setClickable(true);
         setFocusable(true);
         setAllCaps(false);
+        FocusRing.install(this, 14);
 
         var variant = PRIMARY;
         if (attrs != null) {

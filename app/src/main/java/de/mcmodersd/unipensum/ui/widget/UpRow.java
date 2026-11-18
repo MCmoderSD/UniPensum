@@ -49,6 +49,7 @@ public class UpRow extends LinearLayout {
         background.setCornerRadius(14 * dp);
         background.setColor(ContextCompat.getColor(context, surface));
         setBackground(background);
+        FocusRing.install(this, 14);
 
         var texts = new LinearLayout(context);
         texts.setOrientation(VERTICAL);
