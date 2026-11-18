@@ -1,5 +1,5 @@
 [versions]
-agp = "9.6.0-alpha03"
+agp = "9.5.1"
 junit = "4.13.2"
 androidxTestExt = "1.3.0"
 androidxTest = "1.7.0"
@@ -13,15 +13,12 @@ viewpager2 = "1.1.0"
 recyclerview = "1.4.0"
 core = "1.19.1"
 customview = "1.2.0"
-# Build tools only, the app does not use these. The Android Gradle Plugin and lint bring them along in versions
-# with known security issues; the build files require at least the versions below (bundle "buildToolFixes").
-# An entry can go once the plugin asks for that version or a newer one by itself.
-# The Kotlin plugin also sets the version of the Kotlin standard library that ends up in the app.
 bouncycastle = "1.87"
 jose4j = "0.9.7"
 jdom2 = "2.0.6.1"
 commonsLang3 = "3.22.0"
 httpclient = "4.5.14"
+guava = "33.8.0-jre"
 kotlin = "2.4.21"
 
 [libraries]
@@ -47,12 +44,14 @@ fix-jose4j = { group = "org.bitbucket.b_c", name = "jose4j", version.ref = "jose
 fix-jdom2 = { group = "org.jdom", name = "jdom2", version.ref = "jdom2" }
 fix-commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commonsLang3" }
 fix-httpclient = { group = "org.apache.httpcomponents", name = "httpclient", version.ref = "httpclient" }
+fix-guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 fix-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 
 [bundles]
+# noinspection UnusedVersionCatalogEntry
 buildToolFixes = [
     "fix-bcprov", "fix-bcpkix", "fix-bcutil", "fix-jose4j", "fix-jdom2",
-    "fix-commons-lang3", "fix-httpclient", "fix-kotlin-gradle-plugin",
+    "fix-commons-lang3", "fix-httpclient", "fix-guava", "fix-kotlin-gradle-plugin"
 ]
 
 [plugins]
