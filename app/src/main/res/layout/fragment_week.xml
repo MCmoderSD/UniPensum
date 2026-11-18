@@ -31,7 +31,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
-                    android:contentDescription="@string/semester_switch_description"
                     android:drawablePadding="@dimen/space_2"
                     android:ellipsize="end"
                     android:focusable="true"

@@ -13,7 +13,7 @@
     <string name="empty_title">No semester yet</string>
     <string name="empty_body">Create your first semester to start planning.</string>
     <string name="empty_action">Create semester</string>
-    <string name="semester_switch_description">Switch semester</string>
+    <string name="semester_switch_description">%1$s, switch semester</string>
 
     <!-- Common actions -->
     <string name="action_cancel">Cancel</string>
@@ -254,5 +254,5 @@
     <string name="lecturer_name_last">Last name</string>
     <string name="lecturer_name_full">First and last name</string>
     <string name="settings_manage_lecturers">Manage lecturers</string>
-    <string name="session_description">%1$s, %2$s, %3$s – %4$s</string>
+    <string name="session_description">%1$s, %2$s, %3$s, %4$s – %5$s</string>
 </resources>

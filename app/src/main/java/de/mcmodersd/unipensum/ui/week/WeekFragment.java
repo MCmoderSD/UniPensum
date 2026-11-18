@@ -247,6 +247,8 @@ public class WeekFragment extends Fragment {
                             ? getString(app_name) : getString(no_semester)
             );
         }
+        // The description replaces the text for a screen reader, so it has to say the name of the semester too.
+        title.setContentDescription(getString(semester_switch_description, title.getText()));
         subtitle.setText(
                 getString(
                         week_subtitle,

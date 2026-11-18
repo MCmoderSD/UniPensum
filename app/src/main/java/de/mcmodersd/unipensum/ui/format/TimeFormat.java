@@ -43,6 +43,12 @@ public final class TimeFormat {
         return DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "MMMd"), locale).format(date);
     }
 
+    /** "Tuesday, Oct 13" or "Dienstag, 13. Okt.": the weekday and the date, in the form of the app language. */
+    public static String dateWithWeekday(Context context, LocalDate date) {
+        var locale = locale(context);
+        return DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "EEEEMMMd"), locale).format(date);
+    }
+
     /** "October 2026" for the title of a month, in the form of the app language. */
     public static String monthYear(Context context, YearMonth month) {
         var locale = locale(context);

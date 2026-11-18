@@ -95,14 +95,19 @@ final class SessionBlockView extends LinearLayout {
         type = line(context, false, TimeFormat.typeName(context, details.type()));
         lecturer = line(context, false, session.lecturer() == null ? "" : session.lecturer().name(nameStyle));
 
-        setContentDescription(
-                context.getString(
-                        session_description,
-                        session.courseName(),
-                        TimeFormat.typeName(context, details.type()),
-                        TimeFormat.time(context, details.startMin()),
-                        TimeFormat.time(context, details.endMin())
-                )
+        setContentDescription(describe(context, session));
+    }
+
+    /** What a screen reader says about a session: the day, the course, the type and the time. */
+    static String describe(Context context, SessionView session) {
+        var details = session.session().details();
+        return context.getString(
+                session_description,
+                TimeFormat.dateWithWeekday(context, session.session().day()),
+                session.courseName(),
+                TimeFormat.typeName(context, details.type()),
+                TimeFormat.time(context, details.startMin()),
+                TimeFormat.time(context, details.endMin())
         );
     }
 
