@@ -32,13 +32,16 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
         }
     }
 
-    private final ArrayList<WeekPageView> attached = new ArrayList<>();
+    private final ArrayList<PageHolder> attached = new ArrayList<>();
+    /** Measuring the hour labels is not free, and the numbers are the same for every page, so they are made once. */
+    private GridMetrics metrics;
     private Timetable timetable;
     private TimeWindow window = TimeWindow.DEFAULT;
     private NameStyle nameStyle = LAST_NAME;
     private WeekGridView.OnSessionClickListener clickListener;
     private OnZoomChangedListener zoomListener;
     private int scrollY;
+    private int currentPage = RecyclerView.NO_POSITION;
     private final IntSupplier currentScrollY = () -> scrollY;
     private float zoom = ZoomMetrics.MIN;
 
@@ -53,6 +56,21 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
 
     void setOnZoomChangedListener(OnZoomChangedListener listener) {
         this.zoomListener = listener;
+    }
+
+    /**
+     * Tells which week is shown. Only that one takes part in the focus: the weeks beside it are kept ready, but the
+     * Tab key must not go into a week that cannot be seen.
+     */
+    void setCurrentPage(int position) {
+        currentPage = position;
+        for (var holder : attached) focusOnlyIfCurrent(holder, holder.getBindingAdapterPosition());
+    }
+
+    private void focusOnlyIfCurrent(PageHolder holder, int position) {
+        holder.page.setDescendantFocusability(
+                position == currentPage ? ViewGroup.FOCUS_AFTER_DESCENDANTS : ViewGroup.FOCUS_BLOCK_DESCENDANTS
+        );
     }
 
     void setTimetable(Timetable timetable) {
@@ -78,7 +96,8 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
     @NonNull
     @Override
     public PageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        var page = new WeekPageView(parent.getContext(), new GridMetrics(parent.getContext()));
+        if (metrics == null) metrics = new GridMetrics(parent.getContext());
+        var page = new WeekPageView(parent.getContext(), metrics);
         page.setLayoutParams(new RecyclerView.LayoutParams(MATCH_PARENT, MATCH_PARENT));
         page.setScrollListener(this::onPageScrolled);
         page.setZoomListener(this::onPageZoomed);
@@ -87,6 +106,7 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
 
     @Override
     public void onBindViewHolder(@NonNull PageHolder holder, int position) {
+        focusOnlyIfCurrent(holder, position);
         holder.page.bind(Weeks.mondayOf(position), LocalDate.now(), window, nameStyle, timetable, clickListener);
         holder.page.setZoom(zoom);
         holder.page.followWhenReady(currentScrollY);
@@ -99,12 +119,12 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
 
     @Override
     public void onViewAttachedToWindow(@NonNull PageHolder holder) {
-        attached.add(holder.page);
+        attached.add(holder);
     }
 
     @Override
     public void onViewDetachedFromWindow(@NonNull PageHolder holder) {
-        attached.remove(holder.page);
+        attached.remove(holder);
     }
 
     /**
@@ -115,16 +135,16 @@ final class WeekPagerAdapter extends RecyclerView.Adapter<WeekPagerAdapter.PageH
         zoom = newZoom;
         if (zoomListener != null) zoomListener.onZoomChanged(newZoom);
         if (!settled) return;
-        for (var page : attached) {
-            if (page != source) page.followZoom(newZoom, currentScrollY);
+        for (var holder : attached) {
+            if (holder.page != source) holder.page.followZoom(newZoom, currentScrollY);
         }
     }
 
     /** Keeps the vertical position the same on every page, so swiping weeks never jumps. */
     private void onPageScrolled(WeekPageView source, int y) {
         scrollY = y;
-        for (var page : attached) {
-            if (page != source && page.scrollY() != y) page.followWhenReady(currentScrollY);
+        for (var holder : attached) {
+            if (holder.page != source && holder.page.scrollY() != y) holder.page.followWhenReady(currentScrollY);
         }
     }
 }

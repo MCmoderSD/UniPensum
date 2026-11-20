@@ -4,6 +4,7 @@ import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.util.TypedValue.COMPLEX_UNIT_SP;
 import static android.view.View.MeasureSpec.EXACTLY;
 import static de.mcmodersd.unipensum.R.color.*;
+import static de.mcmodersd.unipensum.ui.week.GridMetrics.*;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -38,8 +39,9 @@ import de.mcmodersd.unipensum.ui.format.TimeFormat;
  * Zooming stretches the hours further.
  * <p>
  * In the current week, a line marks the current time: faint across the whole week, solid in the column of
- * today, drawn over the session blocks. The label of the current hour is highlighted. The marker moves with
- * the clock, once a minute.
+ * today, drawn over the grid. Both stop at a session block, so that they never strike through the text of the lecture
+ * that is on right now; a dot at the edge of that block marks the time instead. The label of the current hour is
+ * highlighted. The marker moves with the clock, once a minute.
  */
 // Created in code by WeekPageView only, never inflated from XML.
 @SuppressLint("ViewConstructor")
@@ -94,7 +96,9 @@ final class WeekGridView extends ViewGroup {
         linePaint.setStrokeWidth(Math.max(1f, getResources().getDisplayMetrics().density * 0.75f));
 
         labelPaint.setColor(ContextCompat.getColor(context, text_secondary));
-        labelPaint.setTextSize(TypedValue.applyDimension(COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
+        labelPaint.setTextSize(
+                TypedValue.applyDimension(COMPLEX_UNIT_SP, HOUR_LABEL_SP, getResources().getDisplayMetrics())
+        );
         labelPaint.setTextAlign(Paint.Align.RIGHT);
 
         // The marker is black on the light theme and white on the dark one, like the rest of the app.
@@ -272,7 +276,7 @@ final class WeekGridView extends ViewGroup {
             var label = TimeFormat.hour(getContext(), hour);
             var paint = now != null && now.minutes() / 60 == hour ? nowLabelPaint : labelPaint;
             canvas.drawText(
-                    label, metrics.gutter - 6 * getResources().getDisplayMetrics().density,
+                    label, metrics.gutter - HOUR_LABEL_GAP_DP * getResources().getDisplayMetrics().density,
                     y - labelOffset, paint
             );
         }
@@ -283,7 +287,11 @@ final class WeekGridView extends ViewGroup {
         }
     }
 
-    /** Over the session blocks, so the current time stays readable inside a lecture. */
+    /**
+     * Over the session blocks, so the current time stays visible in a lecture. The lines leave the blocks out,
+     * because a line through the text of a block makes it hard to read; where the time falls into a block, a dot at
+     * its edge says so.
+     */
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
         super.dispatchDraw(canvas);
@@ -291,8 +299,22 @@ final class WeekGridView extends ViewGroup {
         var y = yOf(now.minutes(), hourHeight(getHeight()));
         var columnWidth = metrics.columnWidth(getWidth());
         var left = metrics.gutter + now.dayIndex() * columnWidth;
+
+        // The gap between a block and the line of its column belongs to the block, or it would show as a dot.
+        var saved = canvas.save();
+        for (var item : placed) {
+            var bounds = item.bounds;
+            canvas.clipOutRect(bounds.left - metrics.blockInset, bounds.top, bounds.right + metrics.blockInset, bounds.bottom);
+        }
         canvas.drawLine(metrics.gutter, y, getWidth(), y, nowFaintPaint);
         canvas.drawLine(left, y, left + columnWidth, y, nowLinePaint);
+        canvas.restoreToCount(saved);
+
+        for (var item : placed) {
+            if (item.dayIndex == now.dayIndex() && item.startMin <= now.minutes() && now.minutes() < item.endMin) {
+                canvas.drawCircle(item.bounds.left, y, metrics.nowLine * 1.75f, nowLinePaint);
+            }
+        }
     }
 
     private float hourHeight(int totalHeight) {

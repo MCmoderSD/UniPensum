@@ -5,11 +5,15 @@
     <color name="sheet">#FFFFFFFF</color>
     <color name="surface">#FFF4F4F5</color>
     <color name="divider">#FFE4E4E7</color>
+    <!-- The off state of a switch: 3:1 against the background, unlike the hairline of the grid. -->
+    <color name="track_off">#FF8E8E96</color>
     <color name="text_primary">#FF0A0A0B</color>
     <color name="text_secondary">#FF6B6B72</color>
+    <!-- Secondary text on the tint of a course color: 4.5:1 on every one of the eleven tints. -->
+    <color name="text_detail">#FF5A5A60</color>
     <color name="text_on_accent">#FFFFFFFF</color>
     <color name="accent">#FF0A0A0B</color>
-    <color name="danger">#FFD92D3A</color>
+    <color name="danger">#FFCE2B37</color>
 
     <!-- Course color presets, see CourseColor. Saturated accents plus a grayscale ramp. -->
     <color name="course_red">#FFE5383B</color>

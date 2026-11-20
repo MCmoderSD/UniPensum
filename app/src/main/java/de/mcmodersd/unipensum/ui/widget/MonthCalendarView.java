@@ -19,6 +19,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -47,6 +48,10 @@ public class MonthCalendarView extends LinearLayout {
     public interface OnDateSelectedListener {
         void onDateSelected(LocalDate date);
     }
+
+    private static final float FOCUS_WIDTH_DP = 2;
+    /** The gap between a day and the ring of the focus around it. */
+    private static final float FOCUS_GAP_DP = 3;
 
     private final TextView monthTitle;
     private final UpIconButton previous;
@@ -134,6 +139,8 @@ public class MonthCalendarView extends LinearLayout {
         next.setVisibility(hasNext ? VISIBLE : INVISIBLE);
         grid.requestLayout();
         grid.invalidate();
+        // The days are other ones in another month.
+        grid.accessibility.invalidateRoot();
     }
 
     private boolean isSelectable(LocalDate day) {
@@ -146,8 +153,9 @@ public class MonthCalendarView extends LinearLayout {
         private final Paint labelPaint = new Paint(ANTI_ALIAS_FLAG);
         private final Paint fillPaint = new Paint(ANTI_ALIAS_FLAG);
         private final Paint ringPaint = new Paint(ANTI_ALIAS_FLAG);
+        private final Paint focusPaint = new Paint(ANTI_ALIAS_FLAG);
         private final float dp = getResources().getDisplayMetrics().density;
-        private final float cellHeight = 44 * dp;
+        private final float cellHeight = 48 * dp;
         private final float labelHeight = 28 * dp;
         private final int textColor;
         private final int disabledColor;
@@ -160,6 +168,9 @@ public class MonthCalendarView extends LinearLayout {
         Grid(Context context) {
             super(context);
             ViewCompat.setAccessibilityDelegate(this, accessibility);
+            // The keys move between the days; the day that has the focus carries the ring, not the whole grid.
+            setFocusable(true);
+            setDefaultFocusHighlightEnabled(false);
             textColor = ContextCompat.getColor(context, text_primary);
             disabledColor = ContextCompat.getColor(context, divider);
             onAccent = ContextCompat.getColor(context, text_on_accent);
@@ -173,6 +184,9 @@ public class MonthCalendarView extends LinearLayout {
             ringPaint.setColor(ContextCompat.getColor(context, accent));
             ringPaint.setStyle(Paint.Style.STROKE);
             ringPaint.setStrokeWidth(1.5f * dp);
+            focusPaint.setColor(ContextCompat.getColor(context, accent));
+            focusPaint.setStyle(Paint.Style.STROKE);
+            focusPaint.setStrokeWidth(FOCUS_WIDTH_DP * dp);
         }
 
         private int columns() {
@@ -232,6 +246,10 @@ public class MonthCalendarView extends LinearLayout {
                 var isSelected = day.equals(selected);
                 if (isSelected) canvas.drawCircle(centerX, centerY, radius, fillPaint);
                 else if (day.equals(today)) canvas.drawCircle(centerX, centerY, radius, ringPaint);
+                // The ring of the keyboard focus sits outside the day, so it shows on a chosen day as well.
+                if (isFocused() && accessibility.getKeyboardFocusedVirtualViewId() == d) {
+                    canvas.drawCircle(centerX, centerY, radius + FOCUS_GAP_DP * dp, focusPaint);
+                }
 
                 textPaint.setColor(isSelected ? onAccent : (enabled ? textColor : disabledColor));
                 textPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
@@ -262,6 +280,38 @@ public class MonthCalendarView extends LinearLayout {
         @Override
         public boolean dispatchHoverEvent(MotionEvent event) {
             return accessibility.dispatchHoverEvent(event) || super.dispatchHoverEvent(event);
+        }
+
+        /**
+         * The arrow keys move between the days and Enter chooses one. Tab is not for going from day to day, which
+         * would take up to 31 presses to get past the grid: it goes on to the next control, so the grid is one stop.
+         */
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent event) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_TAB) return super.dispatchKeyEvent(event);
+            return accessibility.dispatchKeyEvent(event) || super.dispatchKeyEvent(event);
+        }
+
+        @Override
+        protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
+            super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+            accessibility.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+            // The focus always arrives on the chosen day: that is where one moves on from.
+            if (gainFocus) {
+                var start = startDay();
+                if (start != ExploreByTouchHelper.INVALID_ID) accessibility.requestKeyboardFocusForVirtualView(start);
+            }
+        }
+
+        /** The chosen day if this month shows it, else the first day that is shown. */
+        private int startDay() {
+            if (selected != null && YearMonth.from(selected).equals(month) && columnOf(selected) < columns()) {
+                return selected.getDayOfMonth();
+            }
+            for (var d = 1; d <= month.lengthOfMonth(); d++) {
+                if (columnOf(month.atDay(d)) < columns()) return d;
+            }
+            return ExploreByTouchHelper.INVALID_ID;
         }
 
         /** @return the day drawn at that point, or {@code null} for gaps and the weekday labels */

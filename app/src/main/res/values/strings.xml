@@ -9,11 +9,15 @@
     <!-- Week header -->
     <string name="week_subtitle">%1$s – %2$s · Week %3$d</string>
 
+    <!-- The week as a list of days, for large text sizes. -->
+    <string name="agenda_today">Today\n%1$s</string>
+    <string name="agenda_no_events">No events</string>
+
     <!-- Empty state -->
     <string name="empty_title">No semester yet</string>
     <string name="empty_body">Create your first semester to start planning.</string>
     <string name="empty_action">Create semester</string>
-    <string name="semester_switch_description">Switch semester</string>
+    <string name="semester_switch_description">%1$s, switch semester</string>
 
     <!-- Common actions -->
     <string name="action_cancel">Cancel</string>
@@ -26,6 +30,12 @@
     <string name="action_done">Done</string>
     <string name="stepper_decrease">Decrease</string>
     <string name="stepper_increase">Increase</string>
+    <!-- What a screen reader says for the buttons of a stepper, with the name of what it sets. -->
+    <string name="stepper_decrease_named">%1$s, decrease</string>
+    <string name="stepper_increase_named">%1$s, increase</string>
+    <!-- One option of a group of options, for a screen reader: the name of the group, then the option. -->
+    <string name="option_description">%1$s: %2$s</string>
+    <string name="state_selected">Selected</string>
     <!-- Reminders -->
     <string name="field_reminder">Reminder</string>
     <string name="reminder_switch">Remind me before the start</string>
@@ -78,6 +88,8 @@
     <string name="course_delete_message">All its events and sessions are deleted.</string>
 
     <string name="courses_title">Courses</string>
+    <!-- The title of the list is the name of the semester; a screen reader also hears what the list is. -->
+    <string name="courses_page_title">Courses, %1$s</string>
     <string name="courses_description">Courses</string>
     <string name="courses_empty">No courses in this semester yet.</string>
     <plurals name="event_count">
@@ -254,5 +266,5 @@
     <string name="lecturer_name_last">Last name</string>
     <string name="lecturer_name_full">First and last name</string>
     <string name="settings_manage_lecturers">Manage lecturers</string>
-    <string name="session_description">%1$s, %2$s, %3$s – %4$s</string>
+    <string name="session_description">%1$s, %2$s, %3$s, %4$s – %5$s</string>
 </resources>

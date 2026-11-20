@@ -15,11 +15,16 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.AccessibilityDelegateCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
 import java.util.function.Consumer;
 
@@ -64,12 +69,28 @@ public class UpTextField extends LinearLayout {
         input.setOnFocusChangeListener((v, focused) -> updateStroke(focused));
         addView(input, new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 
+        // The label is the name of the field for a screen reader, which would otherwise say only "Edit box".
+        input.setId(generateViewId());
+        label.setLabelFor(input.getId());
+
         error = new TextView(context);
         error.setTextSize(COMPLEX_UNIT_SP, 13);
         error.setTextColor(ContextCompat.getColor(context, danger));
         error.setPadding(Math.round(4 * dp), Math.round(6 * dp), 0, 0);
         error.setVisibility(GONE);
+        // A message that shows after a failed Save is said without being asked.
+        error.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
         addView(error);
+        // A refused field carries its message itself, like Material's text fields do.
+        ViewCompat.setAccessibilityDelegate(input, new AccessibilityDelegateCompat() {
+            @Override
+            public void onInitializeAccessibilityNodeInfo(@NonNull View host, @NonNull AccessibilityNodeInfoCompat info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                if (error.getVisibility() != VISIBLE) return;
+                info.setError(error.getText());
+                info.setContentInvalid(true);
+            }
+        });
 
         if (attrs != null) {
             try (var array = context.obtainStyledAttributes(attrs, R.styleable.UpTextField)) {
@@ -120,6 +141,11 @@ public class UpTextField extends LinearLayout {
         error.setText(message);
         error.setVisibility(message == null ? GONE : VISIBLE);
         updateStroke(input.hasFocus());
+    }
+
+    /** Moves the focus into the field, for the first field a form refuses, so a screen reader reads its message. */
+    public void focusInput() {
+        input.requestFocus();
     }
 
     /** Reports every edit of the text. */

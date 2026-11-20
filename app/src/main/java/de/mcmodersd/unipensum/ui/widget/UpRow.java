@@ -13,12 +13,14 @@ import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.core.widget.ImageViewCompat;
 
 import de.mcmodersd.unipensum.R;
@@ -26,6 +28,9 @@ import de.mcmodersd.unipensum.R;
 /** A card-like row: title (and optional subtitle) on the left, a value and an optional chevron on the right. */
 public class UpRow extends LinearLayout {
 
+    private static final int VALUE_GAP_DP = 12;
+
+    private final LinearLayout texts;
     private final TextView title;
     private final TextView subtitle;
     private final TextView value;
@@ -33,6 +38,8 @@ public class UpRow extends LinearLayout {
     private UpIconButton action;
     private View dot;
     private ImageView leadingIcon;
+    /** Whether the value stands under the texts because there is no room for it beside them. */
+    private boolean valueBelow;
 
     public UpRow(Context context) {
         this(context, null);
@@ -49,8 +56,11 @@ public class UpRow extends LinearLayout {
         background.setCornerRadius(14 * dp);
         background.setColor(ContextCompat.getColor(context, surface));
         setBackground(background);
+        FocusRing.install(this, 14);
+        // A row is one thing to a screen reader, read as its title and its subtitle, also where it cannot be tapped.
+        ViewCompat.setScreenReaderFocusable(this, true);
 
-        var texts = new LinearLayout(context);
+        texts = new LinearLayout(context);
         texts.setOrientation(VERTICAL);
         title = text(context, 16, text_primary);
         subtitle = text(context, 13, text_secondary);
@@ -61,7 +71,7 @@ public class UpRow extends LinearLayout {
 
         value = text(context, 16, text_secondary);
         value.setVisibility(GONE);
-        value.setPadding(Math.round(12 * dp), 0, 0, 0);
+        value.setPadding(Math.round(VALUE_GAP_DP * dp), 0, 0, 0);
         addView(value);
 
         chevron = new ImageView(context);
@@ -80,6 +90,57 @@ public class UpRow extends LinearLayout {
                 setValue(array.getText(UpRow_upValue));
                 setChevronVisible(array.getBoolean(UpRow_upChevron, false));
             }
+        }
+    }
+
+    /**
+     * With a large system font the value can take so much of the row that the title is left with a letter or two per
+     * line, as "UniPensum" beside "Version 1.0". Then the value moves under the texts, where it has the whole width.
+     */
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.UNSPECIFIED) {
+            var below = valueNeedsOwnLine(MeasureSpec.getSize(widthMeasureSpec));
+            if (below != valueBelow) placeValue(below);
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    /** @return whether the longest word of the texts and the value together are wider than the row */
+    private boolean valueNeedsOwnLine(int width) {
+        if (value.getVisibility() != VISIBLE) return false;
+        var dp = getResources().getDisplayMetrics().density;
+        var fixed = getPaddingLeft() + getPaddingRight() + VALUE_GAP_DP * dp;
+        for (var i = 0; i < getChildCount(); i++) {
+            var child = getChildAt(i);
+            if (child == texts || child == value || child.getVisibility() == GONE) continue;
+            var params = (LayoutParams) child.getLayoutParams();
+            // An icon button measures itself, at 48dp.
+            fixed += (params.width > 0 ? params.width : 48 * dp) + params.getMarginStart() + params.getMarginEnd();
+        }
+        var words = Math.max(longestWord(title), longestWord(subtitle));
+        return words + value.getPaint().measureText(value.getText().toString()) + fixed > width;
+    }
+
+    private static float longestWord(TextView view) {
+        var longest = 0f;
+        for (var word : view.getText().toString().split("\\s+")) {
+            longest = Math.max(longest, view.getPaint().measureText(word));
+        }
+        return longest;
+    }
+
+    private void placeValue(boolean below) {
+        valueBelow = below;
+        var dp = getResources().getDisplayMetrics().density;
+        if (below) {
+            removeView(value);
+            value.setPadding(0, 0, 0, 0);
+            texts.addView(value);
+        } else {
+            texts.removeView(value);
+            value.setPadding(Math.round(VALUE_GAP_DP * dp), 0, 0, 0);
+            addView(value, indexOfChild(texts) + 1);
         }
     }
 
@@ -155,6 +216,12 @@ public class UpRow extends LinearLayout {
     public boolean performClick() {
         Haptics.tap(this);
         return super.performClick();
+    }
+
+    /** A row that can be tapped is a button to a screen reader; one that only shows a fact is not. */
+    @Override
+    public CharSequence getAccessibilityClassName() {
+        return hasOnClickListeners() ? Button.class.getName() : super.getAccessibilityClassName();
     }
 
     @Override

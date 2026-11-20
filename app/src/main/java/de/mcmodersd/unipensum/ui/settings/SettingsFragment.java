@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -31,6 +30,7 @@ import de.mcmodersd.unipensum.reminder.NotificationAccess;
 import de.mcmodersd.unipensum.reminder.ReminderScheduler;
 import de.mcmodersd.unipensum.ui.Links;
 import de.mcmodersd.unipensum.ui.Navigator;
+import de.mcmodersd.unipensum.ui.PageTitle;
 import de.mcmodersd.unipensum.ui.backup.BackupExportSheet;
 import de.mcmodersd.unipensum.ui.backup.BackupImportSheet;
 import de.mcmodersd.unipensum.ui.lecturer.LecturerSheet;
@@ -68,13 +68,16 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         settings = UniPensumApp.from(requireContext()).settings();
-        ((TextView) view.findViewById(bar_title)).setText(settings_title);
+        PageTitle.set(view, getString(settings_title));
         view.findViewById(back).setOnClickListener(v -> Navigator.of(this).pop());
 
         bindTheme(view.findViewById(theme_control));
         bindHours(view.findViewById(R.id.hours_start), view.findViewById(R.id.hours_end));
         bindLecturerNames(view.findViewById(lecturer_name_control));
-        bindReminders(view.findViewById(reminders_switch), view.findViewById(notifications_row));
+        bindReminders(
+                view.findViewById(reminders_row), view.findViewById(reminders_switch),
+                view.findViewById(notifications_row)
+        );
 
         view.findViewById(manage_lecturers).setOnClickListener(v ->
                 LecturerSheet.showManager(getParentFragmentManager())
@@ -98,6 +101,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void bindTheme(UpSegmentedControl control) {
+        control.setLabel(getString(settings_appearance));
         control.setOptions(getString(theme_system), getString(theme_light), getString(theme_dark));
         control.setSelectedIndex(settings.themeMode().ordinal());
         // Changing the theme recreates the activity, which restores this screen from the back stack.
@@ -118,14 +122,16 @@ public class SettingsFragment extends Fragment {
 
     /** Nothing is rebuilt here: the grid and the sheets read the style from the settings when they draw. */
     private void bindLecturerNames(UpSegmentedControl control) {
+        control.setLabel(getString(settings_lecturer_name));
         control.setOptions(getString(lecturer_name_last), getString(lecturer_name_full));
         var current = settings.lecturerNameStyle().getValue();
         control.setSelectedIndex(current == null ? LAST_NAME.ordinal() : current.ordinal());
         control.setOnSelectionChangedListener(index -> settings.setLecturerNameStyle(NameStyle.values()[index]));
     }
 
-    private void bindReminders(UpSwitch enabled, UpRow notifications) {
+    private void bindReminders(View row, UpSwitch enabled, UpRow notifications) {
         notificationsRow = notifications;
+        UpSwitch.bindRow(row, enabled);
         enabled.setChecked(settings.remindersEnabled());
         enabled.setOnCheckedChangeListener(on -> {
             settings.setRemindersEnabled(on);
@@ -154,6 +160,8 @@ public class SettingsFragment extends Fragment {
         hoursEnd = end;
         var window = settings.currentTimeWindow();
         UpStepper.Formatter hourLabel = value -> String.format(Locale.ROOT, "%02d:00", value);
+        start.setLabel(getString(R.string.hours_start));
+        end.setLabel(getString(R.string.hours_end));
         start.setFormatter(hourLabel);
         end.setFormatter(hourLabel);
         applyHourRanges(window);

@@ -30,6 +30,7 @@ import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.ui.format.CourseColors;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
+import de.mcmodersd.unipensum.ui.widget.FocusRing;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
 
 /**
@@ -41,6 +42,8 @@ import de.mcmodersd.unipensum.ui.widget.Haptics;
 @SuppressLint("ViewConstructor")
 final class SessionBlockView extends LinearLayout {
 
+    /** How much of the course color tints the area of a session: 18 %. At full strength it is only a line or a dot. */
+    static final int TINT_ALPHA = 0x2E;
     /** Lets the time range break after the dash when it does not fit on one line. */
     private static final String BREAKABLE_DASH = "–​";
 
@@ -69,7 +72,7 @@ final class SessionBlockView extends LinearLayout {
 
         var background = new GradientDrawable();
         background.setCornerRadius(radius);
-        background.setColor(ColorUtils.setAlphaComponent(accent, 0x2E));
+        background.setColor(ColorUtils.setAlphaComponent(accent, TINT_ALPHA));
         if (overlapping) {
             background.setStroke(Math.round(1.5f * dp), accent, 4 * dp, 3 * dp);
         }
@@ -79,6 +82,7 @@ final class SessionBlockView extends LinearLayout {
         setGravity(TOP);
         setClickable(true);
         setFocusable(true);
+        FocusRing.install(this, radius / dp);
 
         var details = session.session().details();
         title = line(context, true, session.courseName());
@@ -93,14 +97,19 @@ final class SessionBlockView extends LinearLayout {
         type = line(context, false, TimeFormat.typeName(context, details.type()));
         lecturer = line(context, false, session.lecturer() == null ? "" : session.lecturer().name(nameStyle));
 
-        setContentDescription(
-                context.getString(
-                        session_description,
-                        session.courseName(),
-                        TimeFormat.typeName(context, details.type()),
-                        TimeFormat.time(context, details.startMin()),
-                        TimeFormat.time(context, details.endMin())
-                )
+        setContentDescription(describe(context, session));
+    }
+
+    /** What a screen reader says about a session: the day, the course, the type and the time. */
+    static String describe(Context context, SessionView session) {
+        var details = session.session().details();
+        return context.getString(
+                session_description,
+                TimeFormat.dateWithWeekday(context, session.session().day()),
+                session.courseName(),
+                TimeFormat.typeName(context, details.type()),
+                TimeFormat.time(context, details.startMin()),
+                TimeFormat.time(context, details.endMin())
         );
     }
 
@@ -180,7 +189,7 @@ final class SessionBlockView extends LinearLayout {
     private TextView line(Context context, boolean primary, String text) {
         var view = new TextView(context);
         view.setText(text);
-        view.setTextColor(ContextCompat.getColor(context, primary ? text_primary : text_secondary));
+        view.setTextColor(ContextCompat.getColor(context, primary ? text_primary : text_detail));
         view.setEllipsize(TextUtils.TruncateAt.END);
         view.setIncludeFontPadding(false);
         view.setTypeface(Typeface.create(primary ? "sans-serif-medium" : "sans-serif", Typeface.NORMAL));

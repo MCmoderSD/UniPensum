@@ -31,21 +31,25 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
-                    android:contentDescription="@string/semester_switch_description"
                     android:drawablePadding="@dimen/space_2"
                     android:ellipsize="end"
                     android:focusable="true"
-                    android:maxLines="1"
+                    android:layout_marginStart="-6dp"
+                    android:layout_marginVertical="-5dp"
+                    android:maxLines="2"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="5dp"
                     app:drawableEndCompat="@drawable/ic_chevron_down"
                     app:drawableTint="@color/text_secondary" />
 
                 <TextView
                     android:id="@+id/subtitle"
                     style="@style/TextAppearance.Up.Caption"
+                    android:accessibilityLiveRegion="polite"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_1"
-                    android:maxLines="1" />
+                    android:maxLines="2" />
             </LinearLayout>
 
             <!-- Order of the buttons: add a course, the courses, the settings. -->
@@ -91,7 +95,7 @@
         android:focusable="true"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
-        android:minHeight="36dp"
+        android:minHeight="48dp"
         android:paddingStart="@dimen/space_3"
         android:paddingEnd="@dimen/space_3"
         android:textColor="@color/text_on_accent"

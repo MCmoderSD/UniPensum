@@ -9,11 +9,15 @@
     <!-- Week header -->
     <string name="week_subtitle">%1$s – %2$s · KW %3$d</string>
 
+    <!-- The week as a list of days, for large text sizes. -->
+    <string name="agenda_today">Heute\n%1$s</string>
+    <string name="agenda_no_events">Keine Termine</string>
+
     <!-- Empty state -->
     <string name="empty_title">Noch kein Semester</string>
     <string name="empty_body">Lege dein erstes Semester an, um mit der Planung zu beginnen.</string>
     <string name="empty_action">Semester anlegen</string>
-    <string name="semester_switch_description">Semester wechseln</string>
+    <string name="semester_switch_description">%1$s, Semester wechseln</string>
 
     <!-- Common actions -->
     <string name="action_cancel">Abbrechen</string>
@@ -26,6 +30,12 @@
     <string name="action_done">Fertig</string>
     <string name="stepper_decrease">Verringern</string>
     <string name="stepper_increase">Erhöhen</string>
+    <!-- Was ein Screenreader für die Knöpfe eines Zählers sagt, mit dem Namen dessen, was er einstellt. -->
+    <string name="stepper_decrease_named">%1$s, verringern</string>
+    <string name="stepper_increase_named">%1$s, erhöhen</string>
+    <!-- Eine Option einer Gruppe, für einen Screenreader: der Name der Gruppe, dann die Option. -->
+    <string name="option_description">%1$s: %2$s</string>
+    <string name="state_selected">Ausgewählt</string>
     <!-- Erinnerungen -->
     <string name="field_reminder">Erinnerung</string>
     <string name="reminder_switch">Vor dem Beginn erinnern</string>
@@ -78,6 +88,8 @@
     <string name="course_delete_message">Alle Veranstaltungen und Termine dieses Fachs werden gelöscht.</string>
 
     <string name="courses_title">Fächer</string>
+    <!-- Der Titel der Liste ist der Name des Semesters; ein Screenreader sagt zusätzlich, was die Liste ist. -->
+    <string name="courses_page_title">Fächer, %1$s</string>
     <string name="courses_description">Fächer</string>
     <string name="courses_empty">In diesem Semester gibt es noch keine Fächer.</string>
     <plurals name="event_count">
@@ -253,5 +265,5 @@
     <string name="lecturer_name_last">Nachname</string>
     <string name="lecturer_name_full">Vor- und Nachname</string>
     <string name="settings_manage_lecturers">Dozenten verwalten</string>
-    <string name="session_description">%1$s, %2$s, %3$s – %4$s</string>
+    <string name="session_description">%1$s, %2$s, %3$s, %4$s – %5$s</string>
 </resources>
