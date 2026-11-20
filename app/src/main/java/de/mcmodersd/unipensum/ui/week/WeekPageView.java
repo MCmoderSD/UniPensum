@@ -86,6 +86,8 @@ final class WeekPageView extends LinearLayout {
 
         agendaMode = WeekAgendaView.wanted(context);
         scroll = new ScrollView(context);
+        // The sessions are the stops of the Tab key; the area they sit in is not one.
+        scroll.setFocusable(false);
         scroll.setFillViewport(true);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setOverScrollMode(OVER_SCROLL_NEVER);
