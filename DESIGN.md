@@ -318,17 +318,22 @@ settings. Below it the week pager. The grid shows Monday to Friday only, in five
 hour labels. An hour is at least 44dp tall and grows with pinch zoom; the grid has 10dp of padding at top and
 bottom, and each block is inset 1dp from its column. The gutter is 44dp, the day header 56dp tall; both grow with the
 font size of the system, the gutter to the widest hour label and the header with the day numbers. The semester name
-and the date line may take a second line instead of being cut off.
+and the date line may take a second line instead of being cut off. With a keyboard the Tab key goes through the
+header and then through the sessions of the week that is shown, and Page Up, Page Down and Home turn the weeks and
+come back to this one. A screen reader hears the new week from the date line, which is a live region.
 
 **The day list.** From a font scale of 1.3 on ("Largest" on most phones) five columns cannot hold the text, so the
-week is a list: one heading per day (weekday and date, "· Today" on the current one), below it one card per session
-or the line "No events". The cards are as wide as the screen and show every line in full. There is no grid, no day
+week is a list: one heading per day (weekday and date, with "Today" on a line of its own above the current one), below it one
+card per session or the line "No events". The cards are as wide as the screen and show every line in full. There is no grid, no day
 header and no zoom in this mode.
 
 **Orientation.** The app turns on phones and tablets. In landscape a window of 720dp and more splits into week and
 page, so a phone held sideways shows both.
 
 **Sub-pages and sheets.** A sub-page (settings, courses, editors) has a 56dp top bar with a back arrow and a Title.
+The title is also the name of the page for a screen reader, which says it when the page opens ("Courses, Winter 26/27"
+where the bar shows only the semester); the page itself only keeps touches from reaching the week behind it and is
+not a stop of its own.
 A sheet has a 36 x 4dp handle 12dp below its top edge, a title row of at least 60dp, a scrolling content area, and an
 optional footer that stays in place (the Save button). A tall sheet stops 8dp below the status bar.
 
@@ -383,9 +388,11 @@ Tactile slabs that fill the width they are given.
 
 ### Inputs / Fields
 - **Style:** a Small label in Pencil Gray above a Card Gray field (14dp, at least 52dp tall) with Body text and a
-  Pencil Gray hint. No stroke at rest.
+  Pencil Gray hint. No stroke at rest. The label is the name of the field for a screen reader.
 - **Focus:** a 1.5dp Ink stroke.
-- **Error:** a 1.5dp Danger stroke and a Small message in Danger below the field.
+- **Error:** a 1.5dp Danger stroke and a Small message in Danger below the field. The message is a live region, so a
+  screen reader says it when it shows, and the field carries it too. A form that refuses its input moves the focus to
+  the first field it refused.
 
 ### Rows
 - **Style:** a Card Gray card (14dp, at least 56dp tall) with a Body title, an optional Small subtitle, an optional
@@ -396,8 +403,11 @@ Tactile slabs that fill the width they are given.
 ### Segmented Control and Stepper
 - **Segmented control:** a Card Gray track (14dp) with segments 48dp tall, the touch size. The selected option is an
   Ink pill, drawn 3dp inside the segment, with a Paper label; the others are Pencil Gray. The pill slides to a new
-  option in 260ms on the curve (0.2, 0, 0, 1). For a screen reader it is a group of radio buttons, "1 of 4".
-- **Stepper:** a Card Gray card (14dp) with minus and plus icon buttons and the value centered in Body type.
+  option in 260ms on the curve (0.2, 0, 0, 1). For a screen reader it is a group of radio buttons, "1 of 4", and
+  every option says the name of the group: "Type: Lecture". Options that do not fit into one row, as with a large
+  system font, stand in a column of 48dp rows instead of being cut off.
+- **Stepper:** a Card Gray card (14dp) with minus and plus icon buttons and the value centered in Body type. The
+  buttons say what they set ("Day starts at, decrease"), and a screen reader hears the new value after every change.
 
 ### Switch
 - **Style:** a track of 52 x 32dp, a full pill, in a touch area of 52 x 48dp. Off: Track Gray with a Sheet Paper
@@ -410,6 +420,10 @@ Tactile slabs that fill the width they are given.
 Keyboard, D-pad and switch focus is shown by a 2dp Ink ring, as round as the control it sits on (`FocusRing`): 14dp
 on buttons, rows and cards, 6dp on a session block, full on an icon button, 8dp on the semester name. It replaces
 the gray square of the system. Controls take no focus from a touch, so the ring never shows after a tap.
+
+A grid that draws its own cells carries the ring itself, on the cell that has the focus: a circle 3dp outside the day
+in the month calendar, a rounded square around the cell in the color swatches. The arrow keys move between the cells,
+Enter chooses one, and Tab leaves the grid; the focus starts on the chosen cell.
 
 ### Sheets
 - **Style:** Sheet Paper, 28dp top corners, the handle, a Title, no elevation. Opened expanded.
@@ -437,15 +451,16 @@ off. Pressed 65% opacity, tap opens the session sheet. Its heading is the day, w
 - **Week header:** uppercase weekday letters over day numbers; today's number sits in an Ink circle with a Paper digit.
   Its height grows with the day numbers when the system font is larger.
 - **Now line:** a faint line (40%, thin) across the whole week at the current time, and in today's column a 2dp Ink
-  line that stops at a session block, so it never strikes through the text of the lecture that is on. The hour label
-  of the current hour turns Ink.
+  line. Both stop at a session block, so they never strike through the text of the lecture that is on; where the time
+  falls into a block, an Ink dot at its start edge marks it. The hour label of the current hour turns Ink.
 
 ### Pickers
 - **Color swatches:** six columns of course color circles; the selected one gets a 2.5dp Ink ring 5dp outside it.
 - **Month calendar:** 48dp day cells; the selected day is an Ink circle with a Paper number, today a 1.5dp Ink ring;
   disabled days in Hairline Gray.
 - **Time wheel:** five visible values in Wheel type, with a keyboard entry beside it. It is the one control of the app
-  with an iOS look; the keyboard entry keeps it reachable for everyone.
+  with an iOS look; the keyboard entry keeps it reachable for everyone. The two number fields of the entry carry their
+  names, Hour and Minute, in Small type below them.
 - **Zoom indicator:** an Ink pill (36dp, in a 48dp touch area) with a Paper label that shows the zoom level while
   pinching and fades once the zoom is back at 100%.
 
@@ -457,6 +472,10 @@ rows. Going back is an arrow; the chevron points further into the app (rows, mon
 Dynamic Color is not used: the Ink Rule keeps the chrome without a hue of its own. A confirmation opens as a sheet,
 not as a dialog, like everything else that is a short task of its own. Pressing dims a control instead of spreading a
 ripple.
+
+A session shorter than 48dp stays as short as its time: the height of a block in the grid is the length of the
+session, which a time grid says by its shape, so the block is smaller than a touch target. The list of days, from a
+font scale of 1.3, gives every session a card of full height.
 
 ## Do's and Don'ts
 
@@ -476,6 +495,10 @@ ripple.
   can take focus.
 - **Do** make a custom control say what it is to a screen reader: a role, its state, its name, and the day on a
   session; mark titles and sections as headings.
+- **Do** name every field with its label view (`labelFor`), make every message that appears after an action a live
+  region, and give every page that opens a pane title.
+- **Do** let a keyboard do what a finger does: every control a stop of the Tab key with the Focus Ring, a grid that draws
+  its cells with arrow keys and Enter.
 - **Do** let a text grow: use sp, let a line wrap, and size what holds text from the text.
 
 ### Don't:
