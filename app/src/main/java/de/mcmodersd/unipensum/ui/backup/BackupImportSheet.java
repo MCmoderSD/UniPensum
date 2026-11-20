@@ -2,6 +2,7 @@ package de.mcmodersd.unipensum.ui.backup;
 
 import static android.util.TypedValue.COMPLEX_UNIT_SP;
 import static android.view.ViewGroup.LayoutParams.*;
+import static android.view.accessibility.AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS;
 import static android.widget.LinearLayout.VERTICAL;
 import static de.mcmodersd.unipensum.R.color.*;
 import static de.mcmodersd.unipensum.R.plurals.*;
@@ -195,7 +196,11 @@ public final class BackupImportSheet extends UpSheet {
 
     private void finished(@StringRes int message, boolean error) {
         var dp = getResources().getDisplayMetrics().density;
-        column.addView(text(message, 16, error ? danger : text_primary, 8, 16));
+        var result = text(message, 16, error ? danger : text_primary, 8, 16);
+        column.addView(result);
+        // Every step replaces the whole column, which takes the focus of a screen reader with it; it would go back to
+        // the title and say nothing of the outcome. The outcome is what it should land on.
+        result.post(() -> result.performAccessibilityAction(ACTION_ACCESSIBILITY_FOCUS, null));
         var done = new UpButton(requireContext());
         done.setText(error ? action_close : action_done);
         done.setOnClickListener(v -> dismiss());
