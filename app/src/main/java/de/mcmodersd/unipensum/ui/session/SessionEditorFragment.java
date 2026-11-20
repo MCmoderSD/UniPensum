@@ -374,7 +374,7 @@ public class SessionEditorFragment extends Fragment {
             form.mode = Mode.values()[index];
             // A reminder that is still the standard time of the old format becomes that of the new one.
             form.reminderMin = Reminders.afterModeChange(form.reminderMin, previous, form.mode);
-            reminderStepper.setValue(Reminders.afterModeChange(reminderStepper.getValue(), previous, form.mode));
+            reminderStepper.changeTo(Reminders.afterModeChange(reminderStepper.getValue(), previous, form.mode));
             updateModeVisibility();
         });
         hybridSwitch.setChecked(form.hybrid);
@@ -403,6 +403,7 @@ public class SessionEditorFragment extends Fragment {
             for (var lecturer : list) lecturers.put(lecturer.id(), lecturer);
             renderLecturer();
         });
+        reminderStepper.setLabel(getString(field_reminder));
         reminderStepper.setRange(0, MAX_REMINDER_MIN);
         reminderStepper.setStep(STEP_MIN);
         reminderStepper.setFormatter(minutes -> ReminderFormat.text(requireContext(), minutes));
@@ -424,6 +425,7 @@ public class SessionEditorFragment extends Fragment {
         repeatControl.setLabel(getString(field_repeat));
         repeatControl.setOptions(getString(repeat_weekly), getString(repeat_biweekly), getString(repeat_custom));
         repeatControl.setSelectedIndex(repeatIndex(form.interval));
+        repeatStepper.setLabel(getString(field_repeat));
         repeatStepper.setRange(1, 12);
         repeatStepper.setFormatter(value -> SeriesFormat.repeat(requireContext(), value));
         repeatStepper.setValue(form.interval > 2 ? form.interval : DEFAULT_CUSTOM_INTERVAL);

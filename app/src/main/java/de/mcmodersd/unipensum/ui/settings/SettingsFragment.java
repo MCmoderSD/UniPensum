@@ -160,6 +160,8 @@ public class SettingsFragment extends Fragment {
         hoursEnd = end;
         var window = settings.currentTimeWindow();
         UpStepper.Formatter hourLabel = value -> String.format(Locale.ROOT, "%02d:00", value);
+        start.setLabel(getString(R.string.hours_start));
+        end.setLabel(getString(R.string.hours_end));
         start.setFormatter(hourLabel);
         end.setFormatter(hourLabel);
         applyHourRanges(window);

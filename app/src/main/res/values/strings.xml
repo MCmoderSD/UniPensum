@@ -30,6 +30,9 @@
     <string name="action_done">Done</string>
     <string name="stepper_decrease">Decrease</string>
     <string name="stepper_increase">Increase</string>
+    <!-- What a screen reader says for the buttons of a stepper, with the name of what it sets. -->
+    <string name="stepper_decrease_named">%1$s, decrease</string>
+    <string name="stepper_increase_named">%1$s, increase</string>
     <!-- One option of a group of options, for a screen reader: the name of the group, then the option. -->
     <string name="option_description">%1$s: %2$s</string>
     <!-- Reminders -->
