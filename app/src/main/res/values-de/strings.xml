@@ -10,7 +10,7 @@
     <string name="week_subtitle">%1$s – %2$s · KW %3$d</string>
 
     <!-- The week as a list of days, for large text sizes. -->
-    <string name="agenda_today">%1$s · Heute</string>
+    <string name="agenda_today">Heute\n%1$s</string>
     <string name="agenda_no_events">Keine Termine</string>
 
     <!-- Empty state -->
