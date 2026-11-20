@@ -82,6 +82,8 @@
     <string name="course_delete_message">Alle Veranstaltungen und Termine dieses Fachs werden gelöscht.</string>
 
     <string name="courses_title">Fächer</string>
+    <!-- Der Titel der Liste ist der Name des Semesters; ein Screenreader sagt zusätzlich, was die Liste ist. -->
+    <string name="courses_page_title">Fächer, %1$s</string>
     <string name="courses_description">Fächer</string>
     <string name="courses_empty">In diesem Semester gibt es noch keine Fächer.</string>
     <plurals name="event_count">

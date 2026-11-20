@@ -34,6 +34,7 @@ import de.mcmodersd.unipensum.domain.model.Lecturer;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.domain.text.TextSanitizer;
 import de.mcmodersd.unipensum.ui.Navigator;
+import de.mcmodersd.unipensum.ui.PageTitle;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.session.SessionEditorFragment;
 import de.mcmodersd.unipensum.ui.widget.ColorSwatchPicker;
@@ -78,7 +79,7 @@ public class CourseEditorFragment extends Fragment {
         }
         repository = UniPensumApp.from(requireContext()).repository();
 
-        ((TextView) view.findViewById(bar_title)).setText(draft.isNew() ? course_new : course_edit);
+        PageTitle.set(view, getString(draft.isNew() ? course_new : course_edit));
         view.findViewById(back).setOnClickListener(v -> Navigator.of(this).pop());
 
         nameField = view.findViewById(name_field);

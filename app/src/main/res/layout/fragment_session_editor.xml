@@ -7,7 +7,7 @@
     android:background="@color/bg"
     tools:ignore="Overdraw"
     android:clickable="true"
-    android:focusable="true"
+    android:focusable="false"
     android:orientation="vertical">
 
     <include layout="@layout/view_top_bar" />

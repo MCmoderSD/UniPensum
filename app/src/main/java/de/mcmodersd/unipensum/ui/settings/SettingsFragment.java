@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -31,6 +30,7 @@ import de.mcmodersd.unipensum.reminder.NotificationAccess;
 import de.mcmodersd.unipensum.reminder.ReminderScheduler;
 import de.mcmodersd.unipensum.ui.Links;
 import de.mcmodersd.unipensum.ui.Navigator;
+import de.mcmodersd.unipensum.ui.PageTitle;
 import de.mcmodersd.unipensum.ui.backup.BackupExportSheet;
 import de.mcmodersd.unipensum.ui.backup.BackupImportSheet;
 import de.mcmodersd.unipensum.ui.lecturer.LecturerSheet;
@@ -68,7 +68,7 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         settings = UniPensumApp.from(requireContext()).settings();
-        ((TextView) view.findViewById(bar_title)).setText(settings_title);
+        PageTitle.set(view, getString(settings_title));
         view.findViewById(back).setOnClickListener(v -> Navigator.of(this).pop());
 
         bindTheme(view.findViewById(theme_control));

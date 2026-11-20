@@ -52,6 +52,7 @@ import de.mcmodersd.unipensum.domain.model.SessionType;
 import de.mcmodersd.unipensum.domain.text.TextSanitizer;
 import de.mcmodersd.unipensum.reminder.NotificationAccess;
 import de.mcmodersd.unipensum.ui.Navigator;
+import de.mcmodersd.unipensum.ui.PageTitle;
 import de.mcmodersd.unipensum.ui.course.CourseDraftViewModel;
 import de.mcmodersd.unipensum.ui.format.ReminderFormat;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
@@ -204,10 +205,7 @@ public class SessionEditorFragment extends Fragment {
 
         findViews(view);
         view.findViewById(back).setOnClickListener(v -> Navigator.of(this).pop());
-        ((TextView) view.findViewById(bar_title)).setText(
-                seriesMode
-                        ? (seriesIndex < 0 ? event_new : event_edit) : session_edit
-        );
+        PageTitle.set(view, getString(seriesMode ? (seriesIndex < 0 ? event_new : event_edit) : session_edit));
         saveButton.setOnClickListener(v -> save());
 
         var holder = new ViewModelProvider(this).get(FormViewModel.class);

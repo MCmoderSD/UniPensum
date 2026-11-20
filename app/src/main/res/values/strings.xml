@@ -82,6 +82,8 @@
     <string name="course_delete_message">All its events and sessions are deleted.</string>
 
     <string name="courses_title">Courses</string>
+    <!-- The title of the list is the name of the semester; a screen reader also hears what the list is. -->
+    <string name="courses_page_title">Courses, %1$s</string>
     <string name="courses_description">Courses</string>
     <string name="courses_empty">No courses in this semester yet.</string>
     <plurals name="event_count">

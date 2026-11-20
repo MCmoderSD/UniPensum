@@ -5,6 +5,7 @@ import static android.view.ViewGroup.LayoutParams.*;
 import static de.mcmodersd.unipensum.R.id.*;
 import static de.mcmodersd.unipensum.R.layout.fragment_courses;
 import static de.mcmodersd.unipensum.R.plurals.event_count;
+import static de.mcmodersd.unipensum.R.string.courses_page_title;
 import static de.mcmodersd.unipensum.R.string.courses_title;
 
 import android.os.Bundle;
@@ -12,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,6 +27,7 @@ import de.mcmodersd.unipensum.data.TimetableRepository;
 import de.mcmodersd.unipensum.data.db.Database;
 import de.mcmodersd.unipensum.domain.model.Semester;
 import de.mcmodersd.unipensum.ui.Navigator;
+import de.mcmodersd.unipensum.ui.PageTitle;
 import de.mcmodersd.unipensum.ui.format.CourseColors;
 import de.mcmodersd.unipensum.ui.format.SemesterNames;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
@@ -65,8 +66,7 @@ public class CoursesFragment extends Fragment {
         list = view.findViewById(R.id.courses);
         emptyView = view.findViewById(courses_empty);
 
-        TextView title = view.findViewById(bar_title);
-        title.setText(courses_title);
+        PageTitle.set(view, getString(courses_title));
         view.findViewById(back).setOnClickListener(v -> Navigator.of(this).pop());
 
         var semesterId = requireArguments().getLong(ARG_SEMESTER_ID);
@@ -75,7 +75,9 @@ public class CoursesFragment extends Fragment {
             public void onSuccess(Semester loaded) {
                 if (getView() == null) return;
                 semester = loaded;
-                title.setText(SemesterNames.display(requireContext(), loaded));
+                // The bar shows the name of the semester; a screen reader also says that this is the list of courses.
+                var name = SemesterNames.display(requireContext(), loaded);
+                PageTitle.set(view, name, getString(courses_page_title, name));
             }
 
             @Override
