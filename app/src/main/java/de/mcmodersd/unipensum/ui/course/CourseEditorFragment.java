@@ -178,12 +178,15 @@ public class CourseEditorFragment extends Fragment {
         // What is stored is the cleaned text, so a name of only blanks or invisible characters counts as empty.
         var name = TextSanitizer.line(draft.name(), MAX_NAME);
         var valid = true;
+        UpTextField refused = null;
         if (name.isEmpty()) {
             nameField.setError(getString(course_error_name));
+            refused = nameField;
             valid = false;
         }
         if (!TextSanitizer.isValidWebLink(draft.moodleLink())) {
             moodleField.setError(getString(error_link));
+            if (refused == null) refused = moodleField;
             valid = false;
         }
         if (draft.isNew() && draft.series().isEmpty()) {
@@ -193,6 +196,9 @@ public class CourseEditorFragment extends Fragment {
         }
         if (!valid) {
             Haptics.reject(saveButton);
+            // The first field that was refused takes the focus, so a screen reader reads what is wrong with it. A
+            // message that belongs to no field says itself, see TextAppearance.Up.Error.
+            if (refused != null) refused.focusInput();
             return;
         }
 

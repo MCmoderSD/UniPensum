@@ -568,7 +568,8 @@ public class SessionEditorFragment extends Fragment {
         }
         // The link only counts for online and hybrid events; the field is hidden otherwise.
         var linkUsed = form.mode == ONLINE || form.hybrid;
-        if (linkUsed && !TextSanitizer.isValidWebLink(form.link)) {
+        var linkRefused = linkUsed && !TextSanitizer.isValidWebLink(form.link);
+        if (linkRefused) {
             linkField.setError(getString(error_link));
             valid = false;
         }
@@ -584,6 +585,9 @@ public class SessionEditorFragment extends Fragment {
         }
         if (!valid) {
             Haptics.reject(saveButton);
+            // The field that was refused takes the focus, so a screen reader reads what is wrong with it. The messages
+            // of the times and the period say themselves, see TextAppearance.Up.Error.
+            if (linkRefused) linkField.focusInput();
             return;
         }
 

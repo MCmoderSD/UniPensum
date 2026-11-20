@@ -100,9 +100,12 @@ public final class BackupImportSheet extends UpSheet {
         var password = new UpTextField(context);
         password.setLabel(getString(backup_password));
         password.setPassword();
-        if (model.wrongPassword()) password.setError(getString(backup_error_wrong_password));
         password.addTextWatcher(ignored -> password.setError(null));
         column.addView(password, params(dp, 12));
+        if (model.wrongPassword()) {
+            password.setError(getString(backup_error_wrong_password));
+            password.focusInput();
+        }
 
         var next = new UpButton(context);
         next.setText(action_continue);

@@ -1,11 +1,10 @@
 package de.mcmodersd.unipensum.ui.semester;
 
-import static android.util.TypedValue.COMPLEX_UNIT_SP;
 import static android.view.View.*;
 import static android.view.ViewGroup.LayoutParams.*;
 import static android.widget.LinearLayout.VERTICAL;
-import static de.mcmodersd.unipensum.R.color.danger;
 import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.R.style.TextAppearance_Up_Error;
 import static de.mcmodersd.unipensum.domain.text.TextSanitizer.MAX_NAME;
 import static de.mcmodersd.unipensum.ui.widget.DatePickerSheet.RESULT_EPOCH_DAY;
 import static de.mcmodersd.unipensum.ui.widget.UpButton.Variant.DESTRUCTIVE;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import java.time.LocalDate;
@@ -150,8 +148,10 @@ public final class SemesterEditorSheet extends UpSheet {
         column.addView(nameField, spaced(dp, 8));
 
         errorView = new TextView(context);
-        errorView.setTextSize(COMPLEX_UNIT_SP, 14);
-        errorView.setTextColor(ContextCompat.getColor(context, danger));
+        errorView.setTextAppearance(TextAppearance_Up_Error);
+        // A text appearance takes over the text only, not the live region of the style: a screen reader says the
+        // message when it shows, only if this is set as well.
+        errorView.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
         errorView.setPadding(Math.round(4 * dp), Math.round(4 * dp), 0, Math.round(4 * dp));
         errorView.setVisibility(GONE);
         column.addView(errorView);
