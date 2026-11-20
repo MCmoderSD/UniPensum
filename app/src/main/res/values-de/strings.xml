@@ -30,6 +30,8 @@
     <string name="action_done">Fertig</string>
     <string name="stepper_decrease">Verringern</string>
     <string name="stepper_increase">Erhöhen</string>
+    <!-- Eine Option einer Gruppe, für einen Screenreader: der Name der Gruppe, dann die Option. -->
+    <string name="option_description">%1$s: %2$s</string>
     <!-- Erinnerungen -->
     <string name="field_reminder">Erinnerung</string>
     <string name="reminder_switch">Vor dem Beginn erinnern</string>

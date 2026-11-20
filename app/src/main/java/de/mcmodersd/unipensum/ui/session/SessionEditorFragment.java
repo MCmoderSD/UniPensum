@@ -348,6 +348,7 @@ public class SessionEditorFragment extends Fragment {
         root.findViewById(period_block).setVisibility(thisOnly() ? GONE : VISIBLE);
         dateRow.setVisibility(thisOnly() ? VISIBLE : GONE);
 
+        typeControl.setLabel(getString(field_type));
         typeControl.setOptions(
                 getString(type_lecture), getString(type_exercise),
                 getString(type_lab), getString(type_tutorial)
@@ -357,6 +358,7 @@ public class SessionEditorFragment extends Fragment {
 
         var weekdays = new CharSequence[5];
         for (var i = 0; i < 5; i++) weekdays[i] = SeriesFormat.weekdayShort(requireContext(), DayOfWeek.of(i + 1));
+        weekdayControl.setLabel(getString(field_weekday));
         weekdayControl.setOptions(weekdays);
         weekdayControl.setSelectedIndex(form.weekday.getValue() - 1);
         weekdayControl.setOnSelectionChangedListener(index -> {
@@ -364,6 +366,7 @@ public class SessionEditorFragment extends Fragment {
             updateScheduleNote();
         });
 
+        modeControl.setLabel(getString(field_format));
         modeControl.setOptions(getString(mode_in_person), getString(mode_online));
         modeControl.setSelectedIndex(form.mode.ordinal());
         modeControl.setOnSelectionChangedListener(index -> {
@@ -418,6 +421,7 @@ public class SessionEditorFragment extends Fragment {
         noteField.setText(form.note);
         noteField.addTextWatcher(text -> form.note = text);
 
+        repeatControl.setLabel(getString(field_repeat));
         repeatControl.setOptions(getString(repeat_weekly), getString(repeat_biweekly), getString(repeat_custom));
         repeatControl.setSelectedIndex(repeatIndex(form.interval));
         repeatStepper.setRange(1, 12);

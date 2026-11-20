@@ -101,6 +101,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void bindTheme(UpSegmentedControl control) {
+        control.setLabel(getString(settings_appearance));
         control.setOptions(getString(theme_system), getString(theme_light), getString(theme_dark));
         control.setSelectedIndex(settings.themeMode().ordinal());
         // Changing the theme recreates the activity, which restores this screen from the back stack.
@@ -121,6 +122,7 @@ public class SettingsFragment extends Fragment {
 
     /** Nothing is rebuilt here: the grid and the sheets read the style from the settings when they draw. */
     private void bindLecturerNames(UpSegmentedControl control) {
+        control.setLabel(getString(settings_lecturer_name));
         control.setOptions(getString(lecturer_name_last), getString(lecturer_name_full));
         var current = settings.lecturerNameStyle().getValue();
         control.setSelectedIndex(current == null ? LAST_NAME.ordinal() : current.ordinal());
