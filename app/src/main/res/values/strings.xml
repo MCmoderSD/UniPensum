@@ -35,6 +35,7 @@
     <string name="stepper_increase_named">%1$s, increase</string>
     <!-- One option of a group of options, for a screen reader: the name of the group, then the option. -->
     <string name="option_description">%1$s: %2$s</string>
+    <string name="state_selected">Selected</string>
     <!-- Reminders -->
     <string name="field_reminder">Reminder</string>
     <string name="reminder_switch">Remind me before the start</string>

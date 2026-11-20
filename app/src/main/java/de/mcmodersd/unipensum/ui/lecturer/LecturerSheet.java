@@ -18,6 +18,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.FragmentManager;
 
 import java.util.ArrayList;
@@ -125,7 +126,7 @@ public final class LecturerSheet extends UpSheet {
         if (picking()) {
             var none = new UpRow(context);
             none.setTitle(getString(lecturer_none));
-            if (selected == NO_LECTURER) none.setTrailingIcon(ic_check);
+            if (selected == NO_LECTURER) markChosen(none);
             none.setOnClickListener(v -> pick(NO_LECTURER));
             list.addView(none, rowParams(dp));
         }
@@ -144,7 +145,7 @@ public final class LecturerSheet extends UpSheet {
             var row = new UpRow(context);
             row.setTitle(lecturer.name(FULL_NAME));
             if (picking()) {
-                if (lecturer.id() == selected) row.setTrailingIcon(ic_check);
+                if (lecturer.id() == selected) markChosen(row);
                 row.setOnClickListener(v -> pick(lecturer.id()));
             } else {
                 row.setChevronVisible(true);
@@ -152,6 +153,12 @@ public final class LecturerSheet extends UpSheet {
             }
             list.addView(row, rowParams(dp));
         }
+    }
+
+    /** A check mark shows the chosen one; a screen reader is told in words. */
+    private void markChosen(UpRow row) {
+        row.setTrailingIcon(ic_check);
+        ViewCompat.setStateDescription(row, getString(state_selected));
     }
 
     private void pick(long lecturerId) {

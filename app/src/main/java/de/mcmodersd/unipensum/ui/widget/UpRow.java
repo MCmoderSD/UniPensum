@@ -13,12 +13,14 @@ import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.core.widget.ImageViewCompat;
 
 import de.mcmodersd.unipensum.R;
@@ -50,6 +52,8 @@ public class UpRow extends LinearLayout {
         background.setColor(ContextCompat.getColor(context, surface));
         setBackground(background);
         FocusRing.install(this, 14);
+        // A row is one thing to a screen reader, read as its title and its subtitle, also where it cannot be tapped.
+        ViewCompat.setScreenReaderFocusable(this, true);
 
         var texts = new LinearLayout(context);
         texts.setOrientation(VERTICAL);
@@ -156,6 +160,12 @@ public class UpRow extends LinearLayout {
     public boolean performClick() {
         Haptics.tap(this);
         return super.performClick();
+    }
+
+    /** A row that can be tapped is a button to a screen reader; one that only shows a fact is not. */
+    @Override
+    public CharSequence getAccessibilityClassName() {
+        return hasOnClickListeners() ? Button.class.getName() : super.getAccessibilityClassName();
     }
 
     @Override

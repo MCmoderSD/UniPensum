@@ -10,6 +10,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
+import android.widget.Button;
 
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.ContextCompat;
@@ -75,6 +76,12 @@ public class UpButton extends AppCompatTextView {
     public boolean performClick() {
         Haptics.tap(this);
         return super.performClick();
+    }
+
+    /** A screen reader says "Button"; the view is a text view only underneath. */
+    @Override
+    public CharSequence getAccessibilityClassName() {
+        return Button.class.getName();
     }
 
     @Override
