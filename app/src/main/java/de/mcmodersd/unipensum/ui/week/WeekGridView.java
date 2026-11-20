@@ -39,8 +39,8 @@ import de.mcmodersd.unipensum.ui.format.TimeFormat;
  * Zooming stretches the hours further.
  * <p>
  * In the current week, a line marks the current time: faint across the whole week, solid in the column of
- * today, drawn over the grid. The solid line stops at a session block, where the faint one carries on, so that it
- * never strikes through the text of the lecture that is on right now. The label of the current hour is
+ * today, drawn over the grid. Both stop at a session block, so that they never strike through the text of the lecture
+ * that is on right now; a dot at the edge of that block marks the time instead. The label of the current hour is
  * highlighted. The marker moves with the clock, once a minute.
  */
 // Created in code by WeekPageView only, never inflated from XML.
@@ -288,8 +288,9 @@ final class WeekGridView extends ViewGroup {
     }
 
     /**
-     * Over the session blocks, so the current time stays visible inside a lecture. The faint line crosses them;
-     * the solid line leaves them out, because a solid line through the text of a block makes it hard to read.
+     * Over the session blocks, so the current time stays visible in a lecture. The lines leave the blocks out,
+     * because a line through the text of a block makes it hard to read; where the time falls into a block, a dot at
+     * its edge says so.
      */
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
@@ -298,7 +299,6 @@ final class WeekGridView extends ViewGroup {
         var y = yOf(now.minutes(), hourHeight(getHeight()));
         var columnWidth = metrics.columnWidth(getWidth());
         var left = metrics.gutter + now.dayIndex() * columnWidth;
-        canvas.drawLine(metrics.gutter, y, getWidth(), y, nowFaintPaint);
 
         // The gap between a block and the line of its column belongs to the block, or it would show as a dot.
         var saved = canvas.save();
@@ -306,8 +306,15 @@ final class WeekGridView extends ViewGroup {
             var bounds = item.bounds;
             canvas.clipOutRect(bounds.left - metrics.blockInset, bounds.top, bounds.right + metrics.blockInset, bounds.bottom);
         }
+        canvas.drawLine(metrics.gutter, y, getWidth(), y, nowFaintPaint);
         canvas.drawLine(left, y, left + columnWidth, y, nowLinePaint);
         canvas.restoreToCount(saved);
+
+        for (var item : placed) {
+            if (item.dayIndex == now.dayIndex() && item.startMin <= now.minutes() && now.minutes() < item.endMin) {
+                canvas.drawCircle(item.bounds.left, y, metrics.nowLine * 1.75f, nowLinePaint);
+            }
+        }
     }
 
     private float hourHeight(int totalHeight) {
