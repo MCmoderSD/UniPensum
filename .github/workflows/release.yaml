@@ -1,0 +1,316 @@
+name: Release
+
+on:
+  push:
+    branches: [master, main]
+    tags:
+      - "[0-9]*.[0-9]*.[0-9]*"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+permissions:
+  contents: read
+
+env:
+  JAVA_VERSION: "25"
+  JAVA_DISTRIBUTION: zulu
+  GRADLE_ARGS: --no-daemon --no-configuration-cache --console=plain
+
+jobs:
+  version:
+    name: Resolve version and release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.plan.outputs.version }}
+      release: ${{ steps.plan.outputs.release }}
+      build: ${{ steps.plan.outputs.build }}
+
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: plan
+        name: Resolve the version, the release and the build number
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          version="$(sed -n 's/^val appVersion = "\(.*\)"$/\1/p' app/build.gradle.kts | head -n 1)"
+          if [ -z "$version" ]; then
+            echo "::error::app/build.gradle.kts has no appVersion."
+            exit 1
+          fi
+
+          release=false
+          if [ "$REF_TYPE" = tag ]; then
+            semver='^[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}$'
+            if ! [[ "$version" =~ $semver ]]; then
+              echo "::error::'$version' can not be released. A release needs a version like 1.2.3, with three parts and without -SNAPSHOT."
+              exit 1
+            fi
+            if [ "$REF_NAME" != "$version" ]; then
+              echo "::error::The tag is $REF_NAME, but appVersion in app/build.gradle.kts says $version. They must be the same."
+              exit 1
+            fi
+            if [ "$(git rev-parse HEAD)" != "$(git rev-parse "origin/$DEFAULT_BRANCH")" ]; then
+              echo "::error::The tagged commit is not the newest commit of '$DEFAULT_BRANCH'. Releases are only built from there."
+              exit 1
+            fi
+            status="$(curl -sS -o /dev/null -w '%{http_code}' \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/releases/tags/${version}")"
+            case "$status" in
+              404) ;;
+              200)
+                echo "::error::The release ${version} exists already, so this version has been released. Raise appVersion first."
+                exit 1
+                ;;
+              *)
+                echo "::error::The releases could not be looked up (HTTP ${status})."
+                exit 1
+                ;;
+            esac
+            release=true
+          fi
+
+          # Google Play takes every version code once, so each build gets its own: the number of commits since the last
+          # release (all commits before the first one). The same commit always gets the same number, whether it is built
+          # from the branch or from its own tag, so the search for the last release starts at the parent of the commit.
+          last_tag="$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || true)"
+          if [ -n "$last_tag" ]; then
+            build="$(git rev-list --count "${last_tag}..HEAD")"
+          else
+            build="$(git rev-list --count HEAD)"
+          fi
+
+          {
+            echo "version=${version}"
+            echo "release=${release}"
+            echo "build=${build}"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### Version ${version}"
+            echo
+            echo "Build number ${build} (since ${last_tag:-the first commit})."
+            if [ "$release" = true ]; then
+              echo "Publishes the release ${version}."
+            else
+              echo "Builds the signed APK and AAB as an artifact. Nothing is released: this run is not on a version tag."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  build:
+    name: Build and sign
+    runs-on: ubuntu-latest
+    needs: version
+    outputs:
+      md5: ${{ steps.assets.outputs.md5 }}
+      sha1: ${{ steps.assets.outputs.sha1 }}
+      sha256: ${{ steps.assets.outputs.sha256 }}
+      certificate: ${{ steps.verify.outputs.certificate }}
+
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - id: setup-java
+        name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v6
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          cache: gradle
+
+      - id: keystore
+        name: Restore signing keystore
+        env:
+          SIGNING_KEYSTORE: ${{ secrets.SIGNING_KEYSTORE }}
+        run: |
+          if [ -z "$SIGNING_KEYSTORE" ]; then
+            echo "::error::Secret SIGNING_KEYSTORE is not set"
+            exit 1
+          fi
+
+          KEYSTORE="${RUNNER_TEMP}/release.jks"
+          printf '%s' "$SIGNING_KEYSTORE" | base64 --decode --ignore-garbage > "$KEYSTORE"
+          echo "path=${KEYSTORE}" >> "$GITHUB_OUTPUT"
+
+      - id: build
+        name: Test, lint and build
+        env:
+          VERSION_BUILD: ${{ needs.version.outputs.build }}
+          SIGNING_STORE_FILE: ${{ steps.keystore.outputs.path }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ vars.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew $GRADLE_ARGS testDebugUnitTest lintRelease assembleRelease bundleRelease
+
+      - id: assets
+        name: Collect release assets and checksums
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          METADATA="app/build/outputs/apk/release/output-metadata.json"
+          BUILT="$(jq -r '.elements[0].versionName' "$METADATA")"
+          VERSION_CODE="$(jq -r '.elements[0].versionCode' "$METADATA")"
+
+          if [ "$BUILT" != "$VERSION" ]; then
+            echo "::error::The build says ${BUILT}, but the version resolved from app/build.gradle.kts is ${VERSION}"
+            exit 1
+          fi
+
+          APK="$(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)"
+          AAB="$(find app/build/outputs/bundle/release -maxdepth 1 -type f -name '*.aab' | head -n 1)"
+
+          if [ -z "$APK" ] || [ -z "$AAB" ]; then
+            echo "::error::No build artifact found in app/build/outputs/"
+            exit 1
+          fi
+
+          mkdir -p release-assets
+          cp "$APK" "release-assets/${REPO_NAME}-${VERSION}.apk"
+          cp "$AAB" "release-assets/${REPO_NAME}-${VERSION}.aab"
+
+          {
+            echo "apk=release-assets/${REPO_NAME}-${VERSION}.apk"
+            echo "md5=$(md5sum "$APK" | cut -d ' ' -f 1)"
+            echo "sha1=$(sha1sum "$APK" | cut -d ' ' -f 1)"
+            echo "sha256=$(sha256sum "$APK" | cut -d ' ' -f 1)"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Resolved version ${VERSION}, code ${VERSION_CODE}"
+          echo "Release assets:"
+          ls -1 release-assets
+
+      - id: verify
+        name: Verify APK signature
+        env:
+          APK: ${{ steps.assets.outputs.apk }}
+        run: |
+          APKSIGNER="$(find "${ANDROID_HOME}/build-tools" -maxdepth 2 -type f -name apksigner | sort -V | tail -n 1)"
+
+          if [ -z "$APKSIGNER" ]; then
+            echo "::error::No apksigner found in ${ANDROID_HOME}/build-tools"
+            exit 1
+          fi
+
+          if ! CERTS="$("$APKSIGNER" verify --print-certs "$APK")"; then
+            echo "::error::The APK is not signed, check the SIGNING_* secrets and variables"
+            exit 1
+          fi
+
+          FINGERPRINT="$(echo "$CERTS" | sed -n 's/^.*certificate SHA-256 digest: //p' | head -n 1)"
+
+          if [ -z "$FINGERPRINT" ]; then
+            echo "::error::Could not read the signing certificate of the APK"
+            exit 1
+          fi
+
+          echo "certificate=${FINGERPRINT}" >> "$GITHUB_OUTPUT"
+          echo "Signing certificate SHA-256: ${FINGERPRINT}"
+
+      - id: upload
+        name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ github.event.repository.name }}-${{ needs.version.outputs.version }}
+          path: release-assets/*
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    name: Create release
+    runs-on: ubuntu-latest
+    needs: [version, build]
+    if: needs.version.outputs.release == 'true'
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: download
+        name: Download build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ github.event.repository.name }}-${{ needs.version.outputs.version }}
+          path: release-assets
+
+      - id: attest
+        name: Attest build provenance
+        if: ${{ !github.event.repository.private }}
+        uses: actions/attest@v4
+        with:
+          subject-path: release-assets/*
+
+      - id: changelog
+        name: Build changelog link
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          PREVIOUS="$(git tag --sort=-creatordate | grep -vFx "$VERSION" | head -n 1 || true)"
+
+          if [ -z "$PREVIOUS" ]; then
+            echo "No previous tag found, linking full commit history"
+            echo "url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commits/${VERSION}" >> "$GITHUB_OUTPUT"
+          else
+            echo "Previous tag: ${PREVIOUS}"
+            echo "url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/${PREVIOUS}...${VERSION}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - id: release
+        name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.version.outputs.version }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          CHANGELOG_URL: ${{ steps.changelog.outputs.url }}
+          MD5: ${{ needs.build.outputs.md5 }}
+          SHA1: ${{ needs.build.outputs.sha1 }}
+          SHA256: ${{ needs.build.outputs.sha256 }}
+          CERTIFICATE: ${{ needs.build.outputs.certificate }}
+        run: |
+          cat > release-notes.md <<EOF
+          **Full Changelog**: ${CHANGELOG_URL}
+
+          ## Checksums (APK):
+
+          - MD5: ${MD5}
+          - SHA1: ${SHA1}
+          - SHA256: ${SHA256}
+
+          ## Signing certificate:
+
+          - SHA256: ${CERTIFICATE}
+          EOF
+
+          gh release create "$VERSION" release-assets/* \
+            --verify-tag \
+            --title "${REPO_NAME} - Release ${VERSION}" \
+            --notes-file release-notes.md
