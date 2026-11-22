@@ -325,10 +325,12 @@ come back to this one. A screen reader hears the new week from the date line, wh
 **The day list.** From a font scale of 1.3 on ("Largest" on most phones) five columns cannot hold the text, so the
 week is a list: one heading per day (weekday and date, with "Today" on a line of its own above the current one), below it one
 card per session or the line "No events". The cards are as wide as the screen and show every line in full. There is no grid, no day
-header and no zoom in this mode.
+header and no zoom in this mode. A person who needs the large text cannot ask for the grid back: that is a known
+limit, and a setting for the week view would be the way out.
 
 **Orientation.** The app turns on phones and tablets. In landscape a window of 720dp and more splits into week and
-page, so a phone held sideways shows both.
+page, so a phone held sideways shows both. On a small phone held sideways (640 x 360dp) the header takes about half
+of the height, so the grid shows three hours at a time and scrolls for the rest; a sub-page covers the week there.
 
 **Sub-pages and sheets.** A sub-page (settings, courses, editors) has a 56dp top bar with a back arrow and a Title.
 The title is also the name of the page for a screen reader, which says it when the page opens ("Courses, Winter 26/27"
