@@ -10,6 +10,7 @@ import static de.mcmodersd.unipensum.R.string.*;
 import static de.mcmodersd.unipensum.domain.backup.BackupInfo.Compatibility.*;
 import static de.mcmodersd.unipensum.ui.widget.UpButton.Variant.*;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -194,6 +195,7 @@ public final class BackupImportSheet extends UpSheet {
         column.addView(cancelButton(), params(dp, 0));
     }
 
+    @SuppressLint("AccessibilityFocus")
     private void finished(@StringRes int message, boolean error) {
         var dp = getResources().getDisplayMetrics().density;
         var result = text(message, 16, error ? danger : text_primary, 8, 16);
