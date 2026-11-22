@@ -121,7 +121,7 @@ public class WeekFragment extends Fragment {
         // the weeks, see turnWeek.
         weeks().setFocusable(false);
         ViewCompat.setAccessibilityDelegate(weeks(), new WeekPositionDelegate());
-        ViewCompat.addOnUnhandledKeyEventListener(view, (root, event) -> turnWeek(root, event));
+        ViewCompat.addOnUnhandledKeyEventListener(view, this::turnWeek);
         // The view is rebuilt when the screen is recreated (turning, theme, language); come back to the same week.
         pager.setCurrentItem(viewModel.page() >= 0 ? viewModel.page() : Weeks.initialPosition(LocalDate.now()), false);
         adapter.setCurrentPage(pager.getCurrentItem());

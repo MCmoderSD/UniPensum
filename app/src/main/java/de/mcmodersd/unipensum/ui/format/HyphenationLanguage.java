@@ -15,13 +15,6 @@ public final class HyphenationLanguage {
 
     private HyphenationLanguage() { }
 
-    /**
-     * Names in Latin letters are the ones that are told apart, because the patterns for English are a good guess for
-     * them in a language written in another script, and for the other scripts the language of the text cannot be told.
-     *
-     * @return English for a text in Latin letters on a device whose language is written in another script, and
-     * {@code null}, the language of the device, otherwise
-     */
     @Nullable
     public static Locale of(CharSequence text, Locale device) {
         var letter = firstLetter(text);

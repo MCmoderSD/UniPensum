@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -60,7 +59,6 @@ public class CourseEditorFragment extends Fragment {
     private UpTextField nameField;
     private UpTextField moodleField;
     private LinearLayout events;
-    private TextView eventsError;
     private LiveMessage eventsMessage;
     private UpButton saveButton;
 
@@ -106,8 +104,7 @@ public class CourseEditorFragment extends Fragment {
         colors.setOnColorSelectedListener(draft::setColor);
 
         events = view.findViewById(R.id.events);
-        eventsError = view.findViewById(events_error);
-        eventsMessage = new LiveMessage(eventsError);
+        eventsMessage = new LiveMessage(view.findViewById(events_error));
         view.findViewById(add_event).setOnClickListener(v ->
                 Navigator.of(this).push(SessionEditorFragment.forSeries(-1))
         );

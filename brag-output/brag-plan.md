@@ -58,7 +58,7 @@ picture, the music fades under.
 ## Source material
 - Real UI: the store screenshots in `screenshots/` (all dark, sample data "Winter 26/27", the people and addresses in
   them are made up: `uni.example`, a +49 30 5550123 number). Nothing else leaves the project.
-- Icon: `design/icon-dark.svg` (ids: background, mortarboard-top, mortarboard-body, bar-mon .. bar-fri)
+- Icon: `design/icon-dark.svg` (ids: background, mortarboard-top, mortarboard-body, bar-mon ... bar-fri)
 - Copy that must appear verbatim: "A simple calendar for universities and lectures." (README, reworded from "with a
   focus on universities and lectures"), "No account." / "No internet access." (README: "without an account and
   without internet access"), "Open source." (README: "free and open source"; "free" is left out on purpose, it is a

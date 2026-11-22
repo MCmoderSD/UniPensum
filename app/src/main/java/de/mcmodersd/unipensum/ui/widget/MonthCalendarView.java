@@ -50,7 +50,6 @@ public class MonthCalendarView extends LinearLayout {
     }
 
     private static final float FOCUS_WIDTH_DP = 2;
-    /** The gap between a day and the ring of the focus around it. */
     private static final float FOCUS_GAP_DP = 3;
 
     private final TextView monthTitle;

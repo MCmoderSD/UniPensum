@@ -10,6 +10,7 @@ import static de.mcmodersd.unipensum.R.string.*;
 import static de.mcmodersd.unipensum.domain.backup.BackupInfo.Compatibility.*;
 import static de.mcmodersd.unipensum.ui.widget.UpButton.Variant.*;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -194,12 +195,11 @@ public final class BackupImportSheet extends UpSheet {
         column.addView(cancelButton(), params(dp, 0));
     }
 
+    @SuppressLint("AccessibilityFocus")
     private void finished(@StringRes int message, boolean error) {
         var dp = getResources().getDisplayMetrics().density;
         var result = text(message, 16, error ? danger : text_primary, 8, 16);
         column.addView(result);
-        // Every step replaces the whole column, which takes the focus of a screen reader with it; it would go back to
-        // the title and say nothing of the outcome. The outcome is what it should land on.
         result.post(() -> result.performAccessibilityAction(ACTION_ACCESSIBILITY_FOCUS, null));
         var done = new UpButton(requireContext());
         done.setText(error ? action_close : action_done);

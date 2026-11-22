@@ -11,11 +11,6 @@ import android.widget.TextView;
 
 import de.mcmodersd.unipensum.R;
 
-/**
- * The header of the week on a phone held sideways. On a screen less than 480dp high the name of the semester above the
- * date range and the space around them leave a third of the height to the header; here the date range stands beside the
- * name, and the header is as high as its buttons, so that the grid has the height.
- */
 final class CompactHeader {
 
     private static final int GAP_DP = 12;

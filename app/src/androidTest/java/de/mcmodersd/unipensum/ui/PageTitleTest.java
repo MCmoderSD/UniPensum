@@ -16,6 +16,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Objects;
+
 import de.mcmodersd.unipensum.R;
 
 /** A page that opens from the week names itself for a screen reader, and is not a control to stop at. */
@@ -23,7 +25,7 @@ import de.mcmodersd.unipensum.R;
 public class PageTitleTest {
 
     private final Context context = new ContextThemeWrapper(
-            ApplicationProvider.<Context>getApplicationContext(), R.style.Theme_UniPensum
+            ApplicationProvider.getApplicationContext(), R.style.Theme_UniPensum
     );
 
     /** A page as the layouts build it: clickable, so that touches do not reach the week behind it. */
@@ -44,7 +46,7 @@ public class PageTitleTest {
         var page = page();
         PageTitle.set(page, "Settings");
         assertEquals("Settings", bar(page).getText().toString());
-        assertEquals("Settings", ViewCompat.getAccessibilityPaneTitle(page).toString());
+        assertEquals("Settings", Objects.requireNonNull(ViewCompat.getAccessibilityPaneTitle(page)).toString());
         assertNull(bar(page).getContentDescription());
     }
 
@@ -54,7 +56,7 @@ public class PageTitleTest {
         PageTitle.set(page, "Winter 26/27", "Courses, Winter 26/27");
         assertEquals("Winter 26/27", bar(page).getText().toString());
         assertEquals("Courses, Winter 26/27", bar(page).getContentDescription().toString());
-        assertEquals("Courses, Winter 26/27", ViewCompat.getAccessibilityPaneTitle(page).toString());
+        assertEquals("Courses, Winter 26/27", Objects.requireNonNull(ViewCompat.getAccessibilityPaneTitle(page)).toString());
     }
 
     @Test

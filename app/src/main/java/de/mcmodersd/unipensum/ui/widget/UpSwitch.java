@@ -17,10 +17,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
-/**
- * The app's own toggle: a pill track with a sliding thumb. The track is 52 x 32dp; the view around it is 48dp tall,
- * so the touch target has the size Android asks for.
- */
 public class UpSwitch extends View {
 
     public interface OnCheckedChangeListener {

@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -37,10 +38,10 @@ public final class LiveMessage {
         // A message that waits for its frame must not outlive the view: it would hold on to it a little longer.
         view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
-            public void onViewAttachedToWindow(View attached) { }
+            public void onViewAttachedToWindow(@NonNull View attached) { }
 
             @Override
-            public void onViewDetachedFromWindow(View detached) {
+            public void onViewDetachedFromWindow(@NonNull View detached) {
                 cancel();
             }
         });

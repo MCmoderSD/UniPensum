@@ -15,6 +15,8 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -38,6 +40,8 @@ import org.junit.runner.RunWith;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.domain.model.CourseColor;
@@ -47,7 +51,7 @@ import de.mcmodersd.unipensum.domain.model.CourseColor;
 public class ControlsTest {
 
     private final Context context = new ContextThemeWrapper(
-            ApplicationProvider.<Context>getApplicationContext(), R.style.Theme_UniPensum
+            ApplicationProvider.getApplicationContext(), R.style.Theme_UniPensum
     );
     private final float dp = context.getResources().getDisplayMetrics().density;
 
@@ -122,7 +126,10 @@ public class ControlsTest {
             var node = AccessibilityNodeInfoCompat.wrap(control.getChildAt(i).createAccessibilityNodeInfo());
             assertEquals(RadioButton.class.getName(), node.getClassName().toString());
             assertTrue(node.isCheckable());
-            assertEquals(i == 1, node.isChecked());
+            assertEquals(
+                    i == 1 ? AccessibilityNodeInfoCompat.CHECKED_STATE_TRUE : AccessibilityNodeInfoCompat.CHECKED_STATE_FALSE,
+                    node.getChecked()
+            );
             assertEquals(i, node.getCollectionItemInfo().getColumnIndex());
         }
     }
@@ -169,7 +176,26 @@ public class ControlsTest {
 
     /** The message that is set again comes with a later frame, and a little later still after another one. */
     private static void awaitText(TextView view, String expected) throws InterruptedException {
-        for (var i = 0; i < 80 && !expected.contentEquals(view.getText()); i++) Thread.sleep(25);
+        var arrived = new CountDownLatch(1);
+        getInstrumentation().runOnMainSync(() -> {
+            if (expected.contentEquals(view.getText())) {
+                arrived.countDown();
+                return;
+            }
+            view.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence text, int start, int count, int after) { }
+
+                @Override
+                public void onTextChanged(CharSequence text, int start, int before, int count) { }
+
+                @Override
+                public void afterTextChanged(Editable text) {
+                    if (expected.contentEquals(text)) arrived.countDown();
+                }
+            });
+        });
+        assertTrue("The text \"" + expected + "\" did not come", arrived.await(2, TimeUnit.SECONDS));
         assertEquals(expected, view.getText().toString());
     }
 
@@ -305,9 +331,9 @@ public class ControlsTest {
         assertEquals(Button.class.getName(), row.getAccessibilityClassName());
     }
 
-    private Context withFontScale(float scale) {
+    private Context withFontScale() {
         var configuration = new Configuration(context.getResources().getConfiguration());
-        configuration.fontScale = scale;
+        configuration.fontScale = (float) 2.0;
         return new ContextThemeWrapper(context.createConfigurationContext(configuration), R.style.Theme_UniPensum);
     }
 
@@ -317,7 +343,7 @@ public class ControlsTest {
      */
     @Test
     public void measuringARowAndASegmentedControlAgainGivesTheSameLayoutAtLargeText() {
-        var large = withFontScale(2f);
+        var large = withFontScale();
         var row = new UpRow(large);
         row.setTitle("UniPensum");
         row.setValue("Version 1.0-SNAPSHOT");
@@ -354,7 +380,7 @@ public class ControlsTest {
     /** A scroll view or a wrap_content parent measures without a width first, and the width decides only then. */
     @Test
     public void aRowMeasuredWithoutAWidthFirstEndsAsIfMeasuredWithTheWidthAlone() {
-        var large = withFontScale(2f);
+        var large = withFontScale();
         var heightSpec = makeMeasureSpec(4000, AT_MOST);
         for (var width : new int[]{150, 1000}) {
             var widthSpec = makeMeasureSpec(Math.round(width * dp), EXACTLY);
@@ -380,7 +406,7 @@ public class ControlsTest {
 
     @Test
     public void aValueThatChangesAfterTheFirstLayoutFlowsTheRowAgain() {
-        var large = withFontScale(2f);
+        var large = withFontScale();
         var row = new UpRow(large);
         row.setTitle("UniPensum");
         row.setValue("1.0");
