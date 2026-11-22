@@ -340,6 +340,14 @@ optional footer that stays in place (the Save button). A tall sheet stops 8dp be
 **Phone and tablet.** On a window narrower than 720dp, a page opened from the week covers it. From 720dp on,
 `PaneLayout` places the week and the page side by side; the page takes a share of the width between 360 and 480dp.
 
+**Right to left.** The layout runs in the direction of the system language, and the whole app follows it, the week
+included. Monday is the rightmost day, the hours stand on the right, the bar of a session and the dot of the current time
+sit on the start edge, and the month calendar and the color swatches begin on the right. The pane beside the week opens
+from the left, and a page slides in from the left. A text starts at the start of its view (the theme sets
+`textAlignment` to `viewStart`), so an English text in a mirrored row stands on the side of its neighbors. Two things
+read from left to right in every language: a phone number, an e-mail address and a link, because their groups of
+digits would come out reversed, and a time, hours before minutes, in the wheels and in the entry.
+
 ## Elevation & Depth
 
 The system is flat. No view casts a shadow; even the bottom sheet has an elevation of 0dp. Depth comes from three tonal
@@ -411,7 +419,8 @@ Tactile slabs that fill the width they are given.
 
 ### Switch
 - **Style:** a track of 52 x 32dp, a full pill, in a touch area of 52 x 48dp. Off: Track Gray with a Sheet Paper
-  thumb. On: Ink track with a Paper thumb. The thumb is a circle 3dp inside the track.
+  thumb. On: Ink track with a Paper thumb. The thumb is a circle 3dp inside the track and sits at the end of it when the
+  switch is on.
 - **Row:** the label and the switch are one row of at least 48dp, and a tap anywhere on it toggles the switch. The
   screen reader gets the switch alone, named after the row.
 - **Motion:** the thumb and both colors move together in 160ms, with a toggle haptic.
@@ -500,6 +509,9 @@ font scale of 1.3, gives every session a card of full height.
 - **Do** let a keyboard do what a finger does: every control a stop of the Tab key with the Focus Ring, a grid that draws
   its cells with arrow keys and Enter.
 - **Do** let a text grow: use sp, let a line wrap, and size what holds text from the text.
+- **Do** give every padding and margin that is not the same on both sides a start and an end, never a left and a right,
+  and let a view that draws its own columns ask `Mirror`. A view that centers its text sets `textAlignment` to
+  `center` as well as the gravity, because the alignment wins over the gravity.
 
 ### Don't:
 - **Don't** add shadows or elevation to any view (The Flat Rule).

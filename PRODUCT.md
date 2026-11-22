@@ -58,7 +58,8 @@ link and lecturers, and at the same time no account, no internet access, no ads 
 - **Data:** a local SQLite database; no account, no SDKs, no analytics, no ads. Android's own backup is done by the
   system, which the privacy policy says openly.
 - **Languages:** English and German; English is the fallback, so a translation can arrive in parts. New languages come
-  from contributors as one `values-xx/strings.xml`. The language is picked in the Android settings.
+  from contributors as one `values-xx/strings.xml`. The language is picked in the Android settings. A language that
+  is written from right to left mirrors the whole app, the week included.
 - **Distribution:** GitHub Releases and Google Play, both not yet published ("coming soon" in the README).
 - **Price:** free. Store texts must not say "free" (Play metadata policy), even though it is true.
 - **License:** BSD 3-Clause, Seraphin Berger (MCmoderSD).
