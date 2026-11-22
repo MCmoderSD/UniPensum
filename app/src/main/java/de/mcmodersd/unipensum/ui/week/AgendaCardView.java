@@ -26,6 +26,7 @@ import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
 import de.mcmodersd.unipensum.ui.widget.FocusRing;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
+import de.mcmodersd.unipensum.ui.widget.Mirror;
 
 /**
  * One session in the list of a day: the tinted card with a bar in the course color that a block of the grid is,
@@ -54,7 +55,7 @@ final class AgendaCardView extends LinearLayout {
         setBackground(background);
         setWillNotDraw(false);
         setOrientation(VERTICAL);
-        setPadding(Math.round(20 * dp), Math.round(12 * dp), Math.round(16 * dp), Math.round(12 * dp));
+        setPaddingRelative(Math.round(20 * dp), Math.round(12 * dp), Math.round(16 * dp), Math.round(12 * dp));
         setClickable(true);
         setFocusable(true);
         FocusRing.install(this, RADIUS_DP);
@@ -89,7 +90,8 @@ final class AgendaCardView extends LinearLayout {
     protected void onDraw(Canvas canvas) {
         var inset = RADIUS_DP * 0.6f * dp;
         var width = BAR_DP * dp;
-        barRect.set(inset * 0.5f, inset, inset * 0.5f + width, getHeight() - inset);
+        var from = Mirror.isRtl(this) ? getWidth() - inset * 0.5f - width : inset * 0.5f;
+        barRect.set(from, inset, from + width, getHeight() - inset);
         canvas.drawRoundRect(barRect, width / 2f, width / 2f, barPaint);
     }
 

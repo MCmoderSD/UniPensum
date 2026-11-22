@@ -32,6 +32,7 @@ import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
 import de.mcmodersd.unipensum.ui.widget.FocusRing;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
+import de.mcmodersd.unipensum.ui.widget.Mirror;
 
 /**
  * One session in the grid: a tinted card with an accent bar in the course color. Overlapping
@@ -124,7 +125,7 @@ final class SessionBlockView extends LinearLayout {
         fittedHeight = heightPx;
 
         var narrow = widthPx < 52 * dp;
-        setPadding(
+        setPaddingRelative(
                 barWidth + Math.round((narrow ? 2 : 4) * dp), Math.round(3 * dp),
                 Math.round((narrow ? 1 : 3) * dp), Math.round(3 * dp)
         );
@@ -133,7 +134,7 @@ final class SessionBlockView extends LinearLayout {
             detail.setTextSize(COMPLEX_UNIT_SP, narrow ? 9f : 10f);
         }
 
-        var contentWidth = Math.max(0, widthPx - getPaddingLeft() - getPaddingRight());
+        var contentWidth = Math.max(0, widthPx - getPaddingStart() - getPaddingEnd());
         var budget = Math.max(0, heightPx - getPaddingTop() - getPaddingBottom());
         budget -= fit(title, contentWidth, budget, 3, true);
         budget -= fit(time, contentWidth, budget, 2, false);
@@ -170,7 +171,9 @@ final class SessionBlockView extends LinearLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         var inset = radius * 0.6f;
-        barRect.set(inset * 0.5f, inset, inset * 0.5f + barWidth, getHeight() - inset);
+        // The bar runs along the start edge, which is the right one in a layout from right to left.
+        var from = Mirror.isRtl(this) ? getWidth() - inset * 0.5f - barWidth : inset * 0.5f;
+        barRect.set(from, inset, from + barWidth, getHeight() - inset);
         canvas.drawRoundRect(barRect, barWidth / 2f, barWidth / 2f, barPaint);
     }
 
