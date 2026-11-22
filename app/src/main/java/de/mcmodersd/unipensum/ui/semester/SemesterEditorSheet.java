@@ -35,6 +35,7 @@ import de.mcmodersd.unipensum.ui.format.TimeFormat;
 import de.mcmodersd.unipensum.ui.widget.ConfirmSheet;
 import de.mcmodersd.unipensum.ui.widget.DatePickerSheet;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
+import de.mcmodersd.unipensum.ui.widget.LiveMessage;
 import de.mcmodersd.unipensum.ui.widget.UpButton;
 import de.mcmodersd.unipensum.ui.widget.UpRow;
 import de.mcmodersd.unipensum.ui.widget.UpSheet;
@@ -73,6 +74,7 @@ public final class SemesterEditorSheet extends UpSheet {
     private UpRow endRow;
     private UpTextField nameField;
     private TextView errorView;
+    private LiveMessage errorMessage;
     private UpButton saveButton;
 
     /**
@@ -154,6 +156,7 @@ public final class SemesterEditorSheet extends UpSheet {
         errorView.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
         errorView.setPaddingRelative(Math.round(4 * dp), Math.round(4 * dp), 0, Math.round(4 * dp));
         errorView.setVisibility(GONE);
+        errorMessage = new LiveMessage(errorView);
         column.addView(errorView);
 
         saveButton = new UpButton(context);
@@ -218,7 +221,7 @@ public final class SemesterEditorSheet extends UpSheet {
         startRow.setValue(TimeFormat.dateMedium(context, start));
         endRow.setValue(TimeFormat.dateMedium(context, end));
         nameField.setHint(SemesterNames.display(context, new Semester(0, start, end, null)));
-        errorView.setVisibility(GONE);
+        errorMessage.show(null);
     }
 
     private Semester candidate() {
@@ -293,8 +296,7 @@ public final class SemesterEditorSheet extends UpSheet {
     }
 
     private void showError(String message) {
-        errorView.setText(message);
-        errorView.setVisibility(VISIBLE);
+        errorMessage.show(message);
         Haptics.reject(saveButton);
     }
 

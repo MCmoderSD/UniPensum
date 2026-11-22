@@ -40,6 +40,7 @@ import de.mcmodersd.unipensum.ui.session.SessionEditorFragment;
 import de.mcmodersd.unipensum.ui.widget.ColorSwatchPicker;
 import de.mcmodersd.unipensum.ui.widget.ConfirmSheet;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
+import de.mcmodersd.unipensum.ui.widget.LiveMessage;
 import de.mcmodersd.unipensum.ui.widget.UpButton;
 import de.mcmodersd.unipensum.ui.widget.UpRow;
 import de.mcmodersd.unipensum.ui.widget.UpTextField;
@@ -60,6 +61,7 @@ public class CourseEditorFragment extends Fragment {
     private UpTextField moodleField;
     private LinearLayout events;
     private TextView eventsError;
+    private LiveMessage eventsMessage;
     private UpButton saveButton;
 
     @Nullable
@@ -105,6 +107,7 @@ public class CourseEditorFragment extends Fragment {
 
         events = view.findViewById(R.id.events);
         eventsError = view.findViewById(events_error);
+        eventsMessage = new LiveMessage(eventsError);
         view.findViewById(add_event).setOnClickListener(v ->
                 Navigator.of(this).push(SessionEditorFragment.forSeries(-1))
         );
@@ -149,7 +152,7 @@ public class CourseEditorFragment extends Fragment {
 
     private void renderEvents() {
         events.removeAllViews();
-        eventsError.setVisibility(GONE);
+        eventsMessage.show(null);
         var dp = getResources().getDisplayMetrics().density;
         var series = draft.series();
         for (var i = 0; i < series.size(); i++) {
@@ -191,8 +194,7 @@ public class CourseEditorFragment extends Fragment {
             valid = false;
         }
         if (draft.isNew() && draft.series().isEmpty()) {
-            eventsError.setText(course_error_events);
-            eventsError.setVisibility(VISIBLE);
+            eventsMessage.show(getString(course_error_events));
             valid = false;
         }
         if (!valid) {
@@ -234,8 +236,7 @@ public class CourseEditorFragment extends Fragment {
         public void onError(Exception error) {
             if (!isAdded() || getView() == null) return;
             saveButton.setEnabled(true);
-            eventsError.setText(course_error_save);
-            eventsError.setVisibility(VISIBLE);
+            eventsMessage.show(getString(course_error_save));
             Haptics.reject(saveButton);
         }
     }

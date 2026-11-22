@@ -36,6 +36,7 @@ public class UpTextField extends LinearLayout {
     private final TextView label;
     private final AppCompatEditText input;
     private final TextView error;
+    private final LiveMessage errorMessage;
     private final GradientDrawable background = new GradientDrawable();
     private final float dp;
 
@@ -81,6 +82,7 @@ public class UpTextField extends LinearLayout {
         // A message that shows after a failed Save is said without being asked.
         error.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
         addView(error);
+        errorMessage = new LiveMessage(error);
         // A refused field carries its message itself, like Material's text fields do.
         ViewCompat.setAccessibilityDelegate(input, new AccessibilityDelegateCompat() {
             @Override
@@ -138,8 +140,7 @@ public class UpTextField extends LinearLayout {
 
     /** Shows the message below the field, or clears it for {@code null}. */
     public void setError(CharSequence message) {
-        error.setText(message);
-        error.setVisibility(message == null ? GONE : VISIBLE);
+        errorMessage.show(message);
         updateStroke(input.hasFocus());
     }
 
