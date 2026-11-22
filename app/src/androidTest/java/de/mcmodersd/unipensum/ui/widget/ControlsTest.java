@@ -51,7 +51,7 @@ import de.mcmodersd.unipensum.domain.model.CourseColor;
 public class ControlsTest {
 
     private final Context context = new ContextThemeWrapper(
-            ApplicationProvider.<Context>getApplicationContext(), R.style.Theme_UniPensum
+            ApplicationProvider.getApplicationContext(), R.style.Theme_UniPensum
     );
     private final float dp = context.getResources().getDisplayMetrics().density;
 
@@ -331,9 +331,9 @@ public class ControlsTest {
         assertEquals(Button.class.getName(), row.getAccessibilityClassName());
     }
 
-    private Context withFontScale(float scale) {
+    private Context withFontScale() {
         var configuration = new Configuration(context.getResources().getConfiguration());
-        configuration.fontScale = scale;
+        configuration.fontScale = (float) 2.0;
         return new ContextThemeWrapper(context.createConfigurationContext(configuration), R.style.Theme_UniPensum);
     }
 
@@ -343,7 +343,7 @@ public class ControlsTest {
      */
     @Test
     public void measuringARowAndASegmentedControlAgainGivesTheSameLayoutAtLargeText() {
-        var large = withFontScale(2f);
+        var large = withFontScale();
         var row = new UpRow(large);
         row.setTitle("UniPensum");
         row.setValue("Version 1.0-SNAPSHOT");
@@ -380,7 +380,7 @@ public class ControlsTest {
     /** A scroll view or a wrap_content parent measures without a width first, and the width decides only then. */
     @Test
     public void aRowMeasuredWithoutAWidthFirstEndsAsIfMeasuredWithTheWidthAlone() {
-        var large = withFontScale(2f);
+        var large = withFontScale();
         var heightSpec = makeMeasureSpec(4000, AT_MOST);
         for (var width : new int[]{150, 1000}) {
             var widthSpec = makeMeasureSpec(Math.round(width * dp), EXACTLY);
@@ -406,7 +406,7 @@ public class ControlsTest {
 
     @Test
     public void aValueThatChangesAfterTheFirstLayoutFlowsTheRowAgain() {
-        var large = withFontScale(2f);
+        var large = withFontScale();
         var row = new UpRow(large);
         row.setTitle("UniPensum");
         row.setValue("1.0");

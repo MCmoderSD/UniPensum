@@ -57,7 +57,7 @@ public class WeekViewsTest {
     private static final LocalDate MONDAY = LocalDate.of(2026, 10, 12);
 
     private final Context normal = new ContextThemeWrapper(
-            ApplicationProvider.<Context>getApplicationContext(), R.style.Theme_UniPensum
+            ApplicationProvider.getApplicationContext(), R.style.Theme_UniPensum
     );
 
     private Context withFontScale(float scale) {
