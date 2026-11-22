@@ -1,5 +1,7 @@
 package de.mcmodersd.unipensum.ui.widget;
 
+import static android.text.InputType.*;
+import static android.text.Layout.*;
 import static android.view.KeyEvent.*;
 import static android.view.View.LAYOUT_DIRECTION_RTL;
 import static android.view.View.MeasureSpec.AT_MOST;
@@ -492,5 +494,46 @@ public class ControlsTest {
             press(picker, KEYCODE_ENTER);
         });
         assertEquals(List.of(CourseColor.TEAL), chosen);
+    }
+
+    private static TextView titleOf(UpRow row) {
+        return (TextView) ((ViewGroup) row.getChildAt(0)).getChildAt(0);
+    }
+
+    @Test
+    public void aPhoneNumberReadsFromLeftToRightInEveryLayout() {
+        var number = new UpRow(context);
+        number.setTitle("+49 30 5550123");
+        number.keepTitleLeftToRight();
+        var plain = new UpRow(context);
+        plain.setTitle("+49 30 5550123");
+        for (var row : new UpRow[]{number, plain}) {
+            row.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+            layOut(row, 400);
+        }
+        assertEquals(DIR_LEFT_TO_RIGHT, titleOf(number).getLayout().getParagraphDirection(0));
+        // Without the call the digits take the direction of the layout, which is the reversed number of the audit.
+        assertEquals(DIR_RIGHT_TO_LEFT, titleOf(plain).getLayout().getParagraphDirection(0));
+    }
+
+    @Test
+    public void aFieldForAnAddressOrANumberReadsFromLeftToRight() {
+        var types = new int[]{
+                TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_URI,
+                TYPE_CLASS_TEXT | TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+                TYPE_CLASS_PHONE
+        };
+        for (var type : types) {
+            var field = new UpTextField(context);
+            field.setInputType(type);
+            field.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+            layOut(field, 400);
+            assertEquals(View.TEXT_DIRECTION_LTR, field.getChildAt(1).getTextDirection());
+        }
+
+        var name = new UpTextField(context);
+        name.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+        layOut(name, 400);
+        assertNotEquals(View.TEXT_DIRECTION_LTR, name.getChildAt(1).getTextDirection());
     }
 }
