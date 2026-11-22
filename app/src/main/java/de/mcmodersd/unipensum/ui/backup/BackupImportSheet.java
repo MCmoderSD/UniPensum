@@ -200,8 +200,6 @@ public final class BackupImportSheet extends UpSheet {
         var dp = getResources().getDisplayMetrics().density;
         var result = text(message, 16, error ? danger : text_primary, 8, 16);
         column.addView(result);
-        // Every step replaces the whole column, which takes the focus of a screen reader with it; it would go back to
-        // the title and say nothing of the outcome. The outcome is what it should land on.
         result.post(() -> result.performAccessibilityAction(ACTION_ACCESSIBILITY_FOCUS, null));
         var done = new UpButton(requireContext());
         done.setText(error ? action_close : action_done);
