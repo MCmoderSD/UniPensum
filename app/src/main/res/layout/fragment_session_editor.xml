@@ -127,6 +127,7 @@
                     style="@style/TextAppearance.Up.Body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/space_3"
                     android:layout_weight="1"
                     android:importantForAccessibility="no"
                     android:text="@string/field_hybrid" />
@@ -182,6 +183,7 @@
                     style="@style/TextAppearance.Up.Body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/space_3"
                     android:layout_weight="1"
                     android:importantForAccessibility="no"
                     android:text="@string/reminder_switch" />

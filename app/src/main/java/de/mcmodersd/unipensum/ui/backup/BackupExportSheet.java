@@ -93,7 +93,9 @@ public final class BackupExportSheet extends UpSheet {
         switchRow.setMinimumHeight(Math.round(48 * dp));
         switchRow.setPadding(Math.round(4 * dp), 0, Math.round(4 * dp), 0);
         var switchLabel = text(context, backup_protect, 16, text_primary);
-        switchRow.addView(switchLabel, new LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f));
+        var labelParams = new LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f);
+        labelParams.setMarginEnd(Math.round(12 * dp));
+        switchRow.addView(switchLabel, labelParams);
         protect = new UpSwitch(context);
         protect.setContentDescription(getString(backup_protect));
         switchRow.addView(protect);

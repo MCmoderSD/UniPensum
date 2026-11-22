@@ -98,8 +98,9 @@ public class UpSwitch extends View {
 
         var thumbRadius = radius - THUMB_INSET_DP * dp;
         var endX = getWidth() - radius;
+        var thumbX = radius + (endX - radius) * progress;
         thumbPaint.setColor(ColorUtils.blendARGB(thumbOff, thumbOn, progress));
-        canvas.drawCircle(radius + (endX - radius) * progress, top + radius, thumbRadius, thumbPaint);
+        canvas.drawCircle(Mirror.isRtl(this) ? getWidth() - thumbX : thumbX, top + radius, thumbRadius, thumbPaint);
     }
 
     @Override
