@@ -152,7 +152,7 @@ public final class SemesterEditorSheet extends UpSheet {
         // A text appearance takes over the text only, not the live region of the style: a screen reader says the
         // message when it shows, only if this is set as well.
         errorView.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
-        errorView.setPadding(Math.round(4 * dp), Math.round(4 * dp), 0, Math.round(4 * dp));
+        errorView.setPaddingRelative(Math.round(4 * dp), Math.round(4 * dp), 0, Math.round(4 * dp));
         errorView.setVisibility(GONE);
         column.addView(errorView);
 

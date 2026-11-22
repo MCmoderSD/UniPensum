@@ -51,7 +51,7 @@ public class UpRow extends LinearLayout {
         setOrientation(HORIZONTAL);
         setGravity(CENTER_VERTICAL);
         setMinimumHeight(Math.round(56 * dp));
-        setPadding(Math.round(16 * dp), Math.round(8 * dp), Math.round(12 * dp), Math.round(8 * dp));
+        setPaddingRelative(Math.round(16 * dp), Math.round(8 * dp), Math.round(12 * dp), Math.round(8 * dp));
         var background = new GradientDrawable();
         background.setCornerRadius(14 * dp);
         background.setColor(ContextCompat.getColor(context, surface));
@@ -71,7 +71,7 @@ public class UpRow extends LinearLayout {
 
         value = text(context, 16, text_secondary);
         value.setVisibility(GONE);
-        value.setPadding(Math.round(VALUE_GAP_DP * dp), 0, 0, 0);
+        value.setPaddingRelative(Math.round(VALUE_GAP_DP * dp), 0, 0, 0);
         addView(value);
 
         chevron = new ImageView(context);
@@ -110,7 +110,7 @@ public class UpRow extends LinearLayout {
     private boolean valueNeedsOwnLine(int width) {
         if (value.getVisibility() != VISIBLE) return false;
         var dp = getResources().getDisplayMetrics().density;
-        var fixed = getPaddingLeft() + getPaddingRight() + VALUE_GAP_DP * dp;
+        var fixed = getPaddingStart() + getPaddingEnd() + VALUE_GAP_DP * dp;
         for (var i = 0; i < getChildCount(); i++) {
             var child = getChildAt(i);
             if (child == texts || child == value || child.getVisibility() == GONE) continue;
@@ -135,11 +135,11 @@ public class UpRow extends LinearLayout {
         var dp = getResources().getDisplayMetrics().density;
         if (below) {
             removeView(value);
-            value.setPadding(0, 0, 0, 0);
+            value.setPaddingRelative(0, 0, 0, 0);
             texts.addView(value);
         } else {
             texts.removeView(value);
-            value.setPadding(Math.round(VALUE_GAP_DP * dp), 0, 0, 0);
+            value.setPaddingRelative(Math.round(VALUE_GAP_DP * dp), 0, 0, 0);
             addView(value, indexOfChild(texts) + 1);
         }
     }

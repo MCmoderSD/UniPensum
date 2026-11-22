@@ -51,7 +51,7 @@ public class UpTextField extends LinearLayout {
         label = new TextView(context);
         label.setTextSize(COMPLEX_UNIT_SP, 13);
         label.setTextColor(ContextCompat.getColor(context, text_secondary));
-        label.setPadding(Math.round(4 * dp), 0, 0, Math.round(6 * dp));
+        label.setPaddingRelative(Math.round(4 * dp), 0, 0, Math.round(6 * dp));
         addView(label);
 
         input = new AppCompatEditText(context);
@@ -62,7 +62,7 @@ public class UpTextField extends LinearLayout {
         input.setHintTextColor(ContextCompat.getColor(context, text_secondary));
         input.setGravity(CENTER_VERTICAL);
         input.setMinHeight(Math.round(52 * dp));
-        input.setPadding(Math.round(16 * dp), 0, Math.round(16 * dp), 0);
+        input.setPaddingRelative(Math.round(16 * dp), 0, Math.round(16 * dp), 0);
         background.setCornerRadius(14 * dp);
         background.setColor(ContextCompat.getColor(context, surface));
         input.setBackground(background);
@@ -76,7 +76,7 @@ public class UpTextField extends LinearLayout {
         error = new TextView(context);
         error.setTextSize(COMPLEX_UNIT_SP, 13);
         error.setTextColor(ContextCompat.getColor(context, danger));
-        error.setPadding(Math.round(4 * dp), Math.round(6 * dp), 0, 0);
+        error.setPaddingRelative(Math.round(4 * dp), Math.round(6 * dp), 0, 0);
         error.setVisibility(GONE);
         // A message that shows after a failed Save is said without being asked.
         error.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
@@ -170,7 +170,7 @@ public class UpTextField extends LinearLayout {
         input.setMinLines(minLines);
         input.setGravity(TOP | START);
         input.setInputType(TYPE_CLASS_TEXT | TYPE_TEXT_FLAG_MULTI_LINE | TYPE_TEXT_FLAG_CAP_SENTENCES);
-        input.setPadding(input.getPaddingLeft(), Math.round(14 * dp), input.getPaddingRight(), Math.round(14 * dp));
+        input.setPaddingRelative(input.getPaddingStart(), Math.round(14 * dp), input.getPaddingEnd(), Math.round(14 * dp));
     }
 
     /** Stops typing and pasting at {@code maxLength} characters, the limits of {@code TextSanitizer}. */
