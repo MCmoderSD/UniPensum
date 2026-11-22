@@ -19,7 +19,7 @@
             android:paddingEnd="@dimen/space_2"
             android:paddingBottom="@dimen/space_2">
 
-            <LinearLayout
+            <de.mcmodersd.unipensum.ui.week.HeaderTexts
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -50,7 +50,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_1"
                     android:maxLines="2" />
-            </LinearLayout>
+            </de.mcmodersd.unipensum.ui.week.HeaderTexts>
 
             <!-- Order of the buttons: add a course, the courses, the settings. -->
             <de.mcmodersd.unipensum.ui.widget.UpIconButton

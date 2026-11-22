@@ -20,9 +20,7 @@ final class CompactHeader {
 
     private static final int GAP_DP = 12;
     private static final int PADDING_DP = 4;
-    /** The three buttons and the padding of the header, which the two texts share what is left of the width after. */
-    private static final int BUTTONS_DP = 3 * 48 + 24;
-    /** The share of that width the name of the semester takes at most, the date range gets the rest. */
+    /** The share of the room of the two texts the name of the semester takes at most, the date range gets the rest. */
     private static final float NAME_SHARE = 0.55f;
 
     private CompactHeader() { }
@@ -37,17 +35,19 @@ final class CompactHeader {
 
     /** @param root the layout of the week, which holds the header */
     static void apply(View root) {
-        var title = root.findViewById(R.id.title);
+        var title = (TextView) root.findViewById(R.id.title);
         var subtitle = root.findViewById(R.id.subtitle);
         var dp = root.getResources().getDisplayMetrics().density;
 
-        // The name keeps its own width, so the arrow stays beside it, up to a share of the row: a long name is cut off
-        // there and the date range, which takes the rest, stays readable.
-        var texts = (LinearLayout) title.getParent();
+        // The name keeps its own width, so the arrow stays beside it, up to a share of the room of the two texts, which
+        // is the room of the week itself: a long name is cut off there and the date range, which takes the rest, stays
+        // readable, also where the week stands beside an open page.
+        var texts = (HeaderTexts) title.getParent();
         texts.setOrientation(HORIZONTAL);
         texts.setGravity(CENTER_VERTICAL);
-        var windowDp = root.getResources().getConfiguration().screenWidthDp;
-        ((TextView) title).setMaxWidth(Math.round(NAME_SHARE * (windowDp - BUTTONS_DP) * dp));
+        texts.setNameShare(NAME_SHARE);
+        // One line, cut off at its end, and not broken inside a long word in the little room that is left.
+        title.setMaxLines(1);
         var dateParams = (LinearLayout.LayoutParams) subtitle.getLayoutParams();
         dateParams.width = 0;
         dateParams.weight = 1f;
