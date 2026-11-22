@@ -52,6 +52,7 @@ import de.mcmodersd.unipensum.domain.model.SessionType;
 import de.mcmodersd.unipensum.domain.text.TextSanitizer;
 import de.mcmodersd.unipensum.reminder.NotificationAccess;
 import de.mcmodersd.unipensum.ui.Navigator;
+import de.mcmodersd.unipensum.ui.PageTitle;
 import de.mcmodersd.unipensum.ui.course.CourseDraftViewModel;
 import de.mcmodersd.unipensum.ui.format.ReminderFormat;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
@@ -204,10 +205,7 @@ public class SessionEditorFragment extends Fragment {
 
         findViews(view);
         view.findViewById(back).setOnClickListener(v -> Navigator.of(this).pop());
-        ((TextView) view.findViewById(bar_title)).setText(
-                seriesMode
-                        ? (seriesIndex < 0 ? event_new : event_edit) : session_edit
-        );
+        PageTitle.set(view, getString(seriesMode ? (seriesIndex < 0 ? event_new : event_edit) : session_edit));
         saveButton.setOnClickListener(v -> save());
 
         var holder = new ViewModelProvider(this).get(FormViewModel.class);
@@ -315,10 +313,12 @@ public class SessionEditorFragment extends Fragment {
         untilRow = view.findViewById(until_row);
         hybridSwitch = view.findViewById(hybrid_switch);
         hybridRow = view.findViewById(hybrid_row);
+        UpSwitch.bindRow(hybridRow, hybridSwitch);
         roomField = view.findViewById(room_field);
         linkField = view.findViewById(link_field);
         lecturerRow = view.findViewById(lecturer_row);
         reminderSwitch = view.findViewById(R.id.reminder_switch);
+        UpSwitch.bindRow(view.findViewById(R.id.reminder_row), reminderSwitch);
         reminderStepper = view.findViewById(reminder_stepper);
         notificationsOffRow = view.findViewById(notifications_off_row);
         noteField = view.findViewById(note_field);
@@ -348,6 +348,7 @@ public class SessionEditorFragment extends Fragment {
         root.findViewById(period_block).setVisibility(thisOnly() ? GONE : VISIBLE);
         dateRow.setVisibility(thisOnly() ? VISIBLE : GONE);
 
+        typeControl.setLabel(getString(field_type));
         typeControl.setOptions(
                 getString(type_lecture), getString(type_exercise),
                 getString(type_lab), getString(type_tutorial)
@@ -357,6 +358,7 @@ public class SessionEditorFragment extends Fragment {
 
         var weekdays = new CharSequence[5];
         for (var i = 0; i < 5; i++) weekdays[i] = SeriesFormat.weekdayShort(requireContext(), DayOfWeek.of(i + 1));
+        weekdayControl.setLabel(getString(field_weekday));
         weekdayControl.setOptions(weekdays);
         weekdayControl.setSelectedIndex(form.weekday.getValue() - 1);
         weekdayControl.setOnSelectionChangedListener(index -> {
@@ -364,6 +366,7 @@ public class SessionEditorFragment extends Fragment {
             updateScheduleNote();
         });
 
+        modeControl.setLabel(getString(field_format));
         modeControl.setOptions(getString(mode_in_person), getString(mode_online));
         modeControl.setSelectedIndex(form.mode.ordinal());
         modeControl.setOnSelectionChangedListener(index -> {
@@ -371,7 +374,7 @@ public class SessionEditorFragment extends Fragment {
             form.mode = Mode.values()[index];
             // A reminder that is still the standard time of the old format becomes that of the new one.
             form.reminderMin = Reminders.afterModeChange(form.reminderMin, previous, form.mode);
-            reminderStepper.setValue(Reminders.afterModeChange(reminderStepper.getValue(), previous, form.mode));
+            reminderStepper.changeTo(Reminders.afterModeChange(reminderStepper.getValue(), previous, form.mode));
             updateModeVisibility();
         });
         hybridSwitch.setChecked(form.hybrid);
@@ -400,6 +403,7 @@ public class SessionEditorFragment extends Fragment {
             for (var lecturer : list) lecturers.put(lecturer.id(), lecturer);
             renderLecturer();
         });
+        reminderStepper.setLabel(getString(field_reminder));
         reminderStepper.setRange(0, MAX_REMINDER_MIN);
         reminderStepper.setStep(STEP_MIN);
         reminderStepper.setFormatter(minutes -> ReminderFormat.text(requireContext(), minutes));
@@ -418,8 +422,10 @@ public class SessionEditorFragment extends Fragment {
         noteField.setText(form.note);
         noteField.addTextWatcher(text -> form.note = text);
 
+        repeatControl.setLabel(getString(field_repeat));
         repeatControl.setOptions(getString(repeat_weekly), getString(repeat_biweekly), getString(repeat_custom));
         repeatControl.setSelectedIndex(repeatIndex(form.interval));
+        repeatStepper.setLabel(getString(field_repeat));
         repeatStepper.setRange(1, 12);
         repeatStepper.setFormatter(value -> SeriesFormat.repeat(requireContext(), value));
         repeatStepper.setValue(form.interval > 2 ? form.interval : DEFAULT_CUSTOM_INTERVAL);
@@ -566,7 +572,8 @@ public class SessionEditorFragment extends Fragment {
         }
         // The link only counts for online and hybrid events; the field is hidden otherwise.
         var linkUsed = form.mode == ONLINE || form.hybrid;
-        if (linkUsed && !TextSanitizer.isValidWebLink(form.link)) {
+        var linkRefused = linkUsed && !TextSanitizer.isValidWebLink(form.link);
+        if (linkRefused) {
             linkField.setError(getString(error_link));
             valid = false;
         }
@@ -582,6 +589,9 @@ public class SessionEditorFragment extends Fragment {
         }
         if (!valid) {
             Haptics.reject(saveButton);
+            // The field that was refused takes the focus, so a screen reader reads what is wrong with it. The messages
+            // of the times and the period say themselves, see TextAppearance.Up.Error.
+            if (linkRefused) linkField.focusInput();
             return;
         }
 

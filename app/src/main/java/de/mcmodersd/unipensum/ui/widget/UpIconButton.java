@@ -17,9 +17,11 @@ import androidx.core.widget.ImageViewCompat;
 
 import java.util.function.BooleanSupplier;
 
-/** A tappable icon with a 44dp touch target. Set a content description wherever it is used. */
+/** A tappable icon with a 48dp touch target. Set a content description wherever it is used. */
 public class UpIconButton extends AppCompatImageView {
 
+    static final int SIZE_DP = 48;
+    private static final int PADDING_DP = 12;
     private static final long FIRST_INTERVAL_MS = 160;
     private static final long FASTEST_INTERVAL_MS = 50;
     private static final long SPEED_UP_MS = 12;
@@ -47,17 +49,18 @@ public class UpIconButton extends AppCompatImageView {
     public UpIconButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         var dp = getResources().getDisplayMetrics().density;
-        var padding = Math.round(10 * dp);
+        var padding = Math.round(PADDING_DP * dp);
         setPadding(padding, padding, padding, padding);
         setScaleType(FIT_CENTER);
         setClickable(true);
         setFocusable(true);
         ImageViewCompat.setImageTintList(this, ColorStateList.valueOf(ContextCompat.getColor(context, text_primary)));
+        FocusRing.install(this, SIZE_DP / 2f);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        var size = Math.round(44 * getResources().getDisplayMetrics().density);
+        var size = Math.round(SIZE_DP * getResources().getDisplayMetrics().density);
         setMeasuredDimension(resolveSize(size, widthMeasureSpec), resolveSize(size, heightMeasureSpec));
     }
 

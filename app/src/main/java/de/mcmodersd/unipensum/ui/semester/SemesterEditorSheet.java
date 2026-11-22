@@ -1,11 +1,10 @@
 package de.mcmodersd.unipensum.ui.semester;
 
-import static android.util.TypedValue.COMPLEX_UNIT_SP;
 import static android.view.View.*;
 import static android.view.ViewGroup.LayoutParams.*;
 import static android.widget.LinearLayout.VERTICAL;
-import static de.mcmodersd.unipensum.R.color.danger;
 import static de.mcmodersd.unipensum.R.string.*;
+import static de.mcmodersd.unipensum.R.style.TextAppearance_Up_Error;
 import static de.mcmodersd.unipensum.domain.text.TextSanitizer.MAX_NAME;
 import static de.mcmodersd.unipensum.ui.widget.DatePickerSheet.RESULT_EPOCH_DAY;
 import static de.mcmodersd.unipensum.ui.widget.UpButton.Variant.DESTRUCTIVE;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import java.time.LocalDate;
@@ -37,6 +35,7 @@ import de.mcmodersd.unipensum.ui.format.TimeFormat;
 import de.mcmodersd.unipensum.ui.widget.ConfirmSheet;
 import de.mcmodersd.unipensum.ui.widget.DatePickerSheet;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
+import de.mcmodersd.unipensum.ui.widget.LiveMessage;
 import de.mcmodersd.unipensum.ui.widget.UpButton;
 import de.mcmodersd.unipensum.ui.widget.UpRow;
 import de.mcmodersd.unipensum.ui.widget.UpSheet;
@@ -75,6 +74,7 @@ public final class SemesterEditorSheet extends UpSheet {
     private UpRow endRow;
     private UpTextField nameField;
     private TextView errorView;
+    private LiveMessage errorMessage;
     private UpButton saveButton;
 
     /**
@@ -150,10 +150,13 @@ public final class SemesterEditorSheet extends UpSheet {
         column.addView(nameField, spaced(dp, 8));
 
         errorView = new TextView(context);
-        errorView.setTextSize(COMPLEX_UNIT_SP, 14);
-        errorView.setTextColor(ContextCompat.getColor(context, danger));
-        errorView.setPadding(Math.round(4 * dp), Math.round(4 * dp), 0, Math.round(4 * dp));
+        errorView.setTextAppearance(TextAppearance_Up_Error);
+        // A text appearance takes over the text only, not the live region of the style: a screen reader says the
+        // message when it shows, only if this is set as well.
+        errorView.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
+        errorView.setPaddingRelative(Math.round(4 * dp), Math.round(4 * dp), 0, Math.round(4 * dp));
         errorView.setVisibility(GONE);
+        errorMessage = new LiveMessage(errorView);
         column.addView(errorView);
 
         saveButton = new UpButton(context);
@@ -218,7 +221,7 @@ public final class SemesterEditorSheet extends UpSheet {
         startRow.setValue(TimeFormat.dateMedium(context, start));
         endRow.setValue(TimeFormat.dateMedium(context, end));
         nameField.setHint(SemesterNames.display(context, new Semester(0, start, end, null)));
-        errorView.setVisibility(GONE);
+        errorMessage.show(null);
     }
 
     private Semester candidate() {
@@ -293,8 +296,7 @@ public final class SemesterEditorSheet extends UpSheet {
     }
 
     private void showError(String message) {
-        errorView.setText(message);
-        errorView.setVisibility(VISIBLE);
+        errorMessage.show(message);
         Haptics.reject(saveButton);
     }
 

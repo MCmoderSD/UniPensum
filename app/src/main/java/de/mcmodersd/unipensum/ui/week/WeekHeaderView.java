@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
+import de.mcmodersd.unipensum.ui.widget.Mirror;
 
 /** Weekday names and dates above the grid. The current day is marked with a filled circle. */
 // Created in code by WeekPageView only, never inflated from XML.
@@ -78,10 +79,12 @@ final class WeekHeaderView extends View {
         var weekdayBaseline = getHeight() * 0.36f;
         var numberCenter = getHeight() * 0.70f;
         var radius = numberPaint.getTextSize() * 0.95f;
+        var rtl = Mirror.isRtl(this);
 
         for (var i = 0; i < 5; i++) {
             var day = monday.plusDays(i);
             var centerX = metrics.gutter + columnWidth * (i + 0.5f);
+            if (rtl) centerX = getWidth() - centerX;
 
             var weekday = DayOfWeek.of(i + 1).getDisplayName(TextStyle.SHORT, locale);
             canvas.drawText(weekday.toUpperCase(locale), centerX, weekdayBaseline, weekdayPaint);

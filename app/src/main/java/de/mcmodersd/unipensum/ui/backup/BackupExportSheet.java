@@ -93,10 +93,14 @@ public final class BackupExportSheet extends UpSheet {
         switchRow.setMinimumHeight(Math.round(48 * dp));
         switchRow.setPadding(Math.round(4 * dp), 0, Math.round(4 * dp), 0);
         var switchLabel = text(context, backup_protect, 16, text_primary);
-        switchRow.addView(switchLabel, new LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f));
+        var labelParams = new LinearLayout.LayoutParams(0, WRAP_CONTENT, 1f);
+        labelParams.setMarginEnd(Math.round(12 * dp));
+        switchRow.addView(switchLabel, labelParams);
         protect = new UpSwitch(context);
         protect.setContentDescription(getString(backup_protect));
         switchRow.addView(protect);
+        UpSwitch.bindRow(switchRow, protect);
+        switchLabel.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
         formColumn.addView(switchRow, spaced(dp, 0, 8));
 
         var block = new LinearLayout(context);
@@ -151,7 +155,7 @@ public final class BackupExportSheet extends UpSheet {
         if (protect.isChecked()) {
             chars = password.getTextChars();
             var again = repeat.getTextChars();
-            var valid = true;
+            UpTextField refused = null;
             if (chars.length < MIN_PASSWORD_LENGTH) {
                 password.setError(
                         getResources().getQuantityString(
@@ -159,16 +163,18 @@ public final class BackupExportSheet extends UpSheet {
                                 MIN_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH
                         )
                 );
-                valid = false;
+                refused = password;
             }
             if (!Arrays.equals(chars, again)) {
                 repeat.setError(getString(backup_error_password_mismatch));
-                valid = false;
+                if (refused == null) refused = repeat;
             }
             clear(again);
-            if (!valid) {
+            if (refused != null) {
                 clear(chars);
                 Haptics.reject(exportButton);
+                // The first field that was refused takes the focus, so a screen reader reads what is wrong with it.
+                refused.focusInput();
                 return;
             }
         }

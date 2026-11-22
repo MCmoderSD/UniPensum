@@ -19,6 +19,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.AccessibilityDelegateCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.LinearSnapHelper;
@@ -178,11 +181,20 @@ public class WheelPicker extends RecyclerView {
             var view = new TextView(parent.getContext());
             view.setLayoutParams(new LayoutParams(MATCH_PARENT, itemHeight));
             view.setGravity(CENTER);
+            view.setTextAlignment(TEXT_ALIGNMENT_CENTER);
             view.setTextSize(COMPLEX_UNIT_SP, 22);
             view.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
             view.setTextColor(ContextCompat.getColor(parent.getContext(), text_primary));
             var holder = new RecyclerView.ViewHolder(view) {
             };
+            // The value in the middle is the chosen one, which a screen reader says as "selected".
+            ViewCompat.setAccessibilityDelegate(view, new AccessibilityDelegateCompat() {
+                @Override
+                public void onInitializeAccessibilityNodeInfo(@NonNull View host, @NonNull AccessibilityNodeInfoCompat info) {
+                    super.onInitializeAccessibilityNodeInfo(host, info);
+                    info.setSelected(holder.getBindingAdapterPosition() == getSelectedIndex());
+                }
+            });
             view.setOnClickListener(v -> {
                 var position = holder.getBindingAdapterPosition();
                 if (position != NO_POSITION && position != selected) scrollToIndex(position);

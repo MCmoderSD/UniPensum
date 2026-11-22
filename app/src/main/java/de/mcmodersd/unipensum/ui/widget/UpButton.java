@@ -10,6 +10,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
+import android.widget.Button;
 
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.ContextCompat;
@@ -30,6 +31,7 @@ public class UpButton extends AppCompatTextView {
         var dp = getResources().getDisplayMetrics().density;
 
         setGravity(CENTER);
+        setTextAlignment(TEXT_ALIGNMENT_CENTER);
         setMinHeight(Math.round(52 * dp));
         setPadding(Math.round(20 * dp), 0, Math.round(20 * dp), 0);
         setTextSize(COMPLEX_UNIT_SP, 16);
@@ -37,6 +39,7 @@ public class UpButton extends AppCompatTextView {
         setClickable(true);
         setFocusable(true);
         setAllCaps(false);
+        FocusRing.install(this, 14);
 
         var variant = PRIMARY;
         if (attrs != null) {
@@ -74,6 +77,12 @@ public class UpButton extends AppCompatTextView {
     public boolean performClick() {
         Haptics.tap(this);
         return super.performClick();
+    }
+
+    /** A screen reader says "Button"; the view is a text view only underneath. */
+    @Override
+    public CharSequence getAccessibilityClassName() {
+        return Button.class.getName();
     }
 
     @Override

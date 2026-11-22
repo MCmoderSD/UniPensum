@@ -2,7 +2,9 @@ package de.mcmodersd.unipensum.ui.week;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.TIRAMISU;
+import static android.view.KeyEvent.*;
 import static android.view.View.*;
+import static android.view.accessibility.AccessibilityEvent.TYPE_VIEW_SCROLLED;
 import static de.mcmodersd.unipensum.R.id.*;
 import static de.mcmodersd.unipensum.R.layout.fragment_week;
 import static de.mcmodersd.unipensum.R.string.*;
@@ -10,15 +12,20 @@ import static de.mcmodersd.unipensum.ui.semester.SemesterSheet.*;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityEvent;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.AccessibilityDelegateCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,6 +51,7 @@ import de.mcmodersd.unipensum.ui.semester.SemesterSheet;
 import de.mcmodersd.unipensum.ui.session.SessionDetailSheet;
 import de.mcmodersd.unipensum.ui.settings.SettingsFragment;
 import de.mcmodersd.unipensum.ui.widget.ConfirmSheet;
+import de.mcmodersd.unipensum.ui.widget.FocusRing;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
 
 /**
@@ -86,6 +94,7 @@ public class WeekFragment extends Fragment {
         openCourses = view.findViewById(open_courses);
         pager = view.findViewById(R.id.pager);
         zoomIndicator = view.findViewById(zoom_indicator);
+        if (CompactHeader.wanted(requireContext())) CompactHeader.apply(view);
 
         viewModel = new ViewModelProvider(this).get(WeekViewModel.class);
         var adapter = new WeekPagerAdapter();
@@ -98,19 +107,29 @@ public class WeekFragment extends Fragment {
             Haptics.tap(v);
             resetZoom();
         });
-        // The view is rebuilt while the grid is zoomed (turning, theme, language): the label has to come back.
-        if (viewModel.zoom() > ZoomMetrics.MIN) showZoom(viewModel.zoom());
+        // The view is rebuilt while the grid is zoomed (turning, theme, language): the label has to come back. A list
+        // of days, shown for large text, has no zoom.
+        if (viewModel.zoom() > ZoomMetrics.MIN && !WeekAgendaView.wanted(requireContext())) {
+            showZoom(viewModel.zoom());
+        }
         adapter.setOnSessionClickListener(session ->
                 SessionDetailSheet.show(getParentFragmentManager(), session.session().id())
         );
         pager.setAdapter(adapter);
         pager.setOffscreenPageLimit(1);
+        // The weeks are not a stop of their own: the Tab key goes on to the sessions, and Page Up and Page Down turn
+        // the weeks, see turnWeek.
+        weeks().setFocusable(false);
+        ViewCompat.setAccessibilityDelegate(weeks(), new WeekPositionDelegate());
+        ViewCompat.addOnUnhandledKeyEventListener(view, (root, event) -> turnWeek(root, event));
         // The view is rebuilt when the screen is recreated (turning, theme, language); come back to the same week.
         pager.setCurrentItem(viewModel.page() >= 0 ? viewModel.page() : Weeks.initialPosition(LocalDate.now()), false);
+        adapter.setCurrentPage(pager.getCurrentItem());
         pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
                 viewModel.setPage(position);
+                adapter.setCurrentPage(position);
                 updateHeader(position);
             }
         });
@@ -119,6 +138,7 @@ public class WeekFragment extends Fragment {
                 KEY_NOTIFICATIONS, getViewLifecycleOwner(),
                 (key, result) -> allowNotifications()
         );
+        FocusRing.install(title, 8);
         title.setOnClickListener(v -> {
             Haptics.tap(v);
             SemesterSheet.show(getParentFragmentManager());
@@ -155,6 +175,42 @@ public class WeekFragment extends Fragment {
     }
 
     /**
+     * The pager says "Page 360 of 1560" when a week is turned, the place among every week there is, which means
+     * nothing. The week itself is said by the subtitle, a live region, so that report is left out.
+     */
+    private static final class WeekPositionDelegate extends AccessibilityDelegateCompat {
+        @Override
+        public void onInitializeAccessibilityEvent(@NonNull View host, @NonNull AccessibilityEvent event) {
+            super.onInitializeAccessibilityEvent(host, event);
+            if (event.getEventType() != TYPE_VIEW_SCROLLED) return;
+            event.setFromIndex(-1);
+            event.setToIndex(-1);
+            event.setItemCount(-1);
+        }
+    }
+
+    /**
+     * Page Up and Page Down show the week before and after, Home the week of today, for a keyboard that has the focus
+     * in the calendar. The arrow keys stay with the focus, which they move between the sessions.
+     *
+     * @return whether the key was taken
+     */
+    private boolean turnWeek(View root, KeyEvent event) {
+        var key = event.getKeyCode();
+        if (key != KEYCODE_PAGE_UP && key != KEYCODE_PAGE_DOWN && key != KEYCODE_MOVE_HOME) return false;
+        // A page beside the calendar, or over it, has its own keys.
+        if (!root.hasFocus() || event.getRepeatCount() > 0) return false;
+        if (event.getAction() == ACTION_DOWN) {
+            var target = key == KEYCODE_MOVE_HOME
+                    ? Weeks.initialPosition(LocalDate.now())
+                    : pager.getCurrentItem() + (key == KEYCODE_PAGE_DOWN ? 1 : -1);
+            var adapter = pager.getAdapter();
+            if (adapter != null && target >= 0 && target < adapter.getItemCount()) pager.setCurrentItem(target, true);
+        }
+        return true;
+    }
+
+    /**
      * Shows the zoom in percent, with a magnifier, at the bottom right of the grid. It stays while the grid is
      * zoomed, so a tap can reset the zoom, and fades out a moment after the zoom is back at 100 %.
      */
@@ -169,10 +225,14 @@ public class WeekFragment extends Fragment {
         if (zoom <= ZoomMetrics.MIN) zoomIndicator.postDelayed(hideZoom, ZOOM_INDICATOR_MS);
     }
 
+    /** The list inside the pager that holds the weeks. ViewPager2 builds it as its only child and offers no other way in. */
+    private RecyclerView weeks() {
+        return (RecyclerView) pager.getChildAt(0);
+    }
+
     /** Resets the zoom of the week that is shown; the others follow once it has settled. */
     private void resetZoom() {
-        var weeks = (RecyclerView) pager.getChildAt(0);
-        var holder = weeks.findViewHolderForAdapterPosition(pager.getCurrentItem());
+        var holder = weeks().findViewHolderForAdapterPosition(pager.getCurrentItem());
         if (holder instanceof WeekPagerAdapter.PageHolder) ((WeekPagerAdapter.PageHolder) holder).page.resetZoom();
     }
 
@@ -245,14 +305,16 @@ public class WeekFragment extends Fragment {
                             ? getString(app_name) : getString(no_semester)
             );
         }
-        subtitle.setText(
-                getString(
-                        week_subtitle,
-                        TimeFormat.dateShort(requireContext(), monday),
-                        TimeFormat.dateShort(requireContext(), friday),
-                        Weeks.isoWeekNumber(monday)
-                )
+        // The description replaces the text for a screen reader, so it has to say the name of the semester too.
+        title.setContentDescription(getString(semester_switch_description, title.getText()));
+        // A live region says the new week when the user turns it; the same text again would be said again.
+        var range = getString(
+                week_subtitle,
+                TimeFormat.dateShort(requireContext(), monday),
+                TimeFormat.dateShort(requireContext(), friday),
+                Weeks.isoWeekNumber(monday)
         );
+        if (!TextUtils.equals(subtitle.getText(), range)) subtitle.setText(range);
     }
 
     /** The first semester that holds a day of the week, which decides what the title says at a boundary. */

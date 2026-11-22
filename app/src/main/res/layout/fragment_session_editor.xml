@@ -7,7 +7,7 @@
     android:background="@color/bg"
     tools:ignore="Overdraw"
     android:clickable="true"
-    android:focusable="true"
+    android:focusable="false"
     android:orientation="vertical">
 
     <include layout="@layout/view_top_bar" />
@@ -127,7 +127,9 @@
                     style="@style/TextAppearance.Up.Body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/space_3"
                     android:layout_weight="1"
+                    android:importantForAccessibility="no"
                     android:text="@string/field_hybrid" />
 
                 <de.mcmodersd.unipensum.ui.widget.UpSwitch
@@ -169,6 +171,7 @@
                 android:text="@string/field_reminder" />
 
             <LinearLayout
+                android:id="@+id/reminder_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
@@ -180,7 +183,9 @@
                     style="@style/TextAppearance.Up.Body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/space_3"
                     android:layout_weight="1"
+                    android:importantForAccessibility="no"
                     android:text="@string/reminder_switch" />
 
                 <de.mcmodersd.unipensum.ui.widget.UpSwitch

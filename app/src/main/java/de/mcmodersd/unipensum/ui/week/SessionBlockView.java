@@ -28,9 +28,12 @@ import androidx.core.graphics.ColorUtils;
 import de.mcmodersd.unipensum.data.SessionView;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.ui.format.CourseColors;
+import de.mcmodersd.unipensum.ui.format.HyphenationLanguage;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
+import de.mcmodersd.unipensum.ui.widget.FocusRing;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
+import de.mcmodersd.unipensum.ui.widget.Mirror;
 
 /**
  * One session in the grid: a tinted card with an accent bar in the course color. Overlapping
@@ -41,6 +44,8 @@ import de.mcmodersd.unipensum.ui.widget.Haptics;
 @SuppressLint("ViewConstructor")
 final class SessionBlockView extends LinearLayout {
 
+    /** How much of the course color tints the area of a session: 18 %. At full strength it is only a line or a dot. */
+    static final int TINT_ALPHA = 0x2E;
     /** Lets the time range break after the dash when it does not fit on one line. */
     private static final String BREAKABLE_DASH = "–​";
 
@@ -69,7 +74,7 @@ final class SessionBlockView extends LinearLayout {
 
         var background = new GradientDrawable();
         background.setCornerRadius(radius);
-        background.setColor(ColorUtils.setAlphaComponent(accent, 0x2E));
+        background.setColor(ColorUtils.setAlphaComponent(accent, TINT_ALPHA));
         if (overlapping) {
             background.setStroke(Math.round(1.5f * dp), accent, 4 * dp, 3 * dp);
         }
@@ -79,12 +84,18 @@ final class SessionBlockView extends LinearLayout {
         setGravity(TOP);
         setClickable(true);
         setFocusable(true);
+        FocusRing.install(this, radius / dp);
 
         var details = session.session().details();
         title = line(context, true, session.courseName());
         // Two sessions side by side leave very little width; hyphenate instead of breaking inside a word.
         title.setHyphenationFrequency(HYPHENATION_FREQUENCY_FULL);
         title.setBreakStrategy(BREAK_STRATEGY_HIGH_QUALITY);
+        // A name in Latin letters on a device in Arabic, say, has no patterns of its own to be hyphenated by.
+        var language = HyphenationLanguage.of(
+                session.courseName(), context.getResources().getConfiguration().getLocales().get(0)
+        );
+        if (language != null) title.setTextLocale(language);
         time = line(
                 context, false, TimeFormat.time(context, details.startMin()) + BREAKABLE_DASH
                         + TimeFormat.time(context, details.endMin())
@@ -93,14 +104,19 @@ final class SessionBlockView extends LinearLayout {
         type = line(context, false, TimeFormat.typeName(context, details.type()));
         lecturer = line(context, false, session.lecturer() == null ? "" : session.lecturer().name(nameStyle));
 
-        setContentDescription(
-                context.getString(
-                        session_description,
-                        session.courseName(),
-                        TimeFormat.typeName(context, details.type()),
-                        TimeFormat.time(context, details.startMin()),
-                        TimeFormat.time(context, details.endMin())
-                )
+        setContentDescription(describe(context, session));
+    }
+
+    /** What a screen reader says about a session: the day, the course, the type and the time. */
+    static String describe(Context context, SessionView session) {
+        var details = session.session().details();
+        return context.getString(
+                session_description,
+                TimeFormat.dateWithWeekday(context, session.session().day()),
+                session.courseName(),
+                TimeFormat.typeName(context, details.type()),
+                TimeFormat.time(context, details.startMin()),
+                TimeFormat.time(context, details.endMin())
         );
     }
 
@@ -115,7 +131,7 @@ final class SessionBlockView extends LinearLayout {
         fittedHeight = heightPx;
 
         var narrow = widthPx < 52 * dp;
-        setPadding(
+        setPaddingRelative(
                 barWidth + Math.round((narrow ? 2 : 4) * dp), Math.round(3 * dp),
                 Math.round((narrow ? 1 : 3) * dp), Math.round(3 * dp)
         );
@@ -124,7 +140,7 @@ final class SessionBlockView extends LinearLayout {
             detail.setTextSize(COMPLEX_UNIT_SP, narrow ? 9f : 10f);
         }
 
-        var contentWidth = Math.max(0, widthPx - getPaddingLeft() - getPaddingRight());
+        var contentWidth = Math.max(0, widthPx - getPaddingStart() - getPaddingEnd());
         var budget = Math.max(0, heightPx - getPaddingTop() - getPaddingBottom());
         budget -= fit(title, contentWidth, budget, 3, true);
         budget -= fit(time, contentWidth, budget, 2, false);
@@ -161,7 +177,9 @@ final class SessionBlockView extends LinearLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         var inset = radius * 0.6f;
-        barRect.set(inset * 0.5f, inset, inset * 0.5f + barWidth, getHeight() - inset);
+        // The bar runs along the start edge, which is the right one in a layout from right to left.
+        var from = Mirror.isRtl(this) ? getWidth() - inset * 0.5f - barWidth : inset * 0.5f;
+        barRect.set(from, inset, from + barWidth, getHeight() - inset);
         canvas.drawRoundRect(barRect, barWidth / 2f, barWidth / 2f, barPaint);
     }
 
@@ -180,7 +198,7 @@ final class SessionBlockView extends LinearLayout {
     private TextView line(Context context, boolean primary, String text) {
         var view = new TextView(context);
         view.setText(text);
-        view.setTextColor(ContextCompat.getColor(context, primary ? text_primary : text_secondary));
+        view.setTextColor(ContextCompat.getColor(context, primary ? text_primary : text_detail));
         view.setEllipsize(TextUtils.TruncateAt.END);
         view.setIncludeFontPadding(false);
         view.setTypeface(Typeface.create(primary ? "sans-serif-medium" : "sans-serif", Typeface.NORMAL));

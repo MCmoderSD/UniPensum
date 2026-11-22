@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.WindowCompat;
@@ -131,6 +132,8 @@ public final class TimePickerSheet extends UpSheet {
 
         var colon = colon(context, 22);
         var wheels = new LinearLayout(context);
+        // A time reads hours, then minutes, from left to right in every language.
+        wheels.setLayoutDirection(LAYOUT_DIRECTION_LTR);
         wheels.setGravity(CENTER);
         wheels.addView(hourWheel, new LinearLayout.LayoutParams(Math.round(88 * dp), WRAP_CONTENT));
         wheels.addView(colon, new LinearLayout.LayoutParams(Math.round(20 * dp), WRAP_CONTENT));
@@ -163,8 +166,8 @@ public final class TimePickerSheet extends UpSheet {
     // --- typing ---
 
     private View buildTypingFields(Context context, float dp) {
-        hourInput = numberField(context, dp, getString(time_hour));
-        minuteInput = numberField(context, dp, getString(time_minute));
+        hourInput = numberField(context, dp);
+        minuteInput = numberField(context, dp);
         hourInput.setImeOptions(IME_ACTION_NEXT);
         minuteInput.setImeOptions(IME_ACTION_DONE);
         minuteInput.setOnEditorActionListener((v, actionId, event) -> {
@@ -181,14 +184,39 @@ public final class TimePickerSheet extends UpSheet {
         );
 
         var row = new LinearLayout(context);
+        row.setLayoutDirection(LAYOUT_DIRECTION_LTR);
         row.setGravity(CENTER);
-        row.addView(hourInput, new LinearLayout.LayoutParams(Math.round(96 * dp), Math.round(68 * dp)));
-        row.addView(colon(context, 28), new LinearLayout.LayoutParams(Math.round(28 * dp), WRAP_CONTENT));
-        row.addView(minuteInput, new LinearLayout.LayoutParams(Math.round(96 * dp), Math.round(68 * dp)));
+        var hour = named(context, dp, hourInput, time_hour);
+        row.addView(hour);
+        // The colon is as tall as the fields and sits level with them, not with the names below: it leaves room for
+        // the name, which is as tall as the line of the first one.
+        var name = (TextView) hour.getChildAt(1);
+        var colonParams = new LinearLayout.LayoutParams(Math.round(28 * dp), Math.round(68 * dp));
+        colonParams.bottomMargin = name.getPaddingTop() + name.getLineHeight();
+        row.addView(colon(context, 28), colonParams);
+        row.addView(named(context, dp, minuteInput, time_minute));
         return row;
     }
 
-    private AppCompatEditText numberField(Context context, float dp, String description) {
+    /** The field with its name below it. The name is also what a screen reader says for the field. */
+    private LinearLayout named(Context context, float dp, AppCompatEditText field, @StringRes int name) {
+        var caption = new TextView(context);
+        caption.setText(name);
+        caption.setGravity(CENTER);
+        caption.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+        caption.setTextSize(COMPLEX_UNIT_SP, 13);
+        caption.setTextColor(ContextCompat.getColor(context, text_secondary));
+        caption.setPadding(0, Math.round(6 * dp), 0, 0);
+        caption.setLabelFor(field.getId());
+
+        var column = new LinearLayout(context);
+        column.setOrientation(VERTICAL);
+        column.addView(field, new LinearLayout.LayoutParams(Math.round(96 * dp), Math.round(68 * dp)));
+        column.addView(caption, new LinearLayout.LayoutParams(Math.round(96 * dp), WRAP_CONTENT));
+        return column;
+    }
+
+    private AppCompatEditText numberField(Context context, float dp) {
         var field = new AppCompatEditText(context);
         field.setInputType(TYPE_CLASS_NUMBER);
         field.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
@@ -199,7 +227,7 @@ public final class TimePickerSheet extends UpSheet {
         field.setSelectAllOnFocus(true);
         field.setPadding(0, 0, 0, 0);
         field.setBackground(rounded(context, 14 * dp));
-        field.setContentDescription(description);
+        field.setId(generateViewId());
         field.addTextChangedListener(new AfterChange(text -> markValid(field, true)));
         return field;
     }
@@ -314,6 +342,7 @@ public final class TimePickerSheet extends UpSheet {
         var colon = new TextView(context);
         colon.setText(":");
         colon.setGravity(CENTER);
+        colon.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         colon.setTextSize(COMPLEX_UNIT_SP, sp);
         colon.setTextColor(ContextCompat.getColor(context, text_primary));
         return colon;

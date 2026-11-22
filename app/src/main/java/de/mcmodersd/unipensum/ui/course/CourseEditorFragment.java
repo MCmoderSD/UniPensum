@@ -34,11 +34,13 @@ import de.mcmodersd.unipensum.domain.model.Lecturer;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.domain.text.TextSanitizer;
 import de.mcmodersd.unipensum.ui.Navigator;
+import de.mcmodersd.unipensum.ui.PageTitle;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.session.SessionEditorFragment;
 import de.mcmodersd.unipensum.ui.widget.ColorSwatchPicker;
 import de.mcmodersd.unipensum.ui.widget.ConfirmSheet;
 import de.mcmodersd.unipensum.ui.widget.Haptics;
+import de.mcmodersd.unipensum.ui.widget.LiveMessage;
 import de.mcmodersd.unipensum.ui.widget.UpButton;
 import de.mcmodersd.unipensum.ui.widget.UpRow;
 import de.mcmodersd.unipensum.ui.widget.UpTextField;
@@ -59,6 +61,7 @@ public class CourseEditorFragment extends Fragment {
     private UpTextField moodleField;
     private LinearLayout events;
     private TextView eventsError;
+    private LiveMessage eventsMessage;
     private UpButton saveButton;
 
     @Nullable
@@ -78,7 +81,7 @@ public class CourseEditorFragment extends Fragment {
         }
         repository = UniPensumApp.from(requireContext()).repository();
 
-        ((TextView) view.findViewById(bar_title)).setText(draft.isNew() ? course_new : course_edit);
+        PageTitle.set(view, getString(draft.isNew() ? course_new : course_edit));
         view.findViewById(back).setOnClickListener(v -> Navigator.of(this).pop());
 
         nameField = view.findViewById(name_field);
@@ -104,6 +107,7 @@ public class CourseEditorFragment extends Fragment {
 
         events = view.findViewById(R.id.events);
         eventsError = view.findViewById(events_error);
+        eventsMessage = new LiveMessage(eventsError);
         view.findViewById(add_event).setOnClickListener(v ->
                 Navigator.of(this).push(SessionEditorFragment.forSeries(-1))
         );
@@ -148,7 +152,7 @@ public class CourseEditorFragment extends Fragment {
 
     private void renderEvents() {
         events.removeAllViews();
-        eventsError.setVisibility(GONE);
+        eventsMessage.show(null);
         var dp = getResources().getDisplayMetrics().density;
         var series = draft.series();
         for (var i = 0; i < series.size(); i++) {
@@ -178,21 +182,26 @@ public class CourseEditorFragment extends Fragment {
         // What is stored is the cleaned text, so a name of only blanks or invisible characters counts as empty.
         var name = TextSanitizer.line(draft.name(), MAX_NAME);
         var valid = true;
+        UpTextField refused = null;
         if (name.isEmpty()) {
             nameField.setError(getString(course_error_name));
+            refused = nameField;
             valid = false;
         }
         if (!TextSanitizer.isValidWebLink(draft.moodleLink())) {
             moodleField.setError(getString(error_link));
+            if (refused == null) refused = moodleField;
             valid = false;
         }
         if (draft.isNew() && draft.series().isEmpty()) {
-            eventsError.setText(course_error_events);
-            eventsError.setVisibility(VISIBLE);
+            eventsMessage.show(getString(course_error_events));
             valid = false;
         }
         if (!valid) {
             Haptics.reject(saveButton);
+            // The first field that was refused takes the focus, so a screen reader reads what is wrong with it. A
+            // message that belongs to no field says itself, see TextAppearance.Up.Error.
+            if (refused != null) refused.focusInput();
             return;
         }
 
@@ -227,8 +236,7 @@ public class CourseEditorFragment extends Fragment {
         public void onError(Exception error) {
             if (!isAdded() || getView() == null) return;
             saveButton.setEnabled(true);
-            eventsError.setText(course_error_save);
-            eventsError.setVisibility(VISIBLE);
+            eventsMessage.show(getString(course_error_save));
             Haptics.reject(saveButton);
         }
     }

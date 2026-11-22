@@ -4,6 +4,7 @@ import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 import static android.util.TypedValue.COMPLEX_UNIT_SP;
 import static android.view.View.MeasureSpec.EXACTLY;
 import static de.mcmodersd.unipensum.R.color.*;
+import static de.mcmodersd.unipensum.ui.week.GridMetrics.*;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -30,6 +31,7 @@ import de.mcmodersd.unipensum.domain.logic.NowIndicator;
 import de.mcmodersd.unipensum.domain.logic.WeekLayout;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
+import de.mcmodersd.unipensum.ui.widget.Mirror;
 
 /**
  * The hour lines, the time axis and the session blocks of one week (Monday to Friday).
@@ -38,8 +40,9 @@ import de.mcmodersd.unipensum.ui.format.TimeFormat;
  * Zooming stretches the hours further.
  * <p>
  * In the current week, a line marks the current time: faint across the whole week, solid in the column of
- * today, drawn over the session blocks. The label of the current hour is highlighted. The marker moves with
- * the clock, once a minute.
+ * today, drawn over the grid. Both stop at a session block, so that they never strike through the text of the lecture
+ * that is on right now; a dot at the edge of that block marks the time instead. The label of the current hour is
+ * highlighted. The marker moves with the clock, once a minute.
  */
 // Created in code by WeekPageView only, never inflated from XML.
 @SuppressLint("ViewConstructor")
@@ -94,7 +97,9 @@ final class WeekGridView extends ViewGroup {
         linePaint.setStrokeWidth(Math.max(1f, getResources().getDisplayMetrics().density * 0.75f));
 
         labelPaint.setColor(ContextCompat.getColor(context, text_secondary));
-        labelPaint.setTextSize(TypedValue.applyDimension(COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
+        labelPaint.setTextSize(
+                TypedValue.applyDimension(COMPLEX_UNIT_SP, HOUR_LABEL_SP, getResources().getDisplayMetrics())
+        );
         labelPaint.setTextAlign(Paint.Align.RIGHT);
 
         // The marker is black on the light theme and white on the dark one, like the rest of the app.
@@ -231,16 +236,13 @@ final class WeekGridView extends ViewGroup {
         // which must not happen during a layout pass.
         var hourHeight = hourHeight(height);
         var columnWidth = metrics.columnWidth(width);
+        var rtl = Mirror.isRtl(this);
         for (var item : placed) {
             var columnShare = columnWidth / item.placement.columns();
-            var blockLeft = Math.round(
-                    metrics.gutter + item.dayIndex * columnWidth
-                            + item.placement.column() * columnShare
-            ) + metrics.blockInset;
-            var blockRight = Math.round(
-                    metrics.gutter + item.dayIndex * columnWidth
-                            + (item.placement.column() + 1) * columnShare
-            ) - metrics.blockInset;
+            var start = metrics.gutter + item.dayIndex * columnWidth + item.placement.column() * columnShare;
+            var end = metrics.gutter + item.dayIndex * columnWidth + (item.placement.column() + 1) * columnShare;
+            var blockLeft = Math.round(rtl ? width - end : start) + metrics.blockInset;
+            var blockRight = Math.round(rtl ? width - start : end) - metrics.blockInset;
             var blockTop = Math.round(yOf(item.startMin, hourHeight)) + metrics.blockInset;
             var blockBottom = Math.round(yOf(item.endMin, hourHeight)) - metrics.blockInset;
             item.bounds.set(blockLeft, blockTop, Math.max(blockLeft, blockRight), Math.max(blockTop, blockBottom));
@@ -265,34 +267,62 @@ final class WeekGridView extends ViewGroup {
         var hourHeight = hourHeight(getHeight());
         var labelOffset = (labelPaint.descent() + labelPaint.ascent()) / 2f;
 
+        // The hours are on the start side of the grid: on the left, or on the right in a layout from right to left.
+        var rtl = Mirror.isRtl(this);
+        var align = rtl ? Paint.Align.LEFT : Paint.Align.RIGHT;
+        labelPaint.setTextAlign(align);
+        nowLabelPaint.setTextAlign(align);
+        var gap = HOUR_LABEL_GAP_DP * getResources().getDisplayMetrics().density;
+        var labelX = rtl ? getWidth() - metrics.gutter + gap : metrics.gutter - gap;
+        var gridLeft = rtl ? 0 : metrics.gutter;
+        var gridRight = rtl ? getWidth() - metrics.gutter : getWidth();
+
         for (var i = 0; i <= hours(); i++) {
             var y = metrics.verticalPadding + i * hourHeight;
-            canvas.drawLine(metrics.gutter, y, getWidth(), y, linePaint);
+            canvas.drawLine(gridLeft, y, gridRight, y, linePaint);
             var hour = window.startHour() + i;
             var label = TimeFormat.hour(getContext(), hour);
             var paint = now != null && now.minutes() / 60 == hour ? nowLabelPaint : labelPaint;
-            canvas.drawText(
-                    label, metrics.gutter - 6 * getResources().getDisplayMetrics().density,
-                    y - labelOffset, paint
-            );
+            canvas.drawText(label, labelX, y - labelOffset, paint);
         }
         var columnWidth = metrics.columnWidth(getWidth());
         for (var i = 0; i <= 5; i++) {
             var x = metrics.gutter + i * columnWidth;
+            if (rtl) x = getWidth() - x;
             canvas.drawLine(x, metrics.verticalPadding, x, getHeight() - metrics.verticalPadding, linePaint);
         }
     }
 
-    /** Over the session blocks, so the current time stays readable inside a lecture. */
+    /**
+     * Over the session blocks, so the current time stays visible in a lecture. The lines leave the blocks out,
+     * because a line through the text of a block makes it hard to read; where the time falls into a block, a dot at
+     * its edge says so.
+     */
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
         super.dispatchDraw(canvas);
         if (now == null) return;
         var y = yOf(now.minutes(), hourHeight(getHeight()));
         var columnWidth = metrics.columnWidth(getWidth());
+        var rtl = Mirror.isRtl(this);
         var left = metrics.gutter + now.dayIndex() * columnWidth;
-        canvas.drawLine(metrics.gutter, y, getWidth(), y, nowFaintPaint);
+        if (rtl) left = getWidth() - left - columnWidth;
+
+        // The gap between a block and the line of its column belongs to the block, or it would show as a dot.
+        var saved = canvas.save();
+        for (var item : placed) {
+            var bounds = item.bounds;
+            canvas.clipOutRect(bounds.left - metrics.blockInset, bounds.top, bounds.right + metrics.blockInset, bounds.bottom);
+        }
+        canvas.drawLine(rtl ? 0 : metrics.gutter, y, rtl ? getWidth() - metrics.gutter : getWidth(), y, nowFaintPaint);
         canvas.drawLine(left, y, left + columnWidth, y, nowLinePaint);
+        canvas.restoreToCount(saved);
+
+        for (var item : placed) {
+            if (item.dayIndex == now.dayIndex() && item.startMin <= now.minutes() && now.minutes() < item.endMin) {
+                canvas.drawCircle(rtl ? item.bounds.right : item.bounds.left, y, metrics.nowLine * 1.75f, nowLinePaint);
+            }
+        }
     }
 
     private float hourHeight(int totalHeight) {

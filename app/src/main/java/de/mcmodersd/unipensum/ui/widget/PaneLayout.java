@@ -158,10 +158,20 @@ public final class PaneLayout extends ViewGroup {
         var innerTop = getPaddingTop();
         var innerRight = right - left - getPaddingRight();
 
-        main.layout(innerLeft, innerTop, innerLeft + main.getMeasuredWidth(), innerTop + main.getMeasuredHeight());
-        // Closed, the pane lies just outside the right edge and is clipped away.
-        var sideLeft = split ? innerRight - Math.round(side.getMeasuredWidth() * progress) : innerLeft;
-        side.layout(sideLeft, innerTop, sideLeft + side.getMeasuredWidth(), innerTop + side.getMeasuredHeight());
+        place(main, innerLeft, innerTop, innerLeft, innerRight);
+        // Closed, the pane lies just outside the end edge and is clipped away.
+        var sideStart = split ? innerRight - Math.round(side.getMeasuredWidth() * progress) : innerLeft;
+        place(side, sideStart, innerTop, innerLeft, innerRight);
+    }
+
+    /**
+     * Lays out a child that starts at {@code start}, counted from the left, and mirrors it inside the padded area when
+     * the layout runs from right to left: the calendar is then on the right and the pane opens from the left.
+     */
+    private void place(View child, int start, int top, int innerLeft, int innerRight) {
+        var width = child.getMeasuredWidth();
+        var left = Mirror.isRtl(this) ? innerLeft + innerRight - start - width : start;
+        child.layout(left, top, left + width, top + child.getMeasuredHeight());
     }
 
     @Override
@@ -169,9 +179,7 @@ public final class PaneLayout extends ViewGroup {
         super.dispatchDraw(canvas);
         if (!split || progress <= 0f) return;
         // A thin line where the calendar ends and the pane begins.
-        canvas.drawRect(
-                side.getLeft() - dividerWidth, getPaddingTop(), side.getLeft(),
-                getHeight() - getPaddingBottom(), dividerPaint
-        );
+        var edge = Mirror.isRtl(this) ? side.getRight() : side.getLeft() - dividerWidth;
+        canvas.drawRect(edge, getPaddingTop(), edge + dividerWidth, getHeight() - getPaddingBottom(), dividerPaint);
     }
 }

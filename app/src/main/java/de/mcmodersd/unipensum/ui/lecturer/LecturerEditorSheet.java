@@ -163,17 +163,19 @@ public final class LecturerEditorSheet extends UpSheet {
                 emailField.getText(), phoneField.getText()
         ).normalized();
 
-        var valid = true;
+        UpTextField refused = null;
         if (candidate.lastName().isEmpty()) {
             lastNameField.setError(getString(lecturer_error_last_name));
-            valid = false;
+            refused = lastNameField;
         }
         if (candidate.email() != null && !EMAIL_ADDRESS.matcher(candidate.email()).matches()) {
             emailField.setError(getString(lecturer_error_email));
-            valid = false;
+            if (refused == null) refused = emailField;
         }
-        if (!valid) {
+        if (refused != null) {
             Haptics.reject(saveButton);
+            // The first field that was refused takes the focus, so a screen reader reads what is wrong with it.
+            refused.focusInput();
             return;
         }
 

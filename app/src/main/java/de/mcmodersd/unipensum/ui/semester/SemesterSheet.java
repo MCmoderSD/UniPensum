@@ -89,7 +89,7 @@ public final class SemesterSheet extends UpSheet {
             empty.setText(semesters_empty);
             empty.setTextSize(COMPLEX_UNIT_SP, 16);
             empty.setTextColor(ContextCompat.getColor(context, text_secondary));
-            empty.setPadding(Math.round(8 * dp), Math.round(4 * dp), 0, Math.round(4 * dp));
+            empty.setPaddingRelative(Math.round(8 * dp), Math.round(4 * dp), 0, Math.round(4 * dp));
             list.addView(empty);
             return;
         }

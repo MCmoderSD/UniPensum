@@ -239,6 +239,7 @@ public final class SessionDetailSheet extends UpSheet {
     /** A row with an icon that hands its value to another app when tapped. */
     private UpRow contact(Context context, float dp, int icon, String value, String label, Opener opener) {
         var row = info(context, dp, value, label);
+        row.keepTitleLeftToRight();
         row.setLeadingIcon(icon);
         row.setOnClickListener(v -> {
             if (!opener.open(context, value)) Haptics.reject(v);

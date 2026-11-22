@@ -23,6 +23,8 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:enforceNavigationBarContrast">false</item>
+        <!-- Text starts at the start of its view, also where the text is in another script than the layout. -->
+        <item name="android:textViewStyle">@style/Widget.Up.TextView</item>
 
         <!--
             The splash screen is drawn by the system before the app runs. Without these two items it takes the colors

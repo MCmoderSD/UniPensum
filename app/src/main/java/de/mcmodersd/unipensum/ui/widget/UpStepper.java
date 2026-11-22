@@ -9,6 +9,7 @@ import static de.mcmodersd.unipensum.R.string.*;
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -67,6 +68,7 @@ public class UpStepper extends LinearLayout {
 
         valueView = new TextView(context);
         valueView.setGravity(CENTER);
+        valueView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         valueView.setTextSize(COMPLEX_UNIT_SP, 16);
         valueView.setTextColor(ContextCompat.getColor(context, text_primary));
 
@@ -74,6 +76,15 @@ public class UpStepper extends LinearLayout {
         addView(valueView, new LayoutParams(0, WRAP_CONTENT, 1f));
         addView(plus);
         render();
+    }
+
+    /**
+     * Names what the stepper sets for a screen reader, which would otherwise hear two buttons called "Decrease" and
+     * "Increase" and a number. Show the same text above the stepper.
+     */
+    public void setLabel(CharSequence label) {
+        minus.setContentDescription(getContext().getString(stepper_decrease_named, label));
+        plus.setContentDescription(getContext().getString(stepper_increase_named, label));
     }
 
     public void setRange(int min, int max) {
@@ -103,6 +114,15 @@ public class UpStepper extends LinearLayout {
         render();
     }
 
+    /**
+     * Sets the value because of something the user did elsewhere, and says the new value to a screen reader, which
+     * would otherwise not notice. Does not notify the listener.
+     */
+    public void changeTo(int value) {
+        this.value = Math.max(min, Math.min(max, value));
+        render(true);
+    }
+
     public void setOnValueChangedListener(OnValueChangedListener listener) {
         this.listener = listener;
     }
@@ -116,14 +136,30 @@ public class UpStepper extends LinearLayout {
         var next = Math.max(min, Math.min(max, value + delta * step));
         if (next == value) return false;
         value = next;
-        render();
+        render(true);
         Haptics.segmentTick(this);
         if (listener != null) listener.onValueChanged(value);
         return true;
     }
 
     private void render() {
-        valueView.setText(formatter.format(value));
+        render(false);
+    }
+
+    /**
+     * @param say whether a screen reader says the new value. A press is felt as a tick, which it cannot tell the
+     *            result of; the value a screen opens with is not news, so the live region is off until a change
+     *            that is
+     */
+    private void render(boolean say) {
+        var text = formatter.format(value);
+        // The same text again would be said again.
+        if (!TextUtils.equals(valueView.getText(), text)) {
+            // The live region stays on from the first change of the user: a screen reader looks at the view after it
+            // has got the event, so one that is switched off again right away would not be heard.
+            if (say) valueView.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
+            valueView.setText(text);
+        }
         minus.setDimmed(value <= min);
         plus.setDimmed(value >= max);
     }
