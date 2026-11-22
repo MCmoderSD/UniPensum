@@ -18,6 +18,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.LocaleList;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -38,6 +39,7 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import de.mcmodersd.unipensum.R;
 import de.mcmodersd.unipensum.data.AppSettings.TimeWindow;
@@ -168,6 +170,45 @@ public class WeekViewsTest {
         );
         assertTrue(description, description.contains(day));
         assertTrue(description, description.contains("Algorithms"));
+    }
+
+    // --- the language of a name ---
+
+    private Context withLocale(String languageTag) {
+        var configuration = new Configuration(normal.getResources().getConfiguration());
+        configuration.setLocales(new LocaleList(Locale.forLanguageTag(languageTag)));
+        return new ContextThemeWrapper(normal.createConfigurationContext(configuration), R.style.Theme_UniPensum);
+    }
+
+    private static TextView titleOf(SessionBlockView block) {
+        return (TextView) block.getChildAt(0);
+    }
+
+    @Test
+    public void aNameInLatinLettersIsHyphenatedInEnglishOnADeviceInAnotherScript() {
+        for (var tag : new String[]{"ar", "he", "fa"}) {
+            var context = withLocale(tag);
+            var block = new SessionBlockView(
+                    context, new GridMetrics(context), session(1, MONDAY, "Software Engineering", "H1"),
+                    NameStyle.LAST_NAME, false
+            );
+            assertEquals(tag, "en", titleOf(block).getTextLocale().getLanguage());
+        }
+    }
+
+    @Test
+    public void theTitleOfABlockKeepsTheLanguageOfTheDeviceWhereItHasPatterns() {
+        var german = withLocale("de");
+        var block = new SessionBlockView(
+                german, new GridMetrics(german), session(1, MONDAY, "Softwaretechnik", "H1"), NameStyle.LAST_NAME, false
+        );
+        assertEquals(new TextView(german).getTextLocale(), titleOf(block).getTextLocale());
+
+        var arabic = withLocale("ar");
+        var arabicName = new SessionBlockView(
+                arabic, new GridMetrics(arabic), session(1, MONDAY, "هندسة البرمجيات", "H1"), NameStyle.LAST_NAME, false
+        );
+        assertEquals(new TextView(arabic).getTextLocale(), titleOf(arabicName).getTextLocale());
     }
 
     // --- a phone held sideways ---
