@@ -1,6 +1,7 @@
 package de.mcmodersd.unipensum.ui.widget;
 
 import static android.view.KeyEvent.*;
+import static android.view.View.LAYOUT_DIRECTION_RTL;
 import static android.view.View.MeasureSpec.AT_MOST;
 import static android.view.View.MeasureSpec.EXACTLY;
 import static android.view.View.MeasureSpec.makeMeasureSpec;
@@ -8,8 +9,11 @@ import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentat
 import static org.junit.Assert.*;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,6 +22,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.test.core.app.ApplicationProvider;
@@ -324,6 +329,166 @@ public class ControlsTest {
             assertFalse(picker.dispatchKeyEvent(new KeyEvent(ACTION_DOWN, KEYCODE_TAB)));
             // The focus is still on the chosen color; one more arrow key moves it by one.
             press(picker, KEYCODE_DPAD_LEFT);
+            press(picker, KEYCODE_ENTER);
+        });
+        assertEquals(List.of(CourseColor.TEAL), chosen);
+    }
+
+    // --- right to left ---
+
+    private void layOut(View view, int widthDp) {
+        view.measure(makeMeasureSpec(Math.round(widthDp * dp), EXACTLY), makeMeasureSpec(4000, AT_MOST));
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+    }
+
+    private void tap(View view, float x, float y) {
+        var down = MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, x, y, 0);
+        var up = MotionEvent.obtain(0, 50, MotionEvent.ACTION_UP, x, y, 0);
+        getInstrumentation().runOnMainSync(() -> {
+            view.dispatchTouchEvent(down);
+            view.dispatchTouchEvent(up);
+        });
+        down.recycle();
+        up.recycle();
+    }
+
+    @Test
+    public void textStartsAtTheStartOfItsViewAndSegmentsAndValuesStayInTheMiddle() {
+        // The alignment of a view is only resolved once it is measured.
+        var text = new TextView(context);
+        measure(text);
+        assertEquals(View.TEXT_ALIGNMENT_VIEW_START, text.getTextAlignment());
+
+        var control = new UpSegmentedControl(context);
+        control.setOptions("System", "Light");
+        measure(control);
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, control.getChildAt(0).getTextAlignment());
+        var stepper = new UpStepper(context);
+        measure(stepper);
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, stepper.getChildAt(1).getTextAlignment());
+        var button = new UpButton(context);
+        measure(button);
+        assertEquals(View.TEXT_ALIGNMENT_CENTER, button.getTextAlignment());
+    }
+
+    @Test
+    public void theValueOfARowKeepsItsGapOnTheSideOfTheTexts() {
+        var row = new UpRow(context);
+        row.setTitle("Notifications");
+        row.setValue("On");
+        var texts = row.getChildAt(0);
+        var value = row.getChildAt(1);
+
+        layOut(row, 400);
+        assertTrue(texts.getRight() <= value.getLeft());
+        assertEquals(Math.round(12 * dp), value.getPaddingLeft());
+
+        row.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+        layOut(row, 400);
+        assertTrue(value.getRight() <= texts.getLeft());
+        assertEquals(Math.round(12 * dp), value.getPaddingRight());
+    }
+
+    private int[] colorsAtTheEndsOf(UpSwitch toggle) {
+        layOut(toggle, 100);
+        var bitmap = Bitmap.createBitmap(toggle.getWidth(), toggle.getHeight(), Bitmap.Config.ARGB_8888);
+        toggle.draw(new Canvas(bitmap));
+        var y = toggle.getHeight() / 2;
+        return new int[]{
+                bitmap.getPixel(Math.round(16 * dp), y),
+                bitmap.getPixel(toggle.getWidth() - Math.round(16 * dp), y)
+        };
+    }
+
+    @Test
+    public void theThumbOfASwitchThatIsOnSitsAtTheEndOfTheTrack() {
+        var track = ContextCompat.getColor(context, R.color.accent);
+        var thumb = ContextCompat.getColor(context, R.color.text_on_accent);
+        var toggle = new UpSwitch(context);
+        toggle.setChecked(true);
+
+        var leftToRight = colorsAtTheEndsOf(toggle);
+        assertEquals(track, leftToRight[0]);
+        assertEquals(thumb, leftToRight[1]);
+
+        toggle.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+        var rightToLeft = colorsAtTheEndsOf(toggle);
+        assertEquals(thumb, rightToLeft[0]);
+        assertEquals(track, rightToLeft[1]);
+    }
+
+    @Test
+    public void theFirstColorIsOnTheRightWhenTheLayoutRunsRightToLeft() {
+        var picker = new ColorSwatchPicker(context);
+        var chosen = new ArrayList<CourseColor>();
+        picker.setOnColorSelectedListener(chosen::add);
+
+        picker.setSelectedColor(CourseColor.BLUE);
+        layOut(picker, 400);
+        tap(picker, 10 * dp, 10 * dp);
+
+        picker.setSelectedColor(CourseColor.BLUE);
+        picker.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+        layOut(picker, 400);
+        tap(picker, picker.getWidth() - 10 * dp, 10 * dp);
+
+        assertEquals(List.of(CourseColor.values()[0], CourseColor.values()[0]), chosen);
+    }
+
+    @Test
+    public void mondayIsOnTheRightWhenTheLayoutRunsRightToLeft() {
+        var calendar = new MonthCalendarView(context);
+        calendar.setSelected(LocalDate.of(2026, 10, 14));
+        var chosen = new ArrayList<LocalDate>();
+        calendar.setOnDateSelectedListener(chosen::add);
+        // The second row of October 2026 starts with Monday the 5th, below the row of the weekday names.
+        var y = (28 + 48 * 1.5f) * dp;
+
+        layOut(calendar, 400);
+        var grid = calendar.getChildAt(1);
+        tap(grid, 10 * dp, y);
+
+        calendar.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+        layOut(calendar, 400);
+        tap(grid, grid.getWidth() - 10 * dp, y);
+
+        assertEquals(List.of(LocalDate.of(2026, 10, 5), LocalDate.of(2026, 10, 5)), chosen);
+    }
+
+    @Test
+    public void theArrowKeysFollowTheMirroredCalendar() {
+        var calendar = new MonthCalendarView(context);
+        calendar.setSelected(LocalDate.of(2026, 10, 14));
+        var chosen = new ArrayList<LocalDate>();
+        calendar.setOnDateSelectedListener(chosen::add);
+        calendar.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+        layOut(calendar, 400);
+
+        var grid = calendar.getChildAt(1);
+        grid.setFocusableInTouchMode(true);
+        getInstrumentation().runOnMainSync(() -> {
+            grid.requestFocus();
+            // The 13th is the day on the right of the 14th now.
+            press(grid, KEYCODE_DPAD_RIGHT);
+            press(grid, KEYCODE_ENTER);
+        });
+        assertEquals(List.of(LocalDate.of(2026, 10, 13)), chosen);
+    }
+
+    @Test
+    public void theArrowKeysFollowTheMirroredColors() {
+        var picker = new ColorSwatchPicker(context);
+        picker.setSelectedColor(CourseColor.BLUE);
+        var chosen = new ArrayList<CourseColor>();
+        picker.setOnColorSelectedListener(chosen::add);
+        picker.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+        layOut(picker, 400);
+
+        picker.setFocusableInTouchMode(true);
+        getInstrumentation().runOnMainSync(() -> {
+            picker.requestFocus();
+            // Blue is the last color, so it is on the left, and teal is the one on its right.
+            press(picker, KEYCODE_DPAD_RIGHT);
             press(picker, KEYCODE_ENTER);
         });
         assertEquals(List.of(CourseColor.TEAL), chosen);
