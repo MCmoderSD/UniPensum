@@ -167,6 +167,79 @@ public class ControlsTest {
         assertEquals(View.ACCESSIBILITY_LIVE_REGION_POLITE, field.getChildAt(2).getAccessibilityLiveRegion());
     }
 
+    /** The message that is set again comes with a later frame, and a little later still after another one. */
+    private static void awaitText(TextView view, String expected) throws InterruptedException {
+        for (var i = 0; i < 80 && !expected.contentEquals(view.getText()); i++) Thread.sleep(25);
+        assertEquals(expected, view.getText().toString());
+    }
+
+    @Test
+    public void aMessageThatIsShownAgainIsClearedAndSetAgainLater() throws InterruptedException {
+        var view = new TextView(context);
+        var message = new LiveMessage(view);
+
+        getInstrumentation().runOnMainSync(() -> message.show("Enter a name."));
+        assertEquals(View.VISIBLE, view.getVisibility());
+        assertEquals("Enter a name.", view.getText().toString());
+
+        // A screen reader does not say the same text twice in a row, so it has to change in between.
+        getInstrumentation().runOnMainSync(() -> {
+            message.show("Enter a name.");
+            assertEquals("", view.getText().toString());
+        });
+        awaitText(view, "Enter a name.");
+        assertEquals(View.VISIBLE, view.getVisibility());
+    }
+
+    @Test
+    public void twoMessagesThatAreShownAgainAreSetInTurn() throws InterruptedException {
+        var first = new TextView(context);
+        var second = new TextView(context);
+        var firstMessage = new LiveMessage(first);
+        var secondMessage = new LiveMessage(second);
+        getInstrumentation().runOnMainSync(() -> {
+            firstMessage.show("Enter a name.");
+            secondMessage.show("Add at least one event.");
+        });
+
+        // Both are cleared and set again, but not in the same frame: a screen reader says one change of a frame.
+        var times = new long[2];
+        getInstrumentation().runOnMainSync(() -> {
+            firstMessage.show("Enter a name.");
+            secondMessage.show("Add at least one event.");
+        });
+        var start = System.nanoTime();
+        awaitText(first, "Enter a name.");
+        times[0] = System.nanoTime() - start;
+        awaitText(second, "Add at least one event.");
+        times[1] = System.nanoTime() - start;
+        assertTrue(times[1] > times[0]);
+    }
+
+    @Test
+    public void aDifferentMessageIsShownAtOnceAndAClearedOneStaysAway() throws InterruptedException {
+        var view = new TextView(context);
+        var message = new LiveMessage(view);
+
+        getInstrumentation().runOnMainSync(() -> {
+            message.show("Enter a name.");
+            message.show("Enter a name.");
+            // the older one must not come back after this one
+            message.show("Add at least one event.");
+            assertEquals("Add at least one event.", view.getText().toString());
+        });
+        Thread.sleep(500);
+        assertEquals("Add at least one event.", view.getText().toString());
+
+        getInstrumentation().runOnMainSync(() -> {
+            message.show("Add at least one event.");
+            message.show(null);
+        });
+        Thread.sleep(500);
+        assertEquals(View.GONE, view.getVisibility());
+        assertEquals("", view.getText().toString());
+    }
+
     @Test
     public void aChoiceIsNotAStateOfTheViewThatWakesAScreenReader() {
         var control = new UpSegmentedControl(context);
