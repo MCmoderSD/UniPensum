@@ -115,8 +115,8 @@ public class UpRow extends LinearLayout {
             var child = getChildAt(i);
             if (child == texts || child == value || child.getVisibility() == GONE) continue;
             var params = (LayoutParams) child.getLayoutParams();
-            // An icon button measures itself, at 48dp.
-            fixed += (params.width > 0 ? params.width : 48 * dp) + params.getMarginStart() + params.getMarginEnd();
+            // An icon button measures itself.
+            fixed += (params.width > 0 ? params.width : UpIconButton.SIZE_DP * dp) + params.getMarginStart() + params.getMarginEnd();
         }
         var words = Math.max(longestWord(title), longestWord(subtitle));
         return words + value.getPaint().measureText(value.getText().toString()) + fixed > width;

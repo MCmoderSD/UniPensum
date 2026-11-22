@@ -118,8 +118,8 @@ public class WeekFragment extends Fragment {
         pager.setOffscreenPageLimit(1);
         // The weeks are not a stop of their own: the Tab key goes on to the sessions, and Page Up and Page Down turn
         // the weeks, see turnWeek.
-        pager.getChildAt(0).setFocusable(false);
-        ViewCompat.setAccessibilityDelegate(pager.getChildAt(0), new WeekPositionDelegate());
+        weeks().setFocusable(false);
+        ViewCompat.setAccessibilityDelegate(weeks(), new WeekPositionDelegate());
         ViewCompat.addOnUnhandledKeyEventListener(view, (root, event) -> turnWeek(root, event));
         // The view is rebuilt when the screen is recreated (turning, theme, language); come back to the same week.
         pager.setCurrentItem(viewModel.page() >= 0 ? viewModel.page() : Weeks.initialPosition(LocalDate.now()), false);
@@ -224,10 +224,14 @@ public class WeekFragment extends Fragment {
         if (zoom <= ZoomMetrics.MIN) zoomIndicator.postDelayed(hideZoom, ZOOM_INDICATOR_MS);
     }
 
+    /** The list inside the pager that holds the weeks. ViewPager2 builds it as its only child and offers no other way in. */
+    private RecyclerView weeks() {
+        return (RecyclerView) pager.getChildAt(0);
+    }
+
     /** Resets the zoom of the week that is shown; the others follow once it has settled. */
     private void resetZoom() {
-        var weeks = (RecyclerView) pager.getChildAt(0);
-        var holder = weeks.findViewHolderForAdapterPosition(pager.getCurrentItem());
+        var holder = weeks().findViewHolderForAdapterPosition(pager.getCurrentItem());
         if (holder instanceof WeekPagerAdapter.PageHolder) ((WeekPagerAdapter.PageHolder) holder).page.resetZoom();
     }
 

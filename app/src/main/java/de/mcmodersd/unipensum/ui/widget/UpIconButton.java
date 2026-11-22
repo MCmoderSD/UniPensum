@@ -20,7 +20,7 @@ import java.util.function.BooleanSupplier;
 /** A tappable icon with a 48dp touch target. Set a content description wherever it is used. */
 public class UpIconButton extends AppCompatImageView {
 
-    private static final int SIZE_DP = 48;
+    static final int SIZE_DP = 48;
     private static final int PADDING_DP = 12;
     private static final long FIRST_INTERVAL_MS = 160;
     private static final long FASTEST_INTERVAL_MS = 50;
