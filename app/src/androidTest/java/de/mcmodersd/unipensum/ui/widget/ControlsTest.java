@@ -6,6 +6,7 @@ import static android.view.KeyEvent.*;
 import static android.view.View.LAYOUT_DIRECTION_RTL;
 import static android.view.View.MeasureSpec.AT_MOST;
 import static android.view.View.MeasureSpec.EXACTLY;
+import static android.view.View.MeasureSpec.UNSPECIFIED;
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static org.junit.Assert.*;
@@ -275,6 +276,59 @@ public class ControlsTest {
                 assertEquals(controlHeight, control.getMeasuredHeight());
             }
         }
+    }
+
+    /** A scroll view or a wrap_content parent measures without a width first, and the width decides only then. */
+    @Test
+    public void aRowMeasuredWithoutAWidthFirstEndsAsIfMeasuredWithTheWidthAlone() {
+        var large = withFontScale(2f);
+        var heightSpec = makeMeasureSpec(4000, AT_MOST);
+        for (var width : new int[]{150, 1000}) {
+            var widthSpec = makeMeasureSpec(Math.round(width * dp), EXACTLY);
+
+            var alone = new UpRow(large);
+            alone.setTitle("UniPensum");
+            alone.setValue("Version 1.0-SNAPSHOT");
+            alone.measure(widthSpec, heightSpec);
+
+            var afterwards = new UpRow(large);
+            afterwards.setTitle("UniPensum");
+            afterwards.setValue("Version 1.0-SNAPSHOT");
+            afterwards.measure(makeMeasureSpec(0, UNSPECIFIED), makeMeasureSpec(0, UNSPECIFIED));
+            afterwards.measure(widthSpec, heightSpec);
+
+            assertEquals(alone.getMeasuredHeight(), afterwards.getMeasuredHeight());
+            assertEquals(
+                    ((ViewGroup) alone.getChildAt(0)).getChildCount(),
+                    ((ViewGroup) afterwards.getChildAt(0)).getChildCount()
+            );
+        }
+    }
+
+    @Test
+    public void aValueThatChangesAfterTheFirstLayoutFlowsTheRowAgain() {
+        var large = withFontScale(2f);
+        var row = new UpRow(large);
+        row.setTitle("UniPensum");
+        row.setValue("1.0");
+        var texts = (ViewGroup) row.getChildAt(0);
+        var widthSpec = makeMeasureSpec(Math.round(400 * dp), EXACTLY);
+        var heightSpec = makeMeasureSpec(4000, AT_MOST);
+
+        row.measure(widthSpec, heightSpec);
+        row.layout(0, 0, row.getMeasuredWidth(), row.getMeasuredHeight());
+        // the title and the subtitle; the value is beside them
+        assertEquals(2, texts.getChildCount());
+
+        row.setValue("Version 1.0-SNAPSHOT of the app");
+        assertTrue(row.isLayoutRequested());
+        row.measure(widthSpec, heightSpec);
+        assertEquals(3, texts.getChildCount());
+
+        row.setValue("");
+        assertTrue(row.isLayoutRequested());
+        row.measure(widthSpec, heightSpec);
+        assertEquals(2, texts.getChildCount());
     }
 
     @Test
