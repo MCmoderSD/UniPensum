@@ -1,7 +1,10 @@
 package de.mcmodersd.unipensum.ui.week;
 
 import static android.util.TypedValue.COMPLEX_UNIT_SP;
+import static android.view.View.LAYOUT_DIRECTION_RTL;
 import static android.view.View.MeasureSpec.AT_MOST;
+import static android.view.View.MeasureSpec.EXACTLY;
+import static android.view.View.MeasureSpec.UNSPECIFIED;
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static de.mcmodersd.unipensum.domain.model.CourseColor.RED;
 import static de.mcmodersd.unipensum.domain.model.Mode.IN_PERSON;
@@ -12,12 +15,15 @@ import static org.junit.Assert.*;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -32,10 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.mcmodersd.unipensum.R;
+import de.mcmodersd.unipensum.data.AppSettings.TimeWindow;
 import de.mcmodersd.unipensum.data.SessionView;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.domain.model.Session;
 import de.mcmodersd.unipensum.domain.model.SessionDetails;
+import de.mcmodersd.unipensum.ui.format.CourseColors;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
 
 /** The week follows the font size of the system, and a screen reader hears on which day a session is. */
@@ -158,5 +166,110 @@ public class WeekViewsTest {
         );
         assertTrue(description, description.contains(day));
         assertTrue(description, description.contains("Algorithms"));
+    }
+
+    // --- right to left ---
+
+    private static void layOut(View view, int width, int height) {
+        view.measure(makeMeasureSpec(width, EXACTLY), makeMeasureSpec(height, EXACTLY));
+        view.layout(0, 0, width, height);
+    }
+
+    private static Bitmap draw(View view) {
+        var bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        view.draw(new Canvas(bitmap));
+        return bitmap;
+    }
+
+    @Test
+    public void theWeekRunsFromTheRightWhenTheLayoutRunsFromRightToLeft() {
+        var width = 1000;
+        var grid = new WeekGridView(normal, new GridMetrics(normal));
+        grid.bind(MONDAY, TimeWindow.DEFAULT, NameStyle.LAST_NAME, week(), null);
+
+        layOut(grid, width, 3000);
+        // The first two blocks share Monday, the third is on Wednesday.
+        var first = grid.getChildAt(0);
+        var second = grid.getChildAt(1);
+        var wednesday = grid.getChildAt(2);
+        assertTrue(first.getLeft() < second.getLeft());
+        assertTrue(second.getRight() <= wednesday.getLeft());
+
+        grid.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+        layOut(grid, width, 3000);
+        assertTrue(first.getLeft() > second.getLeft());
+        assertTrue(wednesday.getRight() <= second.getLeft());
+        // Monday is next to the hours, which are now on the right.
+        assertTrue(first.getRight() > width - new GridMetrics(normal).gutter - 2 * first.getWidth());
+    }
+
+    @Test
+    public void theBarOfASessionRunsAlongTheStartEdge() {
+        var dp = normal.getResources().getDisplayMetrics().density;
+        var width = Math.round(100 * dp);
+        var height = Math.round(100 * dp);
+        var block = new SessionBlockView(
+                normal, new GridMetrics(normal), session(1, MONDAY, "Algorithms", "H1"), NameStyle.LAST_NAME, false
+        );
+        block.fitTo(width, height);
+        var bar = CourseColors.resolve(normal, RED);
+        var x = Math.round(3.3f * dp);
+        var y = height / 2;
+
+        layOut(block, width, height);
+        var leftToRight = draw(block);
+        assertEquals(bar, leftToRight.getPixel(x, y));
+        assertNotEquals(bar, leftToRight.getPixel(width - 1 - x, y));
+        var title = block.getChildAt(0);
+        assertTrue(title.getLeft() > x);
+
+        block.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+        layOut(block, width, height);
+        var rightToLeft = draw(block);
+        assertEquals(bar, rightToLeft.getPixel(width - 1 - x, y));
+        assertNotEquals(bar, rightToLeft.getPixel(x, y));
+        assertTrue(title.getRight() < width - 1 - x);
+    }
+
+    @Test
+    public void theBarOfACardRunsAlongTheStartEdge() {
+        var dp = normal.getResources().getDisplayMetrics().density;
+        var width = Math.round(300 * dp);
+        var card = new AgendaCardView(normal, session(1, MONDAY, "Algorithms", "H1"), NameStyle.LAST_NAME);
+        var bar = CourseColors.resolve(normal, RED);
+        var x = Math.round(6.2f * dp);
+
+        card.measure(makeMeasureSpec(width, EXACTLY), makeMeasureSpec(0, UNSPECIFIED));
+        card.layout(0, 0, width, card.getMeasuredHeight());
+        assertEquals(bar, draw(card).getPixel(x, card.getHeight() / 2));
+
+        card.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+        card.measure(makeMeasureSpec(width, EXACTLY), makeMeasureSpec(0, UNSPECIFIED));
+        card.layout(0, 0, width, card.getMeasuredHeight());
+        assertEquals(bar, draw(card).getPixel(width - 1 - x, card.getHeight() / 2));
+    }
+
+    @Test
+    public void theFirstDayOfTheHeaderIsOnTheRightInALayoutFromRightToLeft() {
+        var dp = normal.getResources().getDisplayMetrics().density;
+        var metrics = new GridMetrics(normal);
+        var width = 1000;
+        var header = new WeekHeaderView(normal, metrics);
+        // Today is the Monday, which the header marks with a filled circle.
+        header.bind(MONDAY, MONDAY);
+        var accent = ContextCompat.getColor(normal, R.color.accent);
+        var mondayX = Math.round(metrics.gutter + metrics.columnWidth(width) / 2);
+        // Inside the circle and beside the number.
+        var offset = Math.round(12 * dp);
+        var y = Math.round(metrics.headerHeight * 0.70f);
+
+        layOut(header, width, metrics.headerHeight);
+        assertEquals(accent, draw(header).getPixel(mondayX - offset, y));
+
+        header.setLayoutDirection(LAYOUT_DIRECTION_RTL);
+        layOut(header, width, metrics.headerHeight);
+        var mirrored = draw(header);
+        assertEquals(accent, mirrored.getPixel(width - mondayX - offset, y));
+        assertNotEquals(accent, mirrored.getPixel(mondayX - offset, y));
     }
 }
