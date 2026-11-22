@@ -213,9 +213,9 @@ public class WeekViewsTest {
 
     // --- a phone held sideways ---
 
-    private Context withScreen(int heightDp, float fontScale) {
+    private Context withScreen(int widthDp, int heightDp, float fontScale) {
         var configuration = new Configuration(normal.getResources().getConfiguration());
-        configuration.screenWidthDp = 640;
+        configuration.screenWidthDp = widthDp;
         configuration.screenHeightDp = heightDp;
         configuration.fontScale = fontScale;
         return new ContextThemeWrapper(normal.createConfigurationContext(configuration), R.style.Theme_UniPensum);
@@ -223,17 +223,17 @@ public class WeekViewsTest {
 
     @Test
     public void theHeaderIsCompactOnAScreenLessThan480dpHighButNotForLargeText() {
-        assertTrue(CompactHeader.wanted(withScreen(360, 1f)));
-        assertTrue(CompactHeader.wanted(withScreen(479, 1f)));
-        assertFalse(CompactHeader.wanted(withScreen(480, 1f)));
-        assertFalse(CompactHeader.wanted(withScreen(800, 1f)));
+        assertTrue(CompactHeader.wanted(withScreen(640, 360, 1f)));
+        assertTrue(CompactHeader.wanted(withScreen(640, 479, 1f)));
+        assertFalse(CompactHeader.wanted(withScreen(640, 480, 1f)));
+        assertFalse(CompactHeader.wanted(withScreen(400, 800, 1f)));
         // From font scale 1.3 the days are a list, and the texts need the room.
-        assertFalse(CompactHeader.wanted(withScreen(360, 1.3f)));
+        assertFalse(CompactHeader.wanted(withScreen(640, 360, 1.3f)));
     }
 
     @Test
     public void theDateRangeStandsBesideTheNameAndTheHeaderLosesHeight() {
-        var context = withScreen(360, 1f);
+        var context = withScreen(640, 360, 1f);
         var dp = context.getResources().getDisplayMetrics().density;
         var width = Math.round(640 * dp);
         var height = Math.round(360 * dp);
@@ -262,6 +262,34 @@ public class WeekViewsTest {
         assertTrue(title.getWidth() <= Math.round(0.55f * (640 - 3 * 48 - 24) * dp) + 1);
         assertTrue(subtitle.getLeft() >= title.getRight());
         assertEquals(1, subtitle.getLineCount());
+    }
+
+    /** A phone held sideways is 914dp wide, but the week beside an open page has only about 550dp of it. */
+    @Test
+    public void theDateRangeKeepsRoomBesideALongNameWhenThePageIsOpen() {
+        var context = withScreen(914, 411, 1f);
+        var dp = context.getResources().getDisplayMetrics().density;
+        var width = Math.round(550 * dp);
+        var height = Math.round(411 * dp);
+        var root = LayoutInflater.from(context).inflate(R.layout.fragment_week, null);
+        var title = (TextView) root.findViewById(R.id.title);
+        var subtitle = (TextView) root.findViewById(R.id.subtitle);
+        title.setText("Wintersemester 2026/27 Informatik Master");
+        subtitle.setText("Nov 23 – Nov 27 · Week 48");
+
+        CompactHeader.apply(root);
+        layOut(root, width, height);
+
+        // the room of the two texts is 550dp less the buttons and the padding, and the name takes 55 % of it
+        var room = Math.round((550 - 3 * 48 - 24) * dp);
+        assertTrue(title.getWidth() <= Math.round(0.55f * room) + 1);
+        assertTrue(subtitle.getWidth() >= Math.round(100 * dp));
+        assertTrue(subtitle.getLeft() >= title.getRight());
+        assertTrue(subtitle.getRight() <= ((View) title.getParent()).getWidth());
+        // The name is cut off at its end and the header stays as high as its buttons.
+        assertEquals(1, title.getLineCount());
+        var row = (View) ((View) title.getParent()).getParent();
+        assertTrue(row.getHeight() <= Math.round(48 * dp) + Math.round(2 * 4 * dp) + 1);
     }
 
     // --- right to left ---
