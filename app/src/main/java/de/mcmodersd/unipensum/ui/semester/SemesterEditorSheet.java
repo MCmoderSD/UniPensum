@@ -73,7 +73,6 @@ public final class SemesterEditorSheet extends UpSheet {
     private UpRow startRow;
     private UpRow endRow;
     private UpTextField nameField;
-    private TextView errorView;
     private LiveMessage errorMessage;
     private UpButton saveButton;
 
@@ -149,7 +148,7 @@ public final class SemesterEditorSheet extends UpSheet {
         if (name != null) nameField.setText(name);
         column.addView(nameField, spaced(dp, 8));
 
-        errorView = new TextView(context);
+        var errorView = new TextView(context);
         errorView.setTextAppearance(TextAppearance_Up_Error);
         // A text appearance takes over the text only, not the live region of the style: a screen reader says the
         // message when it shows, only if this is set as well.
