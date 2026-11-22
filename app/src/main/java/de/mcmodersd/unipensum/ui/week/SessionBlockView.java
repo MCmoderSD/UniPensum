@@ -28,6 +28,7 @@ import androidx.core.graphics.ColorUtils;
 import de.mcmodersd.unipensum.data.SessionView;
 import de.mcmodersd.unipensum.domain.model.NameStyle;
 import de.mcmodersd.unipensum.ui.format.CourseColors;
+import de.mcmodersd.unipensum.ui.format.HyphenationLanguage;
 import de.mcmodersd.unipensum.ui.format.SeriesFormat;
 import de.mcmodersd.unipensum.ui.format.TimeFormat;
 import de.mcmodersd.unipensum.ui.widget.FocusRing;
@@ -90,6 +91,11 @@ final class SessionBlockView extends LinearLayout {
         // Two sessions side by side leave very little width; hyphenate instead of breaking inside a word.
         title.setHyphenationFrequency(HYPHENATION_FREQUENCY_FULL);
         title.setBreakStrategy(BREAK_STRATEGY_HIGH_QUALITY);
+        // A name in Latin letters on a device in Arabic, say, has no patterns of its own to be hyphenated by.
+        var language = HyphenationLanguage.of(
+                session.courseName(), context.getResources().getConfiguration().getLocales().get(0)
+        );
+        if (language != null) title.setTextLocale(language);
         time = line(
                 context, false, TimeFormat.time(context, details.startMin()) + BREAKABLE_DASH
                         + TimeFormat.time(context, details.endMin())
