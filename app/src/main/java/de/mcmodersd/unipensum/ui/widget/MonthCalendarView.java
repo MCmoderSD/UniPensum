@@ -199,6 +199,11 @@ public class MonthCalendarView extends LinearLayout {
             return day.getDayOfWeek().getValue() - 1;
         }
 
+        /** Where a column is drawn, counted from the left: Monday is on the right when the layout runs from right to left. */
+        private int slot(int column) {
+            return Mirror.isRtl(this) ? columns() - 1 - column : column;
+        }
+
         /** Row of the day within the month, counted from the week of the 1st. */
         private int weekRowOf(LocalDate day) {
             var offset = columnOf(month.atDay(1));
@@ -231,7 +236,7 @@ public class MonthCalendarView extends LinearLayout {
 
             for (var c = 0; c < columns(); c++) {
                 var label = DayOfWeek.of(c + 1).getDisplayName(TextStyle.SHORT, locale);
-                canvas.drawText(label, cellWidth * (c + 0.5f), labelHeight * 0.7f, labelPaint);
+                canvas.drawText(label, cellWidth * (slot(c) + 0.5f), labelHeight * 0.7f, labelPaint);
             }
 
             var today = LocalDate.now();
@@ -239,7 +244,7 @@ public class MonthCalendarView extends LinearLayout {
                 var day = month.atDay(d);
                 var column = columnOf(day);
                 if (column >= columns()) continue;
-                var centerX = cellWidth * (column + 0.5f);
+                var centerX = cellWidth * (slot(column) + 0.5f);
                 var centerY = labelHeight + (weekRowOf(day) - firstVisibleRow() + 0.5f) * cellHeight;
                 var radius = Math.min(cellWidth, cellHeight) * 0.42f;
 
@@ -318,7 +323,7 @@ public class MonthCalendarView extends LinearLayout {
         /** @return the day drawn at that point, or {@code null} for gaps and the weekday labels */
         private LocalDate dayAt(float x, float y) {
             if (y < labelHeight || x < 0 || x >= getWidth()) return null;
-            var column = (int) (x / (getWidth() / (float) columns()));
+            var column = slot((int) (x / (getWidth() / (float) columns())));
             var row = (int) ((y - labelHeight) / cellHeight) + firstVisibleRow();
             for (var d = 1; d <= month.lengthOfMonth(); d++) {
                 var day = month.atDay(d);
@@ -346,7 +351,7 @@ public class MonthCalendarView extends LinearLayout {
 
         private void cellBounds(LocalDate day, Rect out) {
             var cellWidth = getWidth() / (float) columns();
-            var left = Math.round(cellWidth * columnOf(day));
+            var left = Math.round(cellWidth * slot(columnOf(day)));
             var top = Math.round(labelHeight + (weekRowOf(day) - firstVisibleRow()) * cellHeight);
             out.set(left, top, Math.round(left + cellWidth), Math.round(top + cellHeight));
         }

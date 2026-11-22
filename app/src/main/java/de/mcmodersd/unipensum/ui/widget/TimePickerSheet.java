@@ -132,6 +132,8 @@ public final class TimePickerSheet extends UpSheet {
 
         var colon = colon(context, 22);
         var wheels = new LinearLayout(context);
+        // A time reads hours, then minutes, from left to right in every language.
+        wheels.setLayoutDirection(LAYOUT_DIRECTION_LTR);
         wheels.setGravity(CENTER);
         wheels.addView(hourWheel, new LinearLayout.LayoutParams(Math.round(88 * dp), WRAP_CONTENT));
         wheels.addView(colon, new LinearLayout.LayoutParams(Math.round(20 * dp), WRAP_CONTENT));
@@ -182,6 +184,7 @@ public final class TimePickerSheet extends UpSheet {
         );
 
         var row = new LinearLayout(context);
+        row.setLayoutDirection(LAYOUT_DIRECTION_LTR);
         row.setGravity(CENTER);
         var hour = named(context, dp, hourInput, time_hour);
         row.addView(hour);

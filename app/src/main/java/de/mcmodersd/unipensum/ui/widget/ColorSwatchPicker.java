@@ -112,6 +112,12 @@ public class ColorSwatchPicker extends View {
         return (colors.length + COLUMNS - 1) / COLUMNS;
     }
 
+    /** Where the swatch of an index is drawn, counted from the left: the first one is on the right in right-to-left. */
+    private int slot(int index) {
+        var column = index % COLUMNS;
+        return Mirror.isRtl(this) ? COLUMNS - 1 - column : column;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), Math.round(rows() * cellHeight));
@@ -122,7 +128,7 @@ public class ColorSwatchPicker extends View {
         var cellWidth = getWidth() / (float) COLUMNS;
         var radius = Math.min(cellWidth, cellHeight) * 0.34f;
         for (var i = 0; i < colors.length; i++) {
-            var cx = cellWidth * (i % COLUMNS + 0.5f);
+            var cx = cellWidth * (slot(i) + 0.5f);
             var row = i / COLUMNS;
             var cy = cellHeight * (row + 0.5f);
             fill.setColor(CourseColors.resolve(getContext(), colors[i]));
@@ -132,8 +138,8 @@ public class ColorSwatchPicker extends View {
             if (isFocused() && accessibility.getKeyboardFocusedVirtualViewId() == i) {
                 var inset = FOCUS_INSET_DP * dp;
                 focusBounds.set(
-                        cellWidth * (i % COLUMNS) + inset, cellHeight * row + inset,
-                        cellWidth * (i % COLUMNS + 1) - inset, cellHeight * (row + 1) - inset
+                        cellWidth * slot(i) + inset, cellHeight * row + inset,
+                        cellWidth * (slot(i) + 1) - inset, cellHeight * (row + 1) - inset
                 );
                 canvas.drawRoundRect(focusBounds, FOCUS_RADIUS_DP * dp, FOCUS_RADIUS_DP * dp, focusRing);
             }
@@ -160,7 +166,8 @@ public class ColorSwatchPicker extends View {
     }
 
     private int indexAt(float x, float y) {
-        var column = Math.min(COLUMNS - 1, (int) (x / (getWidth() / (float) COLUMNS)));
+        var slot = Math.min(COLUMNS - 1, (int) (x / (getWidth() / (float) COLUMNS)));
+        var column = Mirror.isRtl(this) ? COLUMNS - 1 - slot : slot;
         var index = (int) (y / cellHeight) * COLUMNS + column;
         return index >= 0 && index < colors.length ? index : -1;
     }
@@ -175,7 +182,7 @@ public class ColorSwatchPicker extends View {
 
     private void cellBounds(int index, Rect out) {
         var cellWidth = getWidth() / (float) COLUMNS;
-        var left = Math.round(cellWidth * (index % COLUMNS));
+        var left = Math.round(cellWidth * slot(index));
         var row = index / COLUMNS;
         var top = Math.round(cellHeight * row);
         out.set(left, top, Math.round(left + cellWidth), Math.round(top + cellHeight));
