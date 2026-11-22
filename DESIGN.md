@@ -404,7 +404,8 @@ Tactile slabs that fill the width they are given.
 - **Focus:** a 1.5dp Ink stroke.
 - **Error:** a 1.5dp Danger stroke and a Small message in Danger below the field. The message is a live region, so a
   screen reader says it when it shows, and the field carries it too. A form that refuses its input moves the focus to
-  the first field it refused.
+  the first field it refused. A message that is shown again, as the answer to a second press on Save, is cleared and
+  set again a moment later (`LiveMessage`), because a screen reader does not say the same text twice in a row.
 
 ### Rows
 - **Style:** a Card Gray card (14dp, at least 56dp tall) with a Body title, an optional Small subtitle, an optional
@@ -449,7 +450,8 @@ The heart of the app: one session in the week grid.
 - **Color:** the course color as an 18% tint, with a 3dp bar in the full course color along the start edge.
 - **Text:** the course name in block title type and Ink, then the details in block detail type and Detail Gray: time,
   room or mode ("A2 | Hybrid", "Online"), type, lecturer. Below 52dp of width the type steps down (9.5 and 9sp) and the
-  padding tightens.
+  padding tightens. The name is hyphenated by the language of the device, or by English for a name in Latin letters on a
+  device in another script, Arabic or Hebrew, which has no patterns for it.
 - **Overlap:** a session that overlaps another gets a dashed 1.5dp outline in its course color (4dp dashes, 3dp gaps).
 - **State:** pressed 65% opacity; a tap opens the session sheet; keyboard focus the Focus Ring.
 - **Screen reader:** "Tuesday, Oct 13, Algorithms, Lecture, 8:00 AM – 11:15 AM": the day comes first, because the
@@ -509,7 +511,8 @@ font scale of 1.3, gives every session a card of full height.
 - **Do** make a custom control say what it is to a screen reader: a role, its state, its name, and the day on a
   session; mark titles and sections as headings.
 - **Do** name every field with its label view (`labelFor`), make every message that appears after an action a live
-  region, and give every page that opens a pane title.
+  region that is shown through `LiveMessage`, so that it is said again when it is shown again, and give every page
+  that opens a pane title.
 - **Do** let a keyboard do what a finger does: every control a stop of the Tab key with the Focus Ring, a grid that draws
   its cells with arrow keys and Enter.
 - **Do** let a text grow: use sp, let a line wrap, and size what holds text from the text.
