@@ -200,6 +200,7 @@ public final class TimePickerSheet extends UpSheet {
         var caption = new TextView(context);
         caption.setText(name);
         caption.setGravity(CENTER);
+        caption.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         caption.setTextSize(COMPLEX_UNIT_SP, 13);
         caption.setTextColor(ContextCompat.getColor(context, text_secondary));
         caption.setPadding(0, Math.round(6 * dp), 0, 0);
@@ -338,6 +339,7 @@ public final class TimePickerSheet extends UpSheet {
         var colon = new TextView(context);
         colon.setText(":");
         colon.setGravity(CENTER);
+        colon.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         colon.setTextSize(COMPLEX_UNIT_SP, sp);
         colon.setTextColor(ContextCompat.getColor(context, text_primary));
         return colon;

@@ -31,6 +31,7 @@ public class UpButton extends AppCompatTextView {
         var dp = getResources().getDisplayMetrics().density;
 
         setGravity(CENTER);
+        setTextAlignment(TEXT_ALIGNMENT_CENTER);
         setMinHeight(Math.round(52 * dp));
         setPadding(Math.round(20 * dp), 0, Math.round(20 * dp), 0);
         setTextSize(COMPLEX_UNIT_SP, 16);

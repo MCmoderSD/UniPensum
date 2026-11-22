@@ -181,6 +181,7 @@ public class WheelPicker extends RecyclerView {
             var view = new TextView(parent.getContext());
             view.setLayoutParams(new LayoutParams(MATCH_PARENT, itemHeight));
             view.setGravity(CENTER);
+            view.setTextAlignment(TEXT_ALIGNMENT_CENTER);
             view.setTextSize(COMPLEX_UNIT_SP, 22);
             view.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
             view.setTextColor(ContextCompat.getColor(parent.getContext(), text_primary));

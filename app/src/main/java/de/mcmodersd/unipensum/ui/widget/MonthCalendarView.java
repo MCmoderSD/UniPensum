@@ -86,6 +86,7 @@ public class MonthCalendarView extends LinearLayout {
 
         monthTitle = new TextView(context);
         monthTitle.setGravity(CENTER);
+        monthTitle.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         monthTitle.setTextSize(COMPLEX_UNIT_SP, 17);
         monthTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         monthTitle.setTextColor(ContextCompat.getColor(context, text_primary));

@@ -100,6 +100,7 @@ public class UpSegmentedControl extends LinearLayout {
             var segment = new TextView(getContext());
             segment.setText(labels[i]);
             segment.setGravity(CENTER);
+            segment.setTextAlignment(TEXT_ALIGNMENT_CENTER);
             segment.setMaxLines(1);
             segment.setEllipsize(TextUtils.TruncateAt.END);
             segment.setTextSize(COMPLEX_UNIT_SP, 14);

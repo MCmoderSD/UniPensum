@@ -68,6 +68,7 @@ public class UpStepper extends LinearLayout {
 
         valueView = new TextView(context);
         valueView.setGravity(CENTER);
+        valueView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         valueView.setTextSize(COMPLEX_UNIT_SP, 16);
         valueView.setTextColor(ContextCompat.getColor(context, text_primary));
 

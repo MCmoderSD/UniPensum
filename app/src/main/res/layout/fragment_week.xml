@@ -124,7 +124,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_2"
             android:gravity="center"
-            android:text="@string/empty_body" />
+            android:text="@string/empty_body"
+            android:textAlignment="center" />
 
         <de.mcmodersd.unipensum.ui.widget.UpButton
             android:id="@+id/create_semester"

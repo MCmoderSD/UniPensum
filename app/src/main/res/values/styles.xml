@@ -44,4 +44,9 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/danger</item>
     </style>
+
+    <!-- Every TextView of the app, see Theme.UniPensum. -->
+    <style name="Widget.Up.TextView" parent="Widget.AppCompat.TextView">
+        <item name="android:textAlignment">viewStart</item>
+    </style>
 </resources>
