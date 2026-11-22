@@ -94,6 +94,7 @@ public class WeekFragment extends Fragment {
         openCourses = view.findViewById(open_courses);
         pager = view.findViewById(R.id.pager);
         zoomIndicator = view.findViewById(zoom_indicator);
+        if (CompactHeader.wanted(requireContext())) CompactHeader.apply(view);
 
         viewModel = new ViewModelProvider(this).get(WeekViewModel.class);
         var adapter = new WeekPagerAdapter();

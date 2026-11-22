@@ -329,8 +329,10 @@ header and no zoom in this mode. A person who needs the large text cannot ask fo
 limit, and a setting for the week view would be the way out.
 
 **Orientation.** The app turns on phones and tablets. In landscape a window of 720dp and more splits into week and
-page, so a phone held sideways shows both. On a small phone held sideways (640 x 360dp) the header takes about half
-of the height, so the grid shows three hours at a time and scrolls for the rest; a sub-page covers the week there.
+page, so a phone held sideways shows both. On a screen less than 480dp high the header is compact: the date range
+stands beside the name of the semester, and the header is as high as its buttons. The grid of a phone of 640 x 360dp
+then shows four and a half hours at a time and scrolls for the rest, and a sub-page covers the week there. For large
+text, where the days are a list, the header keeps its two lines.
 
 **Sub-pages and sheets.** A sub-page (settings, courses, editors) has a 56dp top bar with a back arrow and a Title.
 The title is also the name of the page for a screen reader, which says it when the page opens ("Courses, Winter 26/27"
