@@ -181,6 +181,11 @@ public class UpTextField extends LinearLayout {
     /** One of the {@link InputType} class constants, for example {@link InputType#TYPE_TEXT_VARIATION_URI}. */
     public void setInputType(int inputType) {
         input.setInputType(inputType);
+        // An address, a link and a number are typed from left to right in every language.
+        var variation = inputType & TYPE_MASK_VARIATION;
+        var plain = (inputType & TYPE_MASK_CLASS) == TYPE_CLASS_PHONE
+                || variation == TYPE_TEXT_VARIATION_URI || variation == TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+        input.setTextDirection(plain ? TEXT_DIRECTION_LTR : TEXT_DIRECTION_INHERIT);
     }
 
     private void updateStroke(boolean focused) {

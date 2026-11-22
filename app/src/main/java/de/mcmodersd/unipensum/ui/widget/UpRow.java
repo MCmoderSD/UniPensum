@@ -148,6 +148,14 @@ public class UpRow extends LinearLayout {
         title.setText(text);
     }
 
+    /**
+     * A phone number, an address or a link has no language of its own: left to the direction of the layout, the groups
+     * of digits of a number come out in reverse order. It reads from left to right whatever the layout.
+     */
+    public void keepTitleLeftToRight() {
+        title.setTextDirection(TEXT_DIRECTION_LTR);
+    }
+
     public void setSubtitle(CharSequence text) {
         subtitle.setText(text);
         subtitle.setVisibility(TextUtils.isEmpty(text) ? GONE : VISIBLE);
