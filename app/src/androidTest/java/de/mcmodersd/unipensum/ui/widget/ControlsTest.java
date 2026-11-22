@@ -11,6 +11,7 @@ import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentat
 import static org.junit.Assert.*;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.view.ContextThemeWrapper;
@@ -228,6 +229,52 @@ public class ControlsTest {
         assertNotEquals(Button.class.getName(), row.getAccessibilityClassName());
         row.setOnClickListener(v -> { });
         assertEquals(Button.class.getName(), row.getAccessibilityClassName());
+    }
+
+    private Context withFontScale(float scale) {
+        var configuration = new Configuration(context.getResources().getConfiguration());
+        configuration.fontScale = scale;
+        return new ContextThemeWrapper(context.createConfigurationContext(configuration), R.style.Theme_UniPensum);
+    }
+
+    /**
+     * A row and a segmented control change their own structure while they measure, so a second measure of the same
+     * width must find the structure of the first and not change it back and forth.
+     */
+    @Test
+    public void measuringARowAndASegmentedControlAgainGivesTheSameLayoutAtLargeText() {
+        var large = withFontScale(2f);
+        var row = new UpRow(large);
+        row.setTitle("UniPensum");
+        row.setValue("Version 1.0-SNAPSHOT");
+        var texts = (ViewGroup) row.getChildAt(0);
+        var control = new UpSegmentedControl(large);
+        control.setOptions("Lecture", "Exercise", "Laboratory", "Tutorial");
+
+        for (var mode : new int[]{EXACTLY, AT_MOST}) {
+            for (var width : new int[]{150, 300, 1000, 300, 150}) {
+                var widthSpec = makeMeasureSpec(Math.round(width * dp), mode);
+                var heightSpec = makeMeasureSpec(4000, AT_MOST);
+
+                row.measure(widthSpec, heightSpec);
+                var rowHeight = row.getMeasuredHeight();
+                var rowTexts = texts.getChildCount();
+                row.forceLayout();
+                row.measure(widthSpec, heightSpec);
+                assertEquals(rowHeight, row.getMeasuredHeight());
+                assertEquals(rowTexts, texts.getChildCount());
+
+                control.measure(widthSpec, heightSpec);
+                var orientation = control.getOrientation();
+                var controlWidth = control.getMeasuredWidth();
+                var controlHeight = control.getMeasuredHeight();
+                control.forceLayout();
+                control.measure(widthSpec, heightSpec);
+                assertEquals(orientation, control.getOrientation());
+                assertEquals(controlWidth, control.getMeasuredWidth());
+                assertEquals(controlHeight, control.getMeasuredHeight());
+            }
+        }
     }
 
     @Test
