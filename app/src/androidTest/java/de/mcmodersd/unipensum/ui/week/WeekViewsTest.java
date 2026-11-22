@@ -20,7 +20,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
@@ -166,6 +168,59 @@ public class WeekViewsTest {
         );
         assertTrue(description, description.contains(day));
         assertTrue(description, description.contains("Algorithms"));
+    }
+
+    // --- a phone held sideways ---
+
+    private Context withScreen(int heightDp, float fontScale) {
+        var configuration = new Configuration(normal.getResources().getConfiguration());
+        configuration.screenWidthDp = 640;
+        configuration.screenHeightDp = heightDp;
+        configuration.fontScale = fontScale;
+        return new ContextThemeWrapper(normal.createConfigurationContext(configuration), R.style.Theme_UniPensum);
+    }
+
+    @Test
+    public void theHeaderIsCompactOnAScreenLessThan480dpHighButNotForLargeText() {
+        assertTrue(CompactHeader.wanted(withScreen(360, 1f)));
+        assertTrue(CompactHeader.wanted(withScreen(479, 1f)));
+        assertFalse(CompactHeader.wanted(withScreen(480, 1f)));
+        assertFalse(CompactHeader.wanted(withScreen(800, 1f)));
+        // From font scale 1.3 the days are a list, and the texts need the room.
+        assertFalse(CompactHeader.wanted(withScreen(360, 1.3f)));
+    }
+
+    @Test
+    public void theDateRangeStandsBesideTheNameAndTheHeaderLosesHeight() {
+        var context = withScreen(360, 1f);
+        var dp = context.getResources().getDisplayMetrics().density;
+        var width = Math.round(640 * dp);
+        var height = Math.round(360 * dp);
+        var root = LayoutInflater.from(context).inflate(R.layout.fragment_week, null);
+        var title = (TextView) root.findViewById(R.id.title);
+        var subtitle = (TextView) root.findViewById(R.id.subtitle);
+        title.setText("Winter 26/27");
+        subtitle.setText("Nov 23 – Nov 27 · Week 48");
+        var row = (View) ((View) title.getParent()).getParent();
+
+        layOut(root, width, height);
+        var high = row.getHeight();
+        assertTrue(subtitle.getTop() >= title.getBottom());
+
+        CompactHeader.apply(root);
+        layOut(root, width, height);
+        assertTrue(row.getHeight() < high);
+        // as high as the buttons of 48dp and the little space around them
+        assertTrue(row.getHeight() <= Math.round(48 * dp) + Math.round(2 * 4 * dp) + 1);
+        assertEquals(LinearLayout.HORIZONTAL, ((LinearLayout) title.getParent()).getOrientation());
+        assertTrue(subtitle.getLeft() >= title.getRight());
+
+        // A long name is cut off and the date range stays whole.
+        title.setText("Introduction to the Mathematics of Computer Science and Its Applications");
+        layOut(root, width, height);
+        assertTrue(title.getWidth() <= Math.round(0.55f * (640 - 3 * 48 - 24) * dp) + 1);
+        assertTrue(subtitle.getLeft() >= title.getRight());
+        assertEquals(1, subtitle.getLineCount());
     }
 
     // --- right to left ---
