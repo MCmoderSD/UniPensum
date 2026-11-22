@@ -40,6 +40,9 @@ public class UpRow extends LinearLayout {
     private ImageView leadingIcon;
     /** Whether the value stands under the texts because there is no room for it beside them. */
     private boolean valueBelow;
+    /** The widths the decision about the value needs, measured once per text and not on every measure; -1 for not known. */
+    private float wordsWidth = -1;
+    private float valueWidth = -1;
 
     public UpRow(Context context) {
         this(context, null);
@@ -118,8 +121,9 @@ public class UpRow extends LinearLayout {
             // An icon button measures itself.
             fixed += (params.width > 0 ? params.width : UpIconButton.SIZE_DP * dp) + params.getMarginStart() + params.getMarginEnd();
         }
-        var words = Math.max(longestWord(title), longestWord(subtitle));
-        return words + value.getPaint().measureText(value.getText().toString()) + fixed > width;
+        if (wordsWidth < 0) wordsWidth = Math.max(longestWord(title), longestWord(subtitle));
+        if (valueWidth < 0) valueWidth = value.getPaint().measureText(value.getText().toString());
+        return wordsWidth + valueWidth + fixed > width;
     }
 
     private static float longestWord(TextView view) {
@@ -146,6 +150,7 @@ public class UpRow extends LinearLayout {
 
     public void setTitle(CharSequence text) {
         title.setText(text);
+        wordsWidth = -1;
     }
 
     /**
@@ -159,11 +164,13 @@ public class UpRow extends LinearLayout {
     public void setSubtitle(CharSequence text) {
         subtitle.setText(text);
         subtitle.setVisibility(TextUtils.isEmpty(text) ? GONE : VISIBLE);
+        wordsWidth = -1;
     }
 
     public void setValue(CharSequence text) {
         value.setText(text);
         value.setVisibility(TextUtils.isEmpty(text) ? GONE : VISIBLE);
+        valueWidth = -1;
     }
 
     public void setChevronVisible(boolean visible) {

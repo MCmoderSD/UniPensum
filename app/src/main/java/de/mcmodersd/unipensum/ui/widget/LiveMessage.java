@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -21,7 +22,10 @@ public final class LiveMessage {
 
     /** Two messages set in the same frame reach a screen reader as one change, of which it says only one. */
     private static final long STAGGER_MILLIS = 150;
-    /** When the next message that is shown again may be set, so that every one of them is a change of its own. */
+    /**
+     * When the next message that is shown again may be set, so that every one of them is a change of its own. Only
+     * the main thread touches it, like the views.
+     */
     private static long free;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -30,14 +34,27 @@ public final class LiveMessage {
 
     public LiveMessage(TextView view) {
         this.view = view;
+        // A message that waits for its frame must not outlive the view: it would hold on to it a little longer.
+        view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View attached) { }
+
+            @Override
+            public void onViewDetachedFromWindow(View detached) {
+                cancel();
+            }
+        });
+    }
+
+    private void cancel() {
+        if (pending == null) return;
+        handler.removeCallbacks(pending);
+        pending = null;
     }
 
     /** Shows the message, or hides the view and forgets the text for {@code null}. */
     public void show(@Nullable CharSequence message) {
-        if (pending != null) {
-            handler.removeCallbacks(pending);
-            pending = null;
-        }
+        cancel();
         if (message == null) {
             view.setText(null);
             view.setVisibility(GONE);
